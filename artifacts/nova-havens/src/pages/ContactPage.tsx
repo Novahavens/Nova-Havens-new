@@ -50,13 +50,16 @@ export default function ContactPage() {
     <div className="w-full">
       {/* Hero */}
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
-        <div className="mx-auto max-w-[1200px] w-full text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6" data-testid="heading-contact-hero">
-            Get in Touch
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto" data-testid="text-contact-subtitle">
-            Have a question? We're here to help.
-          </p>
+        <div className="mx-auto max-w-[1200px] w-full">
+          <div className="max-w-3xl">
+            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">Contact Nova Havens</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6" data-testid="heading-contact-hero">
+              Request Emergency Housing or Get in Touch
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed" data-testid="text-contact-subtitle">
+              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-[#D4A24C] font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a> or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -64,27 +67,27 @@ export default function ContactPage() {
         {/* Quick Action Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           <div className="bg-card rounded-[16px] border border-white/10 p-8 flex flex-col items-center text-center">
-            <h2 className="text-2xl font-bold mb-3 text-foreground">Need Housing Now?</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">Displaced Family or Adjuster?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              If you have a claim and need immediate placement, let's get your request started.
+              If you have an active insurance claim and need immediate furnished housing placement, Nova Havens responds 24/7. Start your request here.
             </p>
-            <Link href="#" className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-request-housing">
-              Request Housing
+            <Link href="#contact-form" className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-request-housing">
+              Request Housing Now
             </Link>
           </div>
           
           <div className="bg-card rounded-[16px] border border-white/10 p-8 flex flex-col items-center text-center">
-            <h2 className="text-2xl font-bold mb-3 text-foreground">Own a Property?</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">Own a Furnished Property?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Join our network of verified furnished homes and start hosting displaced families.
+              Join the Nova Havens network of 20,000+ verified furnished homes and start hosting displaced families — with carrier billing handled entirely by Nova Havens.
             </p>
-            <Link href="#" className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-submit-property">
+            <Link href="#contact-form" className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-submit-property">
               Submit Your Property
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8" id="contact-form">
           
           {/* Contact Info Side */}
           <div className="lg:col-span-1 space-y-6">
@@ -93,7 +96,7 @@ export default function ContactPage() {
                 <Phone className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-1">Phone</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-1">Phone — 24/7 for emergency claims</h3>
                 <a href="tel:6294010054" className="text-lg font-bold text-foreground hover:text-primary transition-colors block">
                   (629) 401-0054
                 </a>
@@ -105,7 +108,7 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-1">Email</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-1">Email — general inquiries</h3>
                 <a href="mailto:info@novahavens.com" className="text-lg font-bold text-foreground hover:text-primary transition-colors block">
                   info@novahavens.com
                 </a>
@@ -117,22 +120,24 @@ export default function ContactPage() {
                 <MapPin className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-1">Location</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-1">Headquarters</h3>
                 <span className="text-lg font-bold text-foreground block">
                   Nashville, TN
                 </span>
+                <span className="text-sm text-muted-foreground">Serving all 48 contiguous US states</span>
               </div>
             </div>
           </div>
 
           {/* Form Side */}
           <div className="lg:col-span-2 bg-card rounded-[16px] border border-white/10 p-8 md:p-10">
-            <h2 className="text-2xl font-bold mb-8 text-foreground" data-testid="heading-form">Send a Message</h2>
+            <h2 className="text-2xl font-bold mb-2 text-foreground" data-testid="heading-form">Send a Message to Nova Havens</h2>
+            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-[#D4A24C] font-semibold">(629) 401-0054</a> directly — 24/7.</p>
             
             {isSubmitted ? (
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 text-center" data-testid="message-success">
                 <p className="text-primary font-bold text-lg mb-2">Thank you!</p>
-                <p className="text-muted-foreground">We've received your message and will be in touch within one business day.</p>
+                <p className="text-muted-foreground">Nova Havens has received your message and will be in touch within one business day. For urgent requests, call (629) 401-0054.</p>
               </div>
             ) : (
               <Form {...form}>
@@ -194,9 +199,9 @@ export default function ContactPage() {
                             </FormControl>
                             <SelectContent className="bg-card border-white/10 text-foreground">
                               <SelectItem value="General Inquiry">General Inquiry</SelectItem>
-                              <SelectItem value="Housing Request">Housing Request</SelectItem>
-                              <SelectItem value="Property Submission">Property Submission</SelectItem>
-                              <SelectItem value="Partnership">Partnership</SelectItem>
+                              <SelectItem value="Housing Request">Housing Request — Displaced Family or Adjuster</SelectItem>
+                              <SelectItem value="Property Submission">Property Submission — Join the Network</SelectItem>
+                              <SelectItem value="Partnership">Carrier or Partner Inquiry</SelectItem>
                               <SelectItem value="Press">Press</SelectItem>
                             </SelectContent>
                           </Select>
@@ -214,7 +219,7 @@ export default function ContactPage() {
                         <FormLabel className="text-muted-foreground">Message *</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="How can we help you?" 
+                            placeholder="Describe your housing need, claim details, property, or question — the more context you provide, the faster Nova Havens can help." 
                             className="bg-[#0A0C10] border-white/10 text-foreground min-h-[150px]" 
                             {...field} 
                             data-testid="input-message"
