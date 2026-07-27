@@ -16,6 +16,8 @@
 import type { Plugin, IndexHtmlTransformContext } from 'vite';
 import { resolveRouteMeta } from './src/lib/routeMeta.ts';
 
+const DEFAULT_OG_IMAGE = 'https://novahavens.com/og-image.png';
+
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -75,6 +77,14 @@ export function metaInjectPlugin(): Plugin {
           .replace(
             /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/,
             `<meta name="twitter:description" content="${escapeAttr(meta.description)}" />`,
+          )
+          .replace(
+            /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/,
+            `<meta property="og:image" content="${escapeAttr(meta.ogImage ?? DEFAULT_OG_IMAGE)}" />`,
+          )
+          .replace(
+            /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/,
+            `<meta name="twitter:image" content="${escapeAttr(meta.ogImage ?? DEFAULT_OG_IMAGE)}" />`,
           )
           // Replace canonical link if present
           .replace(

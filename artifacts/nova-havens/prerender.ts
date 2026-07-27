@@ -21,6 +21,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ALL_ROUTES, resolveRouteMeta } from './src/lib/routeMeta.ts';
+
+const DEFAULT_OG_IMAGE = 'https://novahavens.com/og-image.png';
 import { getRouteBodyHtml } from './src/lib/routeContent.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -77,6 +79,14 @@ function injectMeta(html: string, pathname: string): string {
     .replace(
       /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/,
       `<meta name="twitter:description" content="${escapeAttr(meta.description)}" />`,
+    )
+    .replace(
+      /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/,
+      `<meta property="og:image" content="${escapeAttr(meta.ogImage ?? DEFAULT_OG_IMAGE)}" />`,
+    )
+    .replace(
+      /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/,
+      `<meta name="twitter:image" content="${escapeAttr(meta.ogImage ?? DEFAULT_OG_IMAGE)}" />`,
     )
     // Update canonical link
     .replace(

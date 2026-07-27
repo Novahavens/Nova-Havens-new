@@ -16,6 +16,11 @@ export interface RouteMeta {
   description: string;
   ogType: string;
   canonicalUrl: string;
+  /**
+   * Absolute URL for og:image / twitter:image.
+   * Defaults to the site-wide og-image.png when omitted.
+   */
+  ogImage?: string;
   /** Structured data object to inject as a <script type="application/ld+json"> in the <head>. */
   jsonLd?: Record<string, unknown> | null;
 }
@@ -288,11 +293,13 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
           name: SITE_NAME,
         };
 
+    const postOgImage = `${BASE_URL}/og-blog-${post.slug}.png`;
+
     const blogPostingSchema: Record<string, unknown> = {
       '@type': 'BlogPosting',
       headline: post.title,
       description: post.excerpt,
-      image: `${BASE_URL}/og-image.png`,
+      image: postOgImage,
       datePublished: post.dateISO,
       dateModified: post.dateISO,
       url: `${BASE_URL}/blog/${post.slug}`,
@@ -327,6 +334,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
         description: post.excerpt,
         ogType: 'article',
         canonicalUrl: `${BASE_URL}/blog/${post.slug}`,
+        ogImage: postOgImage,
         jsonLd: {
           '@context': 'https://schema.org',
           '@graph': graph,
