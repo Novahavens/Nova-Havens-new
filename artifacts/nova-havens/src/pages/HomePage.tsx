@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 
 export default function HomePage() {
   useEffect(() => {
-    document.title = "Nova Havens | Nationwide Furnished Housing Coordination";
-
+    // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
     // Inject page-specific structured data
     const script = document.createElement('script');
     script.type = 'application/ld+json';

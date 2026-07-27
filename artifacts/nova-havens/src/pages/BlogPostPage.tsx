@@ -106,14 +106,7 @@ export default function BlogPostPage() {
 
   useEffect(() => {
     if (post) {
-      document.title = `${post.title} | Nova Havens Blog`;
-      const desc = document.querySelector('meta[name="description"]');
-      if (desc) desc.setAttribute('content', post.excerpt);
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', `${post.title} | Nova Havens`);
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute('content', post.excerpt);
-
+      // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
       // Inject BlogPosting structured data
       const script = document.createElement('script');
       script.type = 'application/ld+json';

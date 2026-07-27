@@ -29,6 +29,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           <Link href="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-home">Home</Link>
           <Link href="/blog" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-blog">Blog</Link>
+          <Link href="/meet-the-team" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-team">Team</Link>
           <Link href="/contact" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-contact">Contact</Link>
         </nav>
 
@@ -57,6 +58,7 @@ export default function Navbar() {
               <nav className="flex flex-col gap-6 mb-8">
                 <Link href="/" onClick={closeMenu} className="text-lg font-medium text-foreground" data-testid="link-mobile-home">Home</Link>
                 <Link href="/blog" onClick={closeMenu} className="text-lg font-medium text-foreground" data-testid="link-mobile-blog">Blog</Link>
+                <Link href="/meet-the-team" onClick={closeMenu} className="text-lg font-medium text-foreground" data-testid="link-mobile-team">Team</Link>
                 <Link href="/contact" onClick={closeMenu} className="text-lg font-medium text-foreground" data-testid="link-mobile-contact">Contact</Link>
               </nav>
               <div className="flex flex-col gap-4 mt-auto">

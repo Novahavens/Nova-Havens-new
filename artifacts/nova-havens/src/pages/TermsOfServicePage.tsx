@@ -1,10 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 export default function TermsOfServicePage() {
-  useEffect(() => {
-    document.title = "Terms of Service | Nova Havens";
-  }, []);
-
   return (
     <div className="mx-auto max-w-[800px] w-full px-4 md:px-8 py-20 pb-32">
       {/* Draft Banner */}

@@ -10,19 +10,23 @@ import BlogPostPage from '@/pages/BlogPostPage';
 import ContactPage from '@/pages/ContactPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import TermsOfServicePage from '@/pages/TermsOfServicePage';
+import TeamPage from '@/pages/TeamPage';
 
 // Components
 import Layout from '@/components/Layout';
+import { useRouteMeta } from '@/lib/useRouteMeta';
 
 const queryClient = new QueryClient();
 
 function Router() {
+  useRouteMeta();
   return (
     <Layout>
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/blog/:slug" component={BlogPostPage} />
+        <Route path="/meet-the-team" component={TeamPage} />
         <Route path="/contact" component={ContactPage} />
         <Route path="/privacy-policy" component={PrivacyPolicyPage} />
         <Route path="/terms-of-service" component={TermsOfServicePage} />

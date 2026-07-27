@@ -24,10 +24,7 @@ export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   useEffect(() => {
-    document.title = "Contact | Nova Havens";
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Contact Nova Havens to request emergency furnished housing, submit your property, or partner with our nationwide insurance relocation network. We respond within one business day.');
-    document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Contact Nova Havens to request emergency furnished housing, submit your property, or partner with our nationwide insurance relocation network. We respond within one business day.');
-    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Contact Nova Havens to request emergency furnished housing, submit your property, or partner with our nationwide insurance relocation network. We respond within one business day.');
+    // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
   }, []);
 
   const form = useForm<FormValues>({
