@@ -172,9 +172,10 @@ export default function HomePage() {
           </div>
           <div className="w-full md:w-1/2 relative min-h-[300px] md:min-h-full">
             <img 
-              src="/pet-friendly.png" 
+              src="/pet-friendly.webp" 
               alt="Cozy pet-friendly living room" 
               className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.parentElement!.innerHTML = '<div class="absolute inset-0 bg-[#1A1D24] flex items-center justify-center p-8 text-center text-muted-foreground border-l border-white/5"><div class="flex flex-col items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary/50"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 1-3 3H5a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3h1a3 3 0 0 1 3 3v1a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3v-1a3 3 0 0 1 3-3h1a3 3 0 0 0 3-3v-2a3 3 0 0 0-3-3h-1a3 3 0 0 1-3-3V5a3 3 0 0 0-3-3h-2Z"></path></svg><span>Cozy interior image loading...</span></div></div>';
@@ -230,9 +231,10 @@ export default function HomePage() {
           ].map((altText, idx) => (
             <div key={idx + 1} className="rounded-[16px] overflow-hidden aspect-[4/3] bg-card border border-white/10 relative group" data-testid={`card-photo-${idx + 1}`}>
               <img 
-                src={`/property-${idx + 1}.png`} 
+                src={`/property-${idx + 1}.webp`} 
                 alt={altText} 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.parentElement!.innerHTML = `<div class="absolute inset-0 bg-[#1A1D24] flex items-center justify-center flex-col gap-3 text-muted-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg><span class="text-xs font-medium uppercase tracking-wider">Image ${idx + 1}</span></div>`;
