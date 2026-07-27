@@ -220,15 +220,22 @@ export default function HomePage() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="rounded-[16px] overflow-hidden aspect-[4/3] bg-card border border-white/10 relative group" data-testid={`card-photo-${i}`}>
+          {[
+            "Bright furnished living room with modern sofa and open-plan kitchen",
+            "Spacious master bedroom with quality linens and ample closet space",
+            "Well-equipped kitchen with full appliances, ready for immediate move-in",
+            "Cozy furnished bedroom in a Nova Havens temporary housing property",
+            "Open dining and living area in a furnished home available for placement",
+            "Comfortable furnished home exterior — part of the Nova Havens network",
+          ].map((altText, idx) => (
+            <div key={idx + 1} className="rounded-[16px] overflow-hidden aspect-[4/3] bg-card border border-white/10 relative group" data-testid={`card-photo-${idx + 1}`}>
               <img 
-                src={`/property-${i}.png`} 
-                alt={`Property showcase ${i}`} 
+                src={`/property-${idx + 1}.png`} 
+                alt={altText} 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = `<div class="absolute inset-0 bg-[#1A1D24] flex items-center justify-center flex-col gap-3 text-muted-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg><span class="text-xs font-medium uppercase tracking-wider">Image ${i}</span></div>`;
+                  e.currentTarget.parentElement!.innerHTML = `<div class="absolute inset-0 bg-[#1A1D24] flex items-center justify-center flex-col gap-3 text-muted-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg><span class="text-xs font-medium uppercase tracking-wider">Image ${idx + 1}</span></div>`;
                 }}
               />
             </div>
@@ -339,11 +346,11 @@ export default function HomePage() {
           <div className="flex justify-between items-end mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold" data-testid="heading-reviews">What Our Clients Say</h2>
             <div className="hidden md:flex gap-3">
-              <Button variant="outline" size="icon" onClick={scrollPrev} className="rounded-full border-white/20 hover:bg-white/5 text-foreground hover:text-primary border bg-transparent" data-testid="btn-carousel-prev">
-                <MoveRight className="w-4 h-4 rotate-180" />
+              <Button aria-label="Previous review" variant="outline" size="icon" onClick={scrollPrev} className="rounded-full border-white/20 hover:bg-white/5 text-foreground hover:text-primary border bg-transparent" data-testid="btn-carousel-prev">
+                <MoveRight className="w-4 h-4 rotate-180" aria-hidden="true" />
               </Button>
-              <Button variant="outline" size="icon" onClick={scrollNext} className="rounded-full border-white/20 hover:bg-white/5 text-foreground hover:text-primary border bg-transparent" data-testid="btn-carousel-next">
-                <MoveRight className="w-4 h-4" />
+              <Button aria-label="Next review" variant="outline" size="icon" onClick={scrollNext} className="rounded-full border-white/20 hover:bg-white/5 text-foreground hover:text-primary border bg-transparent" data-testid="btn-carousel-next">
+                <MoveRight className="w-4 h-4" aria-hidden="true" />
               </Button>
             </div>
           </div>

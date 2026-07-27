@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { ArrowRight } from 'lucide-react';
 import { BLOG_POSTS, BLOG_FILTERS } from '@/data/blogPosts';
 
+// hint: Logic changed on both sides. Requires understanding intent of each change.
 export default function BlogPage() {
   const [activeFilter, setActiveFilter] = useState<string>('All');
 
