@@ -37,7 +37,7 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground mb-2">Follow us on social media</h3>
             <div className="flex items-center gap-4">
               <a
-                href="#"
+                href="https://www.linkedin.com/company/novahavenshousing"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Nova Havens on LinkedIn"
@@ -47,7 +47,7 @@ export default function Footer() {
                 <FaLinkedin className="w-6 h-6" aria-hidden="true" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/novahavenshousing/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Nova Havens on Instagram"
@@ -57,7 +57,7 @@ export default function Footer() {
                 <FaInstagram className="w-6 h-6" aria-hidden="true" />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/novahavenshousing"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Nova Havens on Facebook"
