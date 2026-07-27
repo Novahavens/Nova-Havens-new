@@ -218,6 +218,40 @@ const STATIC_META: Record<string, RouteMeta> = {
       'Nova Havens publishes guides for insurance professionals, displaced families, and property owners on temporary housing, ALE coverage, and claims coordination.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/blog`,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'ItemList',
+          name: 'Nova Havens Blog & Resources',
+          description:
+            'Guides and resources for insurance professionals, displaced families, and property owners on temporary housing, ALE coverage, and claims coordination.',
+          url: `${BASE_URL}/blog`,
+          itemListElement: BLOG_POSTS.map((post, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            url: `${BASE_URL}/blog/${post.slug}`,
+            name: post.title,
+            description: post.excerpt,
+          })),
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: BLOG_POSTS.flatMap((post) =>
+            parseFaqsFromContent(post.content).slice(0, 2),
+          )
+            .slice(0, 10)
+            .map((faq) => ({
+              '@type': 'Question',
+              name: faq.question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: faq.answer,
+              },
+            })),
+        },
+      ],
+    },
   },
   '/meet-the-team': {
     title: `Meet the Team | ${SITE_NAME}`,
