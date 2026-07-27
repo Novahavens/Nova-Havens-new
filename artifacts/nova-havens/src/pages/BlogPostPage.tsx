@@ -113,7 +113,44 @@ export default function BlogPostPage() {
       if (ogTitle) ogTitle.setAttribute('content', `${post.title} | Nova Havens`);
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute('content', post.excerpt);
+
+      // Inject BlogPosting structured data
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'jsonld-blogpost';
+      script.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post.title,
+        "description": post.excerpt,
+        "datePublished": post.dateISO,
+        "dateModified": post.dateISO,
+        "url": `https://novahavens.com/blog/${post.slug}`,
+        "author": {
+          "@type": "Organization",
+          "@id": "https://novahavens.com/#organization",
+          "name": "Nova Havens"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "@id": "https://novahavens.com/#organization",
+          "name": "Nova Havens"
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": `https://novahavens.com/blog/${post.slug}`
+        },
+        "articleSection": post.category,
+        "isPartOf": {
+          "@id": "https://novahavens.com/#website"
+        }
+      });
+      document.head.appendChild(script);
     }
+
+    return () => {
+      document.getElementById('jsonld-blogpost')?.remove();
+    };
   }, [post]);
 
   if (!post) {

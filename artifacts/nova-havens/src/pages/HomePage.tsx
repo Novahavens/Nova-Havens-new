@@ -8,6 +8,116 @@ import { Button } from '@/components/ui/button';
 export default function HomePage() {
   useEffect(() => {
     document.title = "Nova Havens | Nationwide Furnished Housing Coordination";
+
+    // Inject page-specific structured data
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'jsonld-homepage';
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://novahavens.com/#localbusiness",
+          "name": "Nova Havens",
+          "url": "https://novahavens.com/",
+          "telephone": "+16294010054",
+          "email": "info@novahavens.com",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Nashville",
+            "addressRegion": "TN",
+            "addressCountry": "US"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "United States"
+          },
+          "serviceType": "Insurance Housing Coordination",
+          "description": "Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call."
+        },
+        {
+          "@type": "HowTo",
+          "name": "How Adjusters & Carriers Work with Nova Havens",
+          "description": "The step-by-step process for insurance adjusters and carriers to coordinate temporary housing placements through Nova Havens.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "name": "Submit a Claim",
+              "text": "Share the claim details with our team via phone or portal."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "name": "Review Placement Options",
+              "text": "We surface verified homes within your parameters within hours."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "name": "Approve & Coordinate",
+              "text": "We handle all logistics with the family directly."
+            }
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How Displaced Families Get Placed with Nova Havens",
+          "description": "The step-by-step process for displaced families to move into temporary furnished housing through Nova Havens.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "name": "Receive Your Options",
+              "text": "Your adjuster or carrier connects you with Nova Havens."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "name": "Choose Your Home",
+              "text": "Browse furnished options matched to your family's needs."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "name": "Move In",
+              "text": "We coordinate move-in logistics so you can focus on what matters."
+            }
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How Property Owners Join the Nova Havens Network",
+          "description": "The step-by-step process for property owners to list their furnished homes with Nova Havens and start hosting displaced families.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "name": "Submit Your Property",
+              "text": "Tell us about your furnished home and availability."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "name": "Get Verified",
+              "text": "We inspect and onboard your property into our network."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "name": "Start Hosting",
+              "text": "We match you with families and handle all coordination."
+            }
+          ]
+        }
+      ]
+    });
+    document.head.appendChild(script);
+
+    return () => {
+      document.getElementById('jsonld-homepage')?.remove();
+    };
   }, []);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });

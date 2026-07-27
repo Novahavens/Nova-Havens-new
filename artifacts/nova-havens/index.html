@@ -30,6 +30,36 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" /></noscript>
     <!-- Preload LCP candidate (above-the-fold pet-friendly image) -->
     <link rel="preload" as="image" href="/pet-friendly.webp" />
+    <!-- Structured data: WebSite + Organization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://novahavens.com/#website",
+      "url": "https://novahavens.com/",
+      "name": "Nova Havens",
+      "description": "Nationwide furnished housing coordination for displaced families — working with insurance carriers and adjusters."
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://novahavens.com/#organization",
+      "name": "Nova Havens",
+      "url": "https://novahavens.com/",
+      "telephone": "+16294010054",
+      "email": "info@novahavens.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Nashville",
+        "addressRegion": "TN",
+        "addressCountry": "US"
+      },
+      "sameAs": []
+    }
+  ]
+}
+    </script>
   </head>
   <body>
     <div id="root"></div>
