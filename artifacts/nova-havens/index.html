@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nova Havens | Nationwide Furnished Housing Coordination</title>
-    <meta name="description" content="Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call." />
+    <meta name="description" content="Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket." />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content="Nova Havens | Nationwide Furnished Housing Coordination" />
-    <meta property="og:description" content="Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call." />
+    <meta property="og:description" content="Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://novahavens.com/" />
     <link rel="canonical" href="https://novahavens.com/" />
@@ -19,7 +19,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@novahavens" />
     <meta name="twitter:title" content="Nova Havens | Nationwide Furnished Housing Coordination" />
-    <meta name="twitter:description" content="Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call." />
+    <meta name="twitter:description" content="Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket." />
     <meta name="twitter:image" content="https://novahavens.com/og-image.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- Plus Jakarta Sans — async non-render-blocking load -->
@@ -30,7 +30,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" /></noscript>
     <!-- Preload LCP candidate (above-the-fold pet-friendly image) -->
     <link rel="preload" as="image" href="/pet-friendly.webp" />
-    <!-- Structured data: WebSite + Organization -->
+    <!-- Structured data: WebSite + Organization + LocalBusiness -->
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -40,7 +40,7 @@
       "@id": "https://novahavens.com/#website",
       "url": "https://novahavens.com/",
       "name": "Nova Havens",
-      "description": "Nationwide furnished housing coordination for displaced families — working with insurance carriers and adjusters."
+      "description": "Nova Havens places insurance-displaced families into verified furnished homes nationwide — coordinated directly with insurance carriers and adjusters."
     },
     {
       "@type": "Organization",
@@ -49,13 +49,66 @@
       "url": "https://novahavens.com/",
       "telephone": "+16294010054",
       "email": "info@novahavens.com",
+      "description": "Nova Havens coordinates furnished temporary housing for families displaced by insurance claims — placing them in verified homes within 24–48 hours, billed directly to carriers across all 48 contiguous US states.",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Nashville",
         "addressRegion": "TN",
         "addressCountry": "US"
       },
-      "sameAs": []
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States",
+        "description": "All 48 contiguous US states"
+      },
+      "knowsAbout": [
+        "insurance housing",
+        "ALE temporary housing",
+        "furnished relocation",
+        "additional living expenses",
+        "temporary housing coordination",
+        "insurance claim housing",
+        "displaced family housing"
+      ],
+      "sameAs": [
+        "https://twitter.com/novahavens"
+      ]
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://novahavens.com/#localbusiness",
+      "name": "Nova Havens",
+      "url": "https://novahavens.com/",
+      "telephone": "+16294010054",
+      "email": "info@novahavens.com",
+      "description": "Nova Havens coordinates furnished temporary housing for families displaced by insurance claims across all 48 contiguous US states.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Nashville",
+        "addressRegion": "TN",
+        "addressCountry": "US"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States",
+        "description": "All 48 contiguous US states"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "00:00",
+        "closes": "23:59"
+      },
+      "makesOffer": {
+        "@type": "Offer",
+        "name": "Furnished Temporary Housing for Insurance-Displaced Families",
+        "description": "Fully furnished temporary housing placement for families displaced by insurance claims — verified properties nationwide, billed directly to carriers under Additional Living Expenses (ALE) coverage. Placements delivered within 24–48 hours in most markets.",
+        "areaServed": "All 48 contiguous US states",
+        "availability": "https://schema.org/InStock",
+        "seller": {
+          "@id": "https://novahavens.com/#organization"
+        }
+      }
     }
   ]
 }

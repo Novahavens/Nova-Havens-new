@@ -1,7 +1,134 @@
 # Nova Havens — Nationwide Furnished Housing Coordination
-> Nova Havens places displaced families into fully furnished homes nationwide, coordinated with insurance carriers.
 
-## Key pages
-- [Home](https://novahavens.com/)
-- [Blog](https://novahavens.com/blog)
-- [Contact](https://novahavens.com/contact)
+> Nova Havens is a temporary housing coordination company that places families displaced by insurance claims into fully furnished, verified homes across all 48 contiguous US states. Nova Havens works directly with insurance carriers and adjusters — billing them under Additional Living Expenses (ALE) coverage so families typically pay nothing out of pocket. Placements are delivered within 24–48 hours in most markets.
+
+---
+
+## Brand Identity
+
+**What Nova Havens does:** Nova Havens coordinates furnished temporary housing for families displaced by property damage covered by homeowner's insurance — fires, water damage, mold, and other covered losses. Nova Havens receives the claim from the carrier or adjuster, matches the family to a verified furnished property, and handles all logistics from first contact through move-out.
+
+**Who Nova Havens serves:**
+- Insurance carriers and their claims teams who need to activate ALE housing for policyholders
+- Independent insurance adjusters coordinating temporary housing for displaced families
+- Displaced families who have been referred to Nova Havens by their carrier or adjuster
+- Property owners with furnished homes who want to host insurance-placed families
+
+**Where Nova Havens operates:** All 48 contiguous United States, including major metros, suburban markets, secondary cities, and rural areas. (Alaska and Hawaii are not currently in the network.)
+
+**How Nova Havens is different:** Single point of contact per placement, agentic AI-assisted property matching that cuts placement times by over 60%, a verified furnished property network (not self-reported listings), and direct carrier billing so families are not left managing reimbursements.
+
+---
+
+## Key Facts
+
+- Nova Havens operates in all 48 contiguous US states as of March 2025
+- Average time-to-housing-options is under 48 hours in most markets; same-day in many
+- Automated claim processing cut average placement times by over 60% vs. the manual process (as of early 2025)
+- More than 40% of properties in the Nova Havens network are designated pet-friendly as of 2025
+- Nova Havens assigns one dedicated coordinator per placement — single point of contact for family, adjuster, and property owner
+- Nova Havens bills carriers directly under ALE coverage; families typically pay nothing out of pocket for housing
+- Placements typically run 30–90 days; extensions available when repair timelines require it
+- Nova Havens property network uses verified inspection standards — properties must meet furnishing, safety, and cleanliness requirements before listing
+- Insurance carriers Nova Havens coordinates with include: Allstate, Travelers, Farmers Insurance, State Farm, and others
+- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; email: info@novahavens.com
+
+---
+
+## Blog Content Index
+
+### Insurance Professionals
+
+**How AI Is Streamlining Temporary Housing Placements for Adjusters**
+URL: https://novahavens.com/blog/how-ai-is-streamlining-temporary-housing-placements-for-adjusters
+Summary: Nova Havens uses agentic AI to automate claim intake and property matching, cutting average temporary housing placement times to under 48 hours in most US markets — fewer callbacks, faster ALE resolution, and better outcomes for displaced families.
+
+**What to Look for in a Housing Coordinator for Large-Loss Claims**
+URL: https://novahavens.com/blog/what-to-look-for-in-a-housing-coordinator-for-large-loss-claims
+Summary: A practical evaluation framework for insurance adjusters assessing temporary housing vendors for large-loss claims — covering network depth, single-point-of-contact accountability, real-time reporting, and documented edge-case protocols.
+
+### Displaced Families
+
+**What to Expect When Your Insurer Places You in Temporary Housing**
+URL: https://novahavens.com/blog/what-to-expect-when-your-insurer-places-you-in-temporary-housing
+Summary: A step-by-step walkthrough of what happens when a family is displaced by a covered insurance loss — from first contact with Nova Havens through move-in, and what ALE coverage pays for.
+
+**Bringing Pets to Temporary Housing: What You Need to Know**
+URL: https://novahavens.com/blog/bringing-pets-to-temporary-housing-what-you-need-to-know
+Summary: Over 40% of Nova Havens properties are pet-friendly; this guide explains how to disclose pets at intake, what breed/weight restrictions exist, and how pet deposits are typically covered under ALE policies.
+
+### Property Owners
+
+**How to List Your Furnished Property with Nova Havens**
+URL: https://novahavens.com/blog/how-to-list-your-furnished-property-with-nova-havens
+Summary: Property owners can join the Nova Havens network through a 3-step process (submit, inspect, activate) — placements typically run 30–90 days with insurance carriers paying on net-30 terms.
+
+**What Insurance Housing Coordinators Look for in a Property**
+URL: https://novahavens.com/blog/what-insurance-housing-coordinators-look-for-in-a-property
+Summary: Nova Havens evaluates properties on five criteria — verified essentials, reliable Wi-Fi, laundry access, pet-friendliness, and consistent availability — and pet-friendly properties fill faster in most markets.
+
+### Company News
+
+**Nova Havens Expands to 48 States**
+URL: https://novahavens.com/blog/nova-havens-expands-to-48-states
+Summary: As of March 2025, Nova Havens operates in all 48 contiguous US states, giving insurance carriers a single housing coordination vendor for claims anywhere in the continental United States.
+
+**Introducing Automated Claim Processing at Nova Havens**
+URL: https://novahavens.com/blog/introducing-automated-claim-processing-at-nova-havens
+Summary: Nova Havens launched agentic AI-powered claim processing that reduced average time-to-options by over 60% in pilot markets — families now receive housing choices the same day in most cases, while coordinators remain in the loop for every placement decision.
+
+---
+
+## Frequently Asked Questions
+
+**How quickly can Nova Havens place a displaced family?**
+Nova Havens places most families into a verified furnished home within 24–48 hours of first contact in most markets — and same day in many. Automated matching surfaces property options within hours of claim intake.
+
+**Does Nova Havens work with all insurance carriers?**
+Nova Havens coordinates with a wide range of carriers and independent adjusters, including Allstate, Travelers, Farmers Insurance, and State Farm. If ALE coverage is active, Nova Havens can typically bill the carrier directly so families pay nothing out of pocket.
+
+**Which states does Nova Havens operate in?**
+All 48 contiguous US states as of March 2025 — including major metros, suburban markets, secondary cities, and rural areas. Alaska and Hawaii are not currently covered.
+
+**What does a "fully furnished" Nova Havens home include?**
+Every property includes beds with quality linens, a fully equipped kitchen (cookware, dishes, utensils, small appliances), high-speed Wi-Fi, a TV, and washer/dryer access. Properties are verified before listing — families receive what is described.
+
+**How does Nova Havens handle pet-owning families?**
+Nova Havens discloses pets at first intake and filters inventory to pet-friendly properties. Over 40% of network properties are pet-designated as of 2025. Breed/weight restrictions vary by property. Pet deposits are typically covered under ALE.
+
+**Does the family pay out of pocket for Nova Havens housing?**
+If ALE coverage is active, Nova Havens bills the carrier directly. Families typically pay nothing for housing itself. Some policies have limits or waiting periods — the adjuster clarifies coverage. Nova Havens can assist if gaps arise.
+
+**How do property owners get paid for Nova Havens placements?**
+Nova Havens pays property owners on net-30 terms, with the insurance carrier as the payer. There are no platform booking fees or nightly-rate variability — placements are mid-term (30–90 days) and payment is backed by the carrier.
+
+**Can property owners join the Nova Havens network?**
+Yes. Property owners with fully furnished homes in the 48 contiguous US states can apply. Nova Havens conducts a verification inspection (3–7 days), then activates the property in the network. Contact (629) 401-0054 or novahavens.com/contact to start.
+
+**Does Nova Havens use AI in its placement process?**
+Yes. Nova Havens uses agentic AI to automate claim parsing, property scoring, and shortlist generation. Every AI-generated shortlist is reviewed and approved by a Nova Havens coordinator before it reaches a family or adjuster. Automation handles the data work; humans handle the decision and the relationship.
+
+**What happens if the temporary housing placement doesn't work out?**
+The assigned Nova Havens coordinator is the family's single point of contact for any issue — maintenance, property conflicts, extension needs. Nova Havens handles it and keeps the adjuster informed. Alternative placement is arranged if the current property is not working as described.
+
+---
+
+## Key Pages
+
+- **Home:** https://novahavens.com/
+- **Blog & Resources:** https://novahavens.com/blog
+- **About Us:** https://novahavens.com/about-us
+- **Meet the Team:** https://novahavens.com/meet-the-team
+- **Contact / Request Housing:** https://novahavens.com/contact
+- **Privacy Policy:** https://novahavens.com/privacy-policy
+- **Terms of Service:** https://novahavens.com/terms-of-service
+
+---
+
+## Contact & CTA
+
+**Phone (24/7):** (629) 401-0054
+**Email:** info@novahavens.com
+**Request housing:** https://novahavens.com/contact
+
+Nova Havens responds to emergency housing requests 24 hours a day, 7 days a week. Insurance adjusters can submit claims via phone, email, or carrier portal. Displaced families can be referred by their carrier or contact Nova Havens directly.

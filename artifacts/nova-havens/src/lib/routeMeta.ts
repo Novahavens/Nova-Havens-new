@@ -23,9 +23,88 @@ export interface RouteMeta {
 const SITE_NAME = 'Nova Havens';
 const BASE_URL = 'https://novahavens.com';
 export const DEFAULT_DESCRIPTION =
-  'Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.';
+  'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket.';
+
+// ── FAQ parser: extracts Q&A pairs from blog post content ──────────────────
+// FAQ sections follow the pattern:
+//   ## Frequently Asked Questions: ...
+//   (blank line)
+//   **Question text?**
+//   Answer text on subsequent lines (same \n\n block)
+
+export function parseFaqsFromContent(
+  content: string,
+): { question: string; answer: string }[] {
+  const blocks = content.split(/\n\n+/);
+  const faqIdx = blocks.findIndex((b) =>
+    /^## Frequently Asked Questions/.test(b),
+  );
+  if (faqIdx === -1) return [];
+
+  const faqs: { question: string; answer: string }[] = [];
+  for (let i = faqIdx + 1; i < blocks.length; i++) {
+    const lines = blocks[i].split('\n');
+    const firstLine = lines[0].trim();
+    // Match bold question: **Question text?**
+    if (
+      firstLine.startsWith('**') &&
+      firstLine.endsWith('**') &&
+      firstLine.includes('?')
+    ) {
+      const question = firstLine.slice(2, -2);
+      const answer = lines.slice(1).join(' ').trim();
+      if (question && answer) {
+        faqs.push({ question, answer });
+      }
+    }
+  }
+  return faqs;
+}
 
 // ── Static route metadata ──────────────────────────────────────────────────
+
+const HOME_FAQS = [
+  {
+    question: 'How quickly can Nova Havens place a displaced family?',
+    answer:
+      'Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets. Our automated claim-intake system surfaces matched properties within hours so coordinators can reach the family the same day a claim is submitted.',
+  },
+  {
+    question: 'Does Nova Havens work with all insurance carriers?',
+    answer:
+      'Nova Havens coordinates with a wide range of insurance carriers and independent adjusters nationwide, including Allstate, Travelers, Farmers Insurance, and State Farm. If your carrier uses Additional Living Expenses (ALE) coverage, Nova Havens can typically bill them directly — so families pay nothing out of pocket for housing.',
+  },
+  {
+    question: 'Are pet-friendly furnished homes available nationwide?',
+    answer:
+      'Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. When you contact Nova Havens, simply share your pet\'s species, breed, and weight and a coordinator will match your family to a compatible property. Most pet deposits are covered under ALE policies.',
+  },
+  {
+    question: 'Which states does Nova Havens operate in?',
+    answer:
+      'Nova Havens operates in all 48 contiguous US states, as of 2025. This includes major metros and rural areas, so families displaced in smaller communities receive the same quality of service as those in large cities.',
+  },
+  {
+    question: "What does a 'fully furnished' Nova Havens home include?",
+    answer:
+      'Every Nova Havens property includes beds with quality linens, a fully equipped kitchen with cookware and dishes, high-speed Wi-Fi, a streaming-ready TV, and washer/dryer access. Properties are verified by Nova Havens coordinators before being listed in the network — so what you see is what you get.',
+  },
+  {
+    question: 'How do I request emergency housing through Nova Havens?',
+    answer:
+      'To request emergency furnished housing through Nova Havens, call (629) 401-0054 or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly.',
+  },
+  {
+    question: 'How does Nova Havens coordinate with my insurance adjuster?',
+    answer:
+      "Nova Havens assigns one dedicated coordinator to each placement. That coordinator communicates directly with your adjuster and carrier — handling documentation, extensions, and status updates — so you don't have to relay messages between parties. Adjusters receive proactive updates throughout the placement.",
+  },
+  {
+    question: 'Can I list my furnished property with Nova Havens?',
+    answer:
+      'Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054 or visit the Contact page to get started.',
+  },
+];
 
 const STATIC_META: Record<string, RouteMeta> = {
   '/': {
@@ -114,47 +193,59 @@ const STATIC_META: Record<string, RouteMeta> = {
             },
           ],
         },
+        {
+          '@type': 'FAQPage',
+          mainEntity: HOME_FAQS.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer,
+            },
+          })),
+        },
       ],
     },
   },
   '/blog': {
     title: `Blog & Resources | ${SITE_NAME}`,
     description:
-      'Industry knowledge for insurance professionals, displaced families, and property owners — from the Nova Havens team.',
+      'Nova Havens publishes guides for insurance professionals, displaced families, and property owners on temporary housing, ALE coverage, and claims coordination.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/blog`,
   },
   '/meet-the-team': {
     title: `Meet the Team | ${SITE_NAME}`,
     description:
-      'Meet the Nova Havens team — the coordinators, carrier specialists, and family advocates behind our nationwide furnished housing network.',
+      'Nova Havens is staffed by coordinators, carrier specialists, and family advocates who manage furnished housing placements across all 48 contiguous US states.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/meet-the-team`,
   },
   '/about-us': {
     title: `About Us | ${SITE_NAME}`,
     description:
-      'Learn how Nova Havens helps displaced families find furnished homes while giving insurance teams and property owners a more dependable path forward.',
+      'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours, billed directly to carriers nationwide.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/about-us`,
   },
   '/contact': {
     title: `Contact Us | ${SITE_NAME}`,
     description:
-      'Get in touch with Nova Havens — request temporary housing, submit your property, or ask a general question. Available 24/7 for emergency claims.',
+      'Reach Nova Havens at (629) 401-0054 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/contact`,
   },
   '/privacy-policy': {
     title: `Privacy Policy | ${SITE_NAME}`,
-    description: 'Nova Havens privacy policy — how we collect, use, and protect your information.',
+    description:
+      'Nova Havens privacy policy — how we collect, use, and protect your information when you use our temporary housing coordination services.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/privacy-policy`,
   },
   '/terms-of-service': {
     title: `Terms of Service | ${SITE_NAME}`,
     description:
-      'Nova Havens terms of service — the rules and agreements governing use of our housing coordination services.',
+      'Nova Havens terms of service — the agreements governing use of our furnished housing coordination services for families, carriers, and property owners.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/terms-of-service`,
   },
@@ -163,42 +254,81 @@ const STATIC_META: Record<string, RouteMeta> = {
 // ── Blog post routes derived from blogPosts.ts — no manual duplication ─────
 
 const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
-  BLOG_POSTS.map((post) => [
-    `/blog/${post.slug}`,
-    {
-      title: `${post.title} | ${SITE_NAME}`,
+  BLOG_POSTS.map((post) => {
+    const faqs = parseFaqsFromContent(post.content);
+    const faqSchema =
+      faqs.length > 0
+        ? {
+            '@type': 'FAQPage',
+            mainEntity: faqs.map((faq) => ({
+              '@type': 'Question',
+              name: faq.question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: faq.answer,
+              },
+            })),
+          }
+        : null;
+
+    const authorSchema = post.author
+      ? {
+          '@type': 'Person',
+          name: post.author.name,
+          jobTitle: post.author.role,
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        }
+      : {
+          '@type': 'Organization',
+          '@id': `${BASE_URL}/#organization`,
+          name: SITE_NAME,
+        };
+
+    const blogPostingSchema: Record<string, unknown> = {
+      '@type': 'BlogPosting',
+      headline: post.title,
       description: post.excerpt,
-      ogType: 'article',
-      canonicalUrl: `${BASE_URL}/blog/${post.slug}`,
-      jsonLd: {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: post.title,
-        description: post.excerpt,
-        datePublished: post.dateISO,
-        dateModified: post.dateISO,
-        url: `${BASE_URL}/blog/${post.slug}`,
-        author: {
-          '@type': 'Organization',
-          '@id': `${BASE_URL}/#organization`,
-          name: SITE_NAME,
-        },
-        publisher: {
-          '@type': 'Organization',
-          '@id': `${BASE_URL}/#organization`,
-          name: SITE_NAME,
-        },
-        mainEntityOfPage: {
-          '@type': 'WebPage',
-          '@id': `${BASE_URL}/blog/${post.slug}`,
-        },
-        articleSection: post.category,
-        isPartOf: {
-          '@id': `${BASE_URL}/#website`,
-        },
+      datePublished: post.dateISO,
+      dateModified: post.dateISO,
+      url: `${BASE_URL}/blog/${post.slug}`,
+      author: authorSchema,
+      publisher: {
+        '@type': 'Organization',
+        '@id': `${BASE_URL}/#organization`,
+        name: SITE_NAME,
       },
-    },
-  ]),
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `${BASE_URL}/blog/${post.slug}`,
+      },
+      articleSection: post.category,
+      keywords: post.keywords.join(', '),
+      isPartOf: {
+        '@id': `${BASE_URL}/#website`,
+      },
+    };
+
+    const graph: Record<string, unknown>[] = [blogPostingSchema];
+    if (faqSchema) graph.push(faqSchema);
+
+    return [
+      `/blog/${post.slug}`,
+      {
+        title: `${post.title} | ${SITE_NAME}`,
+        description: post.excerpt,
+        ogType: 'article',
+        canonicalUrl: `${BASE_URL}/blog/${post.slug}`,
+        jsonLd: {
+          '@context': 'https://schema.org',
+          '@graph': graph,
+        },
+      } satisfies RouteMeta,
+    ];
+  }),
 );
 
 // ── Combined map and helpers ───────────────────────────────────────────────

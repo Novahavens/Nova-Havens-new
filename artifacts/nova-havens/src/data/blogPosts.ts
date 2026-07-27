@@ -6,6 +6,7 @@ export interface BlogPost {
   date: string;
   dateISO: string;
   excerpt: string;
+  keywords: string[];
   author?: {
     name: string;
     role: string;
@@ -21,6 +22,7 @@ export const BLOG_POSTS: BlogPost[] = [
     title: "How AI Is Streamlining Temporary Housing Placements for Adjusters",
     date: "June 12, 2025",
     dateISO: "2025-06-12",
+    keywords: ["AI temporary housing", "insurance housing placement", "adjuster temporary housing", "ALE housing coordination", "automated claim processing", "housing placement speed"],
     excerpt:
       "Nova Havens uses agentic AI to reduce placement times from several days to under 48 hours in most markets — fewer callbacks, faster claims resolution, and better outcomes for displaced families.",
     author: {
@@ -82,6 +84,7 @@ Yes. Nova Havens discloses when and how automation plays a role in the placement
     title: "What to Look for in a Housing Coordinator for Large-Loss Claims",
     date: "May 28, 2025",
     dateISO: "2025-05-28",
+    keywords: ["housing coordinator large loss claims", "insurance temporary housing vendor", "ALE coverage coordinator", "large loss insurance housing", "temporary housing evaluation", "insurance adjuster housing"],
     excerpt:
       "Large-loss claims demand a housing coordinator with verified inventory, a single point of contact, and documented protocols for edge cases. Here is the evaluation framework insurance adjusters should use.",
     author: {
@@ -156,6 +159,7 @@ Nova Havens targets housing options within 48 hours for standard large-loss plac
     title: "What to Expect When Your Insurer Places You in Temporary Housing",
     date: "May 14, 2025",
     dateISO: "2025-05-14",
+    keywords: ["temporary housing after insurance claim", "ALE housing family", "insurance displaced family housing", "furnished temporary housing", "what to expect temporary housing", "home insurance displacement"],
     excerpt:
       "When a family is displaced by property damage, Nova Havens can place them in a furnished home within 24–48 hours in most markets. Here is exactly what the process looks like from first contact through move-in.",
     author: {
@@ -238,6 +242,7 @@ Your insurance carrier determines how ALE housing is coordinated. If Nova Havens
     title: "Bringing Pets to Temporary Housing: What You Need to Know",
     date: "April 30, 2025",
     dateISO: "2025-04-30",
+    keywords: ["pets temporary housing", "pet-friendly insurance housing", "ALE pet deposit", "dog friendly temporary housing", "insurance housing pets", "furnished rental pets"],
     excerpt:
       "More than 40% of properties in the Nova Havens network are designated pet-friendly as of 2025. Here is how to navigate pet policies, what restrictions to expect, and how to make the process as smooth as possible.",
     author: {
@@ -316,6 +321,7 @@ Emotional support animals occupy a different legal category than service animals
     title: "How to List Your Furnished Property with Nova Havens",
     date: "April 15, 2025",
     dateISO: "2025-04-15",
+    keywords: ["list furnished property", "insurance housing network", "property owner insurance housing", "furnished rental insurance", "temporary housing property listing", "ALE housing property owner"],
     excerpt:
       "Property owners can list furnished homes with Nova Havens by completing a 3-step verification process — submit, inspect, activate. Nova Havens placements typically run 30–90 days, and insurance carriers pay promptly on net-30 terms.",
     author: {
@@ -383,6 +389,7 @@ Nova Havens assigns a coordinator to every placement who serves as the point of 
     title: "What Insurance Housing Coordinators Look for in a Property",
     date: "March 22, 2025",
     dateISO: "2025-03-22",
+    keywords: ["insurance housing property standards", "furnished property requirements", "property verification insurance housing", "ALE property qualifications", "housing coordinator property criteria", "furnished rental standards"],
     excerpt:
       "Nova Havens evaluates properties on five criteria: verified essentials, reliable Wi-Fi, laundry access, pet-friendliness, and consistent availability. Here is what makes a property competitive in the insurance temporary housing market.",
     author: {
@@ -454,6 +461,7 @@ Yes. Properties that accept large dogs, or pets beyond the standard cat/small do
     title: "Nova Havens Expands to 48 States",
     date: "March 8, 2025",
     dateISO: "2025-03-08",
+    keywords: ["Nova Havens 48 states", "nationwide insurance housing", "insurance housing all states", "ALE housing nationwide", "national temporary housing coordinator", "insurance housing expansion"],
     excerpt:
       "As of March 2025, Nova Havens operates in all 48 contiguous U.S. states — giving insurance carriers a single housing coordination vendor for claims anywhere in the continental United States.",
     author: {
@@ -520,6 +528,7 @@ Nova Havens has not announced a timeline for Alaska and Hawaii coverage. These m
     title: "Introducing Automated Claim Processing at Nova Havens",
     date: "February 19, 2025",
     dateISO: "2025-02-19",
+    keywords: ["automated claim processing", "AI insurance housing", "Nova Havens automation", "agentic AI housing", "insurance housing technology", "automated temporary housing placement"],
     excerpt:
       "Nova Havens has launched agentic AI-powered claim processing that reduced average time-to-options by over 60% in pilot markets. Families now receive housing choices the same day in most cases.",
     author: {
