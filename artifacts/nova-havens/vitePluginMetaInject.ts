@@ -50,7 +50,7 @@ export function metaInjectPlugin(): Plugin {
           )
           .replace(
             /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/,
-            `<meta name="robots" content="noindex, nofollow" />`,
+            `<meta name="robots" content="index, follow" />`,
           )
           .replace(
             /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/,
