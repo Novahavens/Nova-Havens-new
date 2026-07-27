@@ -9,6 +9,9 @@ export default function BlogPage() {
 
   useEffect(() => {
     document.title = 'Blog & Resources | Nova Havens';
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Insurance housing insights, relocation guides, and industry resources for adjusters, displaced families, and property owners — from the Nova Havens team.');
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Insurance housing insights, relocation guides, and industry resources for adjusters, displaced families, and property owners — from the Nova Havens team.');
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Insurance housing insights, relocation guides, and industry resources for adjusters, displaced families, and property owners — from the Nova Havens team.');
   }, []);
 
   const filteredPosts = BLOG_POSTS.filter(
