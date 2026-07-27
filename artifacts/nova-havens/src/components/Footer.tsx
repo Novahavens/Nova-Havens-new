@@ -16,7 +16,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground mb-2">Company</h3>
+            <h3 className="font-semibold text-foreground mb-2">NovaHavens</h3>
             <Link href="/about-us" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-about">About</Link>
             <Link href="/blog" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-blog">Blog</Link>
             <Link href="/meet-the-team" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-team">Meet the Team</Link>
