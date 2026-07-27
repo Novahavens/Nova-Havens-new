@@ -2,9 +2,10 @@
  * prerender.ts — post-build static HTML generator
  *
  * Generates one index.html per public route under dist/public/, with per-route
- * <title>, <meta description>, robots, og:*, and twitter:* tags baked into the
- * HTML bytes. This means social preview bots and AI crawlers that don't execute
- * JavaScript receive the correct metadata without any JS execution.
+ * <title>, <meta description>, robots, og:*, twitter:*, canonical URL, and
+ * structured data (JSON-LD) baked into the HTML bytes. This means social
+ * preview bots and AI crawlers that don't execute JavaScript receive the
+ * correct metadata without any JS execution.
  *
  * Usage (run after `vite build`):
  *   node --experimental-strip-types prerender.ts
@@ -39,7 +40,7 @@ function escapeAttr(s: string): string {
 function injectMeta(html: string, pathname: string): string {
   const meta = resolveRouteMeta(pathname);
 
-  return html
+  let result = html
     .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(meta.title)}</title>`)
     .replace(
       /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/,
@@ -62,13 +63,30 @@ function injectMeta(html: string, pathname: string): string {
       `<meta property="og:type" content="${escapeAttr(meta.ogType)}" />`,
     )
     .replace(
+      /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/,
+      `<meta property="og:url" content="${escapeAttr(meta.canonicalUrl)}" />`,
+    )
+    .replace(
       /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/,
       `<meta name="twitter:title" content="${escapeAttr(meta.title)}" />`,
     )
     .replace(
       /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/,
       `<meta name="twitter:description" content="${escapeAttr(meta.description)}" />`,
+    )
+    // Update canonical link
+    .replace(
+      /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/,
+      `<link rel="canonical" href="${escapeAttr(meta.canonicalUrl)}" />`,
     );
+
+  // Inject per-route JSON-LD (BlogPosting etc.) before </head>
+  if (meta.jsonLd) {
+    const scriptTag = `<script type="application/ld+json" id="jsonld-route">\n${JSON.stringify(meta.jsonLd, null, 2)}\n</script>`;
+    result = result.replace('</head>', `${scriptTag}\n</head>`);
+  }
+
+  return result;
 }
 
 function routeToFilePath(route: string): string {

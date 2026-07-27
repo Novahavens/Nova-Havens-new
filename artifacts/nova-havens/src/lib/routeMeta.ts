@@ -15,9 +15,13 @@ export interface RouteMeta {
   title: string;
   description: string;
   ogType: string;
+  canonicalUrl: string;
+  /** Structured data object to inject as a <script type="application/ld+json"> in the <head>. */
+  jsonLd?: Record<string, unknown> | null;
 }
 
 const SITE_NAME = 'Nova Havens';
+const BASE_URL = 'https://novahavens.com';
 export const DEFAULT_DESCRIPTION =
   'Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.';
 
@@ -28,29 +32,34 @@ const STATIC_META: Record<string, RouteMeta> = {
     title: `${SITE_NAME} | Nationwide Furnished Housing Coordination`,
     description: DEFAULT_DESCRIPTION,
     ogType: 'website',
+    canonicalUrl: `${BASE_URL}/`,
   },
   '/blog': {
     title: `Blog & Resources | ${SITE_NAME}`,
     description:
       'Industry knowledge for insurance professionals, displaced families, and property owners — from the Nova Havens team.',
     ogType: 'website',
+    canonicalUrl: `${BASE_URL}/blog`,
   },
   '/contact': {
     title: `Contact Us | ${SITE_NAME}`,
     description:
       'Get in touch with Nova Havens — request temporary housing, submit your property, or ask a general question. Available 24/7 for emergency claims.',
     ogType: 'website',
+    canonicalUrl: `${BASE_URL}/contact`,
   },
   '/privacy-policy': {
     title: `Privacy Policy | ${SITE_NAME}`,
     description: 'Nova Havens privacy policy — how we collect, use, and protect your information.',
     ogType: 'website',
+    canonicalUrl: `${BASE_URL}/privacy-policy`,
   },
   '/terms-of-service': {
     title: `Terms of Service | ${SITE_NAME}`,
     description:
       'Nova Havens terms of service — the rules and agreements governing use of our housing coordination services.',
     ogType: 'website',
+    canonicalUrl: `${BASE_URL}/terms-of-service`,
   },
 };
 
@@ -59,7 +68,39 @@ const STATIC_META: Record<string, RouteMeta> = {
 const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
   BLOG_POSTS.map((post) => [
     `/blog/${post.slug}`,
-    { title: `${post.title} | ${SITE_NAME}`, description: post.excerpt, ogType: 'article' },
+    {
+      title: `${post.title} | ${SITE_NAME}`,
+      description: post.excerpt,
+      ogType: 'article',
+      canonicalUrl: `${BASE_URL}/blog/${post.slug}`,
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.excerpt,
+        datePublished: post.dateISO,
+        dateModified: post.dateISO,
+        url: `${BASE_URL}/blog/${post.slug}`,
+        author: {
+          '@type': 'Organization',
+          '@id': `${BASE_URL}/#organization`,
+          name: SITE_NAME,
+        },
+        publisher: {
+          '@type': 'Organization',
+          '@id': `${BASE_URL}/#organization`,
+          name: SITE_NAME,
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': `${BASE_URL}/blog/${post.slug}`,
+        },
+        articleSection: post.category,
+        isPartOf: {
+          '@id': `${BASE_URL}/#website`,
+        },
+      },
+    },
   ]),
 );
 
@@ -84,6 +125,7 @@ export function resolveRouteMeta(pathname: string): RouteMeta {
       title: SITE_NAME,
       description: DEFAULT_DESCRIPTION,
       ogType: 'website',
+      canonicalUrl: `${BASE_URL}${pathname === '/' ? '/' : pathname.replace(/\/+$/, '')}`,
     }
   );
 }
