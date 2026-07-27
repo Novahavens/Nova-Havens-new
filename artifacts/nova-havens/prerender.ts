@@ -94,6 +94,15 @@ function injectMeta(html: string, pathname: string): string {
       `<link rel="canonical" href="${escapeAttr(meta.canonicalUrl)}" />`,
     );
 
+  // Remove any JSON-LD block that vitePluginMetaInject baked into the build
+  // template (it runs at build time with originalUrl='/' and injects the home
+  // schema into the SPA shell). prerender.ts owns the per-route block, so we
+  // strip the template copy first, then inject the correct one.
+  result = result.replace(
+    /<script type="application\/ld\+json" id="jsonld-route">[\s\S]*?<\/script>\n?/,
+    '',
+  );
+
   // Inject per-route JSON-LD (BlogPosting etc.) before </head>
   if (meta.jsonLd) {
     const scriptTag = `<script type="application/ld+json" id="jsonld-route">\n${JSON.stringify(meta.jsonLd, null, 2)}\n</script>`;
