@@ -507,11 +507,11 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex md:hidden justify-center gap-3 mt-8">
-            <Button variant="outline" size="icon" onClick={scrollPrev} className="rounded-full border-white/20 text-foreground bg-transparent">
-              <MoveRight className="w-4 h-4 rotate-180" />
+            <Button aria-label="Previous review" variant="outline" size="icon" onClick={scrollPrev} className="rounded-full border-white/20 text-foreground bg-transparent">
+              <MoveRight className="w-4 h-4 rotate-180" aria-hidden="true" />
             </Button>
-            <Button variant="outline" size="icon" onClick={scrollNext} className="rounded-full border-white/20 text-foreground bg-transparent">
-              <MoveRight className="w-4 h-4" />
+            <Button aria-label="Next review" variant="outline" size="icon" onClick={scrollNext} className="rounded-full border-white/20 text-foreground bg-transparent">
+              <MoveRight className="w-4 h-4" aria-hidden="true" />
             </Button>
           </div>
         </div>
