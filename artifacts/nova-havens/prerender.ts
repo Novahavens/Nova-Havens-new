@@ -3,9 +3,12 @@
  *
  * Generates one index.html per public route under dist/public/, with per-route
  * <title>, <meta description>, robots, og:*, twitter:*, canonical URL, and
- * structured data (JSON-LD) baked into the HTML bytes. This means social
- * preview bots and AI crawlers that don't execute JavaScript receive the
- * correct metadata without any JS execution.
+ * structured data (JSON-LD) baked into the HTML bytes. Additionally, static
+ * body HTML (H1, key content, article bodies) is injected into <div id="root">
+ * so AI crawlers (GPTBot, ClaudeBot, PerplexityBot) and social bots that do
+ * not execute JavaScript receive both correct metadata AND readable page content.
+ * React replaces the injected content on client-side mount (no hydration
+ * mismatch — this is a plain SPA, not SSR).
  *
  * Usage (run after `vite build`):
  *   node --experimental-strip-types prerender.ts
@@ -18,6 +21,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ALL_ROUTES, resolveRouteMeta } from './src/lib/routeMeta.ts';
+import { getRouteBodyHtml } from './src/lib/routeContent.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = join(__dirname, 'dist', 'public');
@@ -84,6 +88,18 @@ function injectMeta(html: string, pathname: string): string {
   if (meta.jsonLd) {
     const scriptTag = `<script type="application/ld+json" id="jsonld-route">\n${JSON.stringify(meta.jsonLd, null, 2)}\n</script>`;
     result = result.replace('</head>', `${scriptTag}\n</head>`);
+  }
+
+  // Inject static body content into <div id="root"> so AI crawlers and social
+  // bots that don't execute JavaScript can read the page content.
+  // React replaces this content when it mounts (no hydration mismatch — this
+  // is a plain SPA, not SSR, so React does a full client-side render).
+  const bodyHtml = getRouteBodyHtml(pathname);
+  if (bodyHtml) {
+    result = result.replace(
+      /<div id="root"><\/div>/,
+      `<div id="root">${bodyHtml}</div>`,
+    );
   }
 
   return result;
