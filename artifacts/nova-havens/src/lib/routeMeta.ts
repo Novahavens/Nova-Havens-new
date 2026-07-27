@@ -292,6 +292,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
       '@type': 'BlogPosting',
       headline: post.title,
       description: post.excerpt,
+      image: `${BASE_URL}/og-image.png`,
       datePublished: post.dateISO,
       dateModified: post.dateISO,
       url: `${BASE_URL}/blog/${post.slug}`,
@@ -300,6 +301,10 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
         '@type': 'Organization',
         '@id': `${BASE_URL}/#organization`,
         name: SITE_NAME,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${BASE_URL}/og-image.png`,
+        },
       },
       mainEntityOfPage: {
         '@type': 'WebPage',

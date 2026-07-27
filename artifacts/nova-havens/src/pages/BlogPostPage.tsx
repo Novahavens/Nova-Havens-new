@@ -172,6 +172,7 @@ export default function BlogPostPage() {
           "@type": "BlogPosting",
           "headline": post.title,
           "description": post.excerpt,
+          "image": "https://novahavens.com/og-image.png",
           "datePublished": post.dateISO,
           "dateModified": post.dateISO,
           "url": `https://novahavens.com/blog/${post.slug}`,
@@ -195,7 +196,11 @@ export default function BlogPostPage() {
           "publisher": {
             "@type": "Organization",
             "@id": "https://novahavens.com/#organization",
-            "name": "Nova Havens"
+            "name": "Nova Havens",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://novahavens.com/og-image.png"
+            }
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
