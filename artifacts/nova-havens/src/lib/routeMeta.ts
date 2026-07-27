@@ -48,6 +48,13 @@ const STATIC_META: Record<string, RouteMeta> = {
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/meet-the-team`,
   },
+  '/about-us': {
+    title: `About Us | ${SITE_NAME}`,
+    description:
+      'Learn how Nova Havens helps displaced families find furnished homes while giving insurance teams and property owners a more dependable path forward.',
+    ogType: 'website',
+    canonicalUrl: `${BASE_URL}/about-us`,
+  },
   '/contact': {
     title: `Contact Us | ${SITE_NAME}`,
     description:

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'wouter';
 import { Phone, Mail, HeartHandshake, Clock, ShieldCheck } from 'lucide-react';
 
@@ -66,7 +67,21 @@ const VALUES = [
 ];
 
 export default function TeamPage() {
-  // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'jsonld-team';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: 'Meet the Nova Havens Team',
+      description: 'The coordinators, carrier specialists, and family advocates behind Nova Havens.',
+      url: 'https://novahavens.com/meet-the-team',
+    });
+    document.head.appendChild(script);
+    return () => document.getElementById('jsonld-team')?.remove();
+  }, []);
+
   return (
     <div className="w-full">
       {/* Hero */}

@@ -11,6 +11,7 @@ import ContactPage from '@/pages/ContactPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import TermsOfServicePage from '@/pages/TermsOfServicePage';
 import TeamPage from '@/pages/TeamPage';
+import AboutPage from '@/pages/AboutPage';
 
 // Components
 import Layout from '@/components/Layout';
@@ -27,6 +28,7 @@ function Router() {
         <Route path="/blog" component={BlogPage} />
         <Route path="/blog/:slug" component={BlogPostPage} />
         <Route path="/meet-the-team" component={TeamPage} />
+        <Route path="/about-us" component={AboutPage} />
         <Route path="/contact" component={ContactPage} />
         <Route path="/privacy-policy" component={PrivacyPolicyPage} />
         <Route path="/terms-of-service" component={TermsOfServicePage} />
