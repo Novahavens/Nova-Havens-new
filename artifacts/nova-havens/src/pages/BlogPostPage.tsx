@@ -172,7 +172,7 @@ export default function BlogPostPage() {
           "@type": "BlogPosting",
           "headline": post.title,
           "description": post.excerpt,
-          "image": "https://novahavens.com/og-image.png",
+          "image": post.image ?? "https://novahavens.com/og-image.png",
           "datePublished": post.dateISO,
           "dateModified": post.dateISO,
           "url": `https://novahavens.com/blog/${post.slug}`,

@@ -327,7 +327,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
           name: SITE_NAME,
         };
 
-    const postOgImage = `${BASE_URL}/og-blog-${post.slug}.png`;
+    const postOgImage = post.image ?? `${BASE_URL}/og-image.png`;
 
     const blogPostingSchema: Record<string, unknown> = {
       '@type': 'BlogPosting',
