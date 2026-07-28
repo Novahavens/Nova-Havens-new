@@ -9,6 +9,13 @@ import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-caro
 
 const GOLD = '#D4A24C';
 
+const PARTNER_LOGOS = [
+  { name: 'Allstate', logo: '/logos/allstate.png', logoClass: 'h-8', showName: true },
+  { name: 'Travelers', logo: '/logos/travelers.png', logoClass: 'h-8', showName: true },
+  { name: 'Farmers Insurance', logo: '/logos/farmers.svg', logoClass: 'h-9', showName: true },
+  { name: 'State Farm', logo: '/logos/state-farm.svg', logoClass: 'h-6', showName: false },
+];
+
 const SHOWCASE_SLIDES: ElegantSlide[] = [
   {
     title: 'Living Spaces',
@@ -239,7 +246,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 2. Trust Strip */}
       <section className="w-full border-y" style={{ backgroundColor: '#111318', borderColor: 'rgba(255,255,255,0.08)' }}>
         <div className="max-w-[1200px] mx-auto py-12 px-4 md:px-8">
@@ -262,7 +268,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 3. Why Choose Nova Havens */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-16" data-testid="heading-why">Why Choose Nova Havens for Insurance Housing?</h2>
@@ -297,7 +302,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 4. Our Mission */}
       <section className="py-24 px-4 md:px-8 w-full border-y border-white/5" style={{ backgroundColor: '#0D0F14' }}>
         <div className="max-w-[800px] mx-auto text-center flex flex-col items-center">
@@ -313,7 +317,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 5. The Nova Havens Experience */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
         <div className="text-center mb-16">
@@ -354,7 +357,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 6. Pet-Friendly Feature */}
       <section className="w-full bg-card border-y border-white/5 overflow-hidden">
         <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row min-h-[500px]">
@@ -383,7 +385,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 7. Where We Operate */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12" data-testid="heading-map">Where Does Nova Havens Operate?</h2>
@@ -462,7 +463,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 8. Property Photo Showcase */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full border-t border-white/5">
         <div className="text-center mb-16">
@@ -472,7 +472,6 @@ export default function HomePage() {
         
         <ElegantCarousel slides={SHOWCASE_SLIDES} />
       </section>
-
       {/* 9. Trusted Partnerships */}
       <section className="py-20 px-4 md:px-8 w-full bg-[#0D0F14] border-y border-white/5">
         <div className="max-w-[1200px] mx-auto">
@@ -481,16 +480,27 @@ export default function HomePage() {
             <p className="text-muted-foreground" data-testid="subtitle-partners">Nova Havens coordinates placements alongside the nation's leading insurance carriers, including:</p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {["Allstate", "Travelers", "Farmers Insurance", "State Farm"].map((partner, idx) => (
-              <div key={idx} className="bg-card border border-white/5 rounded-[12px] p-6 md:p-8 flex items-center justify-center" data-testid={`card-partner-${idx}`}>
-                <span className="font-extrabold text-lg md:text-xl text-[#F5F5F2] tracking-tight">{partner}</span>
-              </div>
-            ))}
+          <div className="relative overflow-hidden" data-testid="marquee-partners">
+            {/* Edge fades */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 z-10 bg-gradient-to-r from-[#0D0F14] to-transparent" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 z-10 bg-gradient-to-l from-[#0D0F14] to-transparent" aria-hidden="true" />
+            <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+              {[0, 1].map((copy) => (
+                <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
+                  {PARTNER_LOGOS.map((partner, idx) => (
+                    <div key={partner.name} className="flex items-center gap-4 bg-card border border-white/5 rounded-[12px] px-8 py-6 mx-3 shrink-0" data-testid={copy === 0 ? `card-partner-${idx}` : undefined}>
+                      <img src={partner.logo} alt={copy === 0 ? `${partner.name} logo` : ''} className={`w-auto object-contain ${partner.logoClass}`} loading="lazy" />
+                      {partner.showName && (
+                        <span className="font-extrabold text-lg md:text-xl text-[#F5F5F2] tracking-tight whitespace-nowrap">{partner.name}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
-
       {/* 10. How It Works */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-16" data-testid="heading-how-it-works">How Does Nova Havens Place Families?</h2>
@@ -569,7 +579,6 @@ export default function HomePage() {
           </TabsContent>
         </Tabs>
       </section>
-
       {/* 11. Reviews Carousel */}
       <section className="py-20 md:py-24 w-full bg-[#0D0F14] border-y border-white/5 overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4 md:px-8">
@@ -635,7 +644,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 11.5 FAQ */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[800px] mx-auto w-full" data-testid="section-faq">
         <div className="text-center mb-12">
@@ -669,10 +677,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
       {/* 12. Emergency Contact Band */}
-      <section className="w-full bg-primary py-12 px-4 text-[#0A0C10]">
-        <div className="max-w-[800px] mx-auto text-center flex flex-col items-center gap-4">
+      <section className="w-full py-12 px-4 text-[#0A0C10] bg-[#0a0c10]">
+        <div className="max-w-[800px] mx-auto text-center flex flex-col items-center gap-4 text-foreground">
           <Phone className="w-8 h-8" />
           <a href="tel:6294010054" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-phone">
             (629) 401-0054
@@ -690,7 +697,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* 13. Closing CTA Band */}
       <section className="py-24 px-4 md:px-8 w-full bg-card">
         <div className="max-w-[800px] mx-auto text-center">
