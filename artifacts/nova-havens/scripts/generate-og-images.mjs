@@ -5,7 +5,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -179,6 +179,13 @@ for (const post of POSTS) {
   }
 
   const outFile = join(publicDir, `og-blog-${post.slug}.png`);
+
+  if (existsSync(outFile)) {
+    console.log(`  –  og-blog-${post.slug}.png (already exists, skipping)`);
+    generated++;
+    continue;
+  }
+
   const svgContent = generateSvg(post, style);
   const tmpSvg = `/tmp/og-${post.slug}.svg`;
 
@@ -196,4 +203,4 @@ for (const post of POSTS) {
   }
 }
 
-console.log(`\nDone — ${generated}/${POSTS.length} images written to public/`);
+console.log(`\nDone — ${generated}/${POSTS.length} images ready in public/`);
