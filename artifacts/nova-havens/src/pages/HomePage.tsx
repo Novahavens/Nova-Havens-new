@@ -5,6 +5,60 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
+import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-carousel';
+
+const GOLD = '#D4A24C';
+
+const SHOWCASE_SLIDES: ElegantSlide[] = [
+  {
+    title: 'Living Spaces',
+    subtitle: 'Move-In Ready Comfort',
+    description: 'Bright, open-plan living rooms with modern furnishings — every home is verified before a family ever sees it.',
+    accent: GOLD,
+    imageUrl: '/property-1.webp',
+    imageAlt: 'Bright furnished living room with modern sofa and open-plan kitchen — Nova Havens verified property',
+  },
+  {
+    title: 'Master Bedrooms',
+    subtitle: 'Rest, Restored',
+    description: 'Spacious bedrooms with quality linens and ample closet space, so displaced families can settle in immediately.',
+    accent: GOLD,
+    imageUrl: '/property-2.webp',
+    imageAlt: 'Spacious master bedroom with quality linens and ample closet space — Nova Havens furnished home',
+  },
+  {
+    title: 'Full Kitchens',
+    subtitle: 'Everything Included',
+    description: 'Well-equipped kitchens with full appliances, cookware, and dishes — ready for the first meal on day one.',
+    accent: GOLD,
+    imageUrl: '/property-3.webp',
+    imageAlt: 'Well-equipped kitchen with full appliances, ready for immediate move-in — Nova Havens network property',
+  },
+  {
+    title: 'Guest Bedrooms',
+    subtitle: 'Room for the Whole Family',
+    description: 'Cozy additional bedrooms mean families of any size stay together under one roof during recovery.',
+    accent: GOLD,
+    imageUrl: '/property-4.webp',
+    imageAlt: 'Cozy furnished bedroom in a Nova Havens temporary housing property',
+  },
+  {
+    title: 'Dining & Gathering',
+    subtitle: 'A Place to Regroup',
+    description: 'Open dining and living areas give families a comfortable place to gather while their home is restored.',
+    accent: GOLD,
+    imageUrl: '/property-5.webp',
+    imageAlt: 'Open dining and living area in a furnished home available for placement through Nova Havens',
+  },
+  {
+    title: 'Home Exteriors',
+    subtitle: 'Part of a 20,000+ Network',
+    description: 'Comfortable, well-kept homes in real neighborhoods — nationwide coverage across 48 contiguous states.',
+    accent: GOLD,
+    imageUrl: '/property-6.webp',
+    imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens 20,000+ property network',
+  },
+];
 
 const FAQ_ITEMS = [
   {
@@ -416,29 +470,7 @@ export default function HomePage() {
           <p className="text-lg text-muted-foreground" data-testid="subtitle-showcase">Every property in the Nova Havens network is verified, fully furnished, and ready for immediate occupancy.</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            "Bright furnished living room with modern sofa and open-plan kitchen — Nova Havens verified property",
-            "Spacious master bedroom with quality linens and ample closet space — Nova Havens furnished home",
-            "Well-equipped kitchen with full appliances, ready for immediate move-in — Nova Havens network property",
-            "Cozy furnished bedroom in a Nova Havens temporary housing property",
-            "Open dining and living area in a furnished home available for placement through Nova Havens",
-            "Comfortable furnished home exterior — part of the Nova Havens 20,000+ property network",
-          ].map((altText, idx) => (
-            <div key={idx + 1} className="rounded-[16px] overflow-hidden aspect-[4/3] bg-card border border-white/10 relative group" data-testid={`card-photo-${idx + 1}`}>
-              <img 
-                src={`/property-${idx + 1}.webp`} 
-                alt={altText} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = `<div class="absolute inset-0 bg-[#1A1D24] flex items-center justify-center flex-col gap-3 text-muted-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg><span class="text-xs font-medium uppercase tracking-wider">Image ${idx + 1}</span></div>`;
-                }}
-              />
-            </div>
-          ))}
-        </div>
+        <ElegantCarousel slides={SHOWCASE_SLIDES} />
       </section>
 
       {/* 9. Trusted Partnerships */}
