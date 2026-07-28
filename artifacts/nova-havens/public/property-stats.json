@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-07-28T18:11:03.077Z",
+  "totalProperties": 12974,
+  "statesCovered": 47,
+  "skippedNoState": 2798,
+  "byState": {
+    "AK": 20,
+    "AL": 120,
+    "AR": 46,
+    "AZ": 708,
+    "CA": 2458,
+    "CO": 264,
+    "CT": 128,
+    "DE": 10,
+    "FL": 92,
+    "GA": 488,
+    "HI": 21,
+    "IA": 19,
+    "ID": 86,
+    "IL": 311,
+    "IN": 125,
+    "KS": 37,
+    "KY": 45,
+    "LA": 68,
+    "MA": 76,
+    "MD": 121,
+    "ME": 4,
+    "MI": 156,
+    "MN": 148,
+    "MO": 140,
+    "MS": 51,
+    "MT": 37,
+    "NC": 248,
+    "NE": 55,
+    "NH": 27,
+    "NJ": 133,
+    "NM": 76,
+    "NV": 165,
+    "NY": 208,
+    "OH": 181,
+    "OK": 86,
+    "OR": 260,
+    "PA": 179,
+    "RI": 45,
+    "SC": 154,
+    "SD": 1,
+    "TN": 409,
+    "TX": 1244,
+    "UT": 53,
+    "VA": 199,
+    "VT": 11,
+    "WA": 585,
+    "WI": 78
+  },
+  "cities": [
+    {
+      "city": "Phoenix, AZ",
+      "lat": 33.4484,
+      "lng": -112.074,
+      "count": 122
+    },
+    {
+      "city": "Los Angeles, CA",
+      "lat": 34.0522,
+      "lng": -118.2437,
+      "count": 92
+    },
+    {
+      "city": "Nashville, TN",
+      "lat": 36.1627,
+      "lng": -86.7816,
+      "count": 91
+    },
+    {
+      "city": "Chicago, IL",
+      "lat": 41.8781,
+      "lng": -87.6298,
+      "count": 89
+    },
+    {
+      "city": "Portland, OR",
+      "lat": 45.5152,
+      "lng": -122.6784,
+      "count": 82
+    },
+    {
+      "city": "Seattle, WA",
+      "lat": 47.6062,
+      "lng": -122.3321,
+      "count": 72
+    },
+    {
+      "city": "Dallas, TX",
+      "lat": 32.7767,
+      "lng": -96.797,
+      "count": 67
+    },
+    {
+      "city": "Atlanta, GA",
+      "lat": 33.749,
+      "lng": -84.388,
+      "count": 61
+    },
+    {
+      "city": "Denver, CO",
+      "lat": 39.7392,
+      "lng": -104.9903,
+      "count": 60
+    },
+    {
+      "city": "Miami, FL",
+      "lat": 25.7617,
+      "lng": -80.1918,
+      "count": 1
+    }
+  ]
+}

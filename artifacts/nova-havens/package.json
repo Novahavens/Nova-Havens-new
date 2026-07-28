@@ -9,7 +9,8 @@
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "validate:jsonld": "node --experimental-strip-types scripts/validate-jsonld.ts",
-    "validate:prerender": "node --experimental-strip-types scripts/validate-prerender.ts"
+    "validate:prerender": "node --experimental-strip-types scripts/validate-prerender.ts",
+    "sync:property-stats": "node --experimental-strip-types scripts/sync-property-stats.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

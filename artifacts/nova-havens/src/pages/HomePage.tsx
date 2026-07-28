@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,11 +40,57 @@ const FAQ_ITEMS = [
   }
 ];
 
+type PropertyCity = { city: string; lat: number; lng: number; count: number };
+type PropertyStats = {
+  totalProperties: number;
+  statesCovered: number;
+  cities: PropertyCity[];
+};
+
+const FALLBACK_CITIES: PropertyCity[] = [
+  { city: 'Nashville, TN', lat: 36.1627, lng: -86.7816, count: 1 },
+  { city: 'Los Angeles, CA', lat: 34.0522, lng: -118.2437, count: 1 },
+  { city: 'Phoenix, AZ', lat: 33.4484, lng: -112.074, count: 1 },
+  { city: 'Dallas, TX', lat: 32.7767, lng: -96.797, count: 1 },
+  { city: 'Seattle, WA', lat: 47.6062, lng: -122.3321, count: 1 },
+  { city: 'Atlanta, GA', lat: 33.749, lng: -84.388, count: 1 },
+  { city: 'Chicago, IL', lat: 41.8781, lng: -87.6298, count: 1 },
+  { city: 'Denver, CO', lat: 39.7392, lng: -104.9903, count: 1 },
+  { city: 'Miami, FL', lat: 25.7617, lng: -80.1918, count: 1 },
+  { city: 'Portland, OR', lat: 45.5152, lng: -122.6784, count: 1 },
+];
+
 export default function HomePage() {
   // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
   // LocalBusiness structured data is emitted statically via routeMeta.ts ('/').
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [propertyStats, setPropertyStats] = useState<PropertyStats>({
+    totalProperties: 12000,
+    statesCovered: 48,
+    cities: FALLBACK_CITIES,
+  });
+
+  useEffect(() => {
+    fetch('/property-stats.json', { cache: 'no-cache' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Stats request failed: ${response.status}`);
+        return response.json() as Promise<PropertyStats>;
+      })
+      .then((stats) => {
+        if (
+          typeof stats.totalProperties !== 'number' ||
+          typeof stats.statesCovered !== 'number' ||
+          !Array.isArray(stats.cities) ||
+          stats.totalProperties === 0
+        ) throw new Error('Invalid or not-yet-synced property stats');
+        setPropertyStats(stats);
+      })
+      .catch(() => {
+        // Keep the established sample map and safe fallback values if the
+        // daily sync has not produced a file yet or the request is unavailable.
+      });
+  }, []);
 
   const scrollPrev = React.useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -227,23 +273,42 @@ export default function HomePage() {
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12" data-testid="heading-map">Where Does Nova Havens Operate?</h2>
         
-        <div className="w-full min-h-[350px] bg-card rounded-[16px] border border-white/10 flex flex-col items-center justify-center mb-12 relative overflow-hidden" data-testid="card-map">
-          {/* Subtle grid pattern background for the map placeholder */}
+        <div className="w-full min-h-[350px] bg-card rounded-[16px] border border-white/10 mb-12 relative overflow-hidden" data-testid="card-map">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(to right, #F5F5F2 1px, transparent 1px), linear-gradient(to bottom, #F5F5F2 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-          <Map className="w-12 h-12 text-[#F2CD6B] mb-4 z-10" />
-          <span className="text-lg font-medium text-foreground z-10">Live property map — coming soon</span>
+          <div className="absolute inset-x-8 inset-y-6" aria-label="Property locations map">
+            {propertyStats.cities.map((city) => {
+              const left = Math.max(3, Math.min(97, ((city.lng + 125) / 60) * 100));
+              const top = Math.max(5, Math.min(95, ((50 - city.lat) / 28) * 100));
+              const size = Math.min(26, 10 + Math.log10(city.count + 1) * 5);
+              return (
+                <div key={city.city} className="absolute -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${left}%`, top: `${top}%` }}>
+                  <span
+                    className="block rounded-full bg-[#D4A24C] border-2 border-[#F2CD6B]/70 shadow-[0_0_18px_rgba(212,162,76,0.45)]"
+                    style={{ width: size, height: size }}
+                    title={`${city.city}: ${city.count.toLocaleString()} properties`}
+                  />
+                  <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                    {city.city}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="absolute bottom-4 left-5 flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="w-2 h-2 rounded-full bg-[#D4A24C]" aria-hidden="true" /> Live mapped property markets
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-card border border-white/5 rounded-[16px] p-8 text-center" data-testid="stat-card-properties">
-            <div className="text-4xl font-extrabold text-[#F2CD6B] mb-2">12,000+</div>
+            <div className="text-4xl font-extrabold text-[#F2CD6B] mb-2">{propertyStats.totalProperties.toLocaleString()}</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">Active Properties</div>
-            <div className="text-xs text-muted-foreground/60 leading-relaxed">Nova Havens has 12,000+ active furnished properties available for placement at any given time, as of 2025.</div>
+            <div className="text-xs text-muted-foreground/60 leading-relaxed">Live property count from the Nova Havens PROPERTY DATABASE board.</div>
           </div>
           <div className="bg-card border border-white/5 rounded-[16px] p-8 text-center" data-testid="stat-card-states">
-            <div className="text-4xl font-extrabold text-[#F2CD6B] mb-2">48</div>
+            <div className="text-4xl font-extrabold text-[#F2CD6B] mb-2">{propertyStats.statesCovered}</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">States Covered</div>
-            <div className="text-xs text-muted-foreground/60 leading-relaxed">Nova Havens operates in all 48 contiguous US states, serving families in both major metros and rural communities.</div>
+            <div className="text-xs text-muted-foreground/60 leading-relaxed">Distinct states with at least one approved property in the live database.</div>
           </div>
           <div className="bg-card border border-white/5 rounded-[16px] p-8 text-center" data-testid="stat-card-speed">
             <div className="text-4xl font-extrabold text-[#F2CD6B] mb-2">&lt; 5 Days</div>
