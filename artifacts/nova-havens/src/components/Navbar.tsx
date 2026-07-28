@@ -3,6 +3,7 @@ import { Menu } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 
 export function Logo() {
   return (
@@ -35,12 +36,12 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/contact" className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-submit-property">
+          <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-submit-property">
             Submit Property
-          </Link>
-          <Link href="/contact" className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-request-housing">
+          </a>
+          <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-request-housing">
             Request Housing
-          </Link>
+          </a>
         </div>
 
         {/* Mobile Nav */}
@@ -64,12 +65,12 @@ export default function Navbar() {
                 <Link href="/contact" onClick={closeMenu} className="text-lg font-medium text-foreground" data-testid="link-mobile-contact">Contact</Link>
               </nav>
               <div className="flex flex-col gap-4 mt-auto">
-                <Link href="/contact" onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-submit-property">
+                <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-submit-property">
                   Submit Property
-                </Link>
-                <Link href="/contact" onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-request-housing">
+                </a>
+                <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-request-housing">
                   Request Housing
-                </Link>
+                </a>
               </div>
             </SheetContent>
           </Sheet>

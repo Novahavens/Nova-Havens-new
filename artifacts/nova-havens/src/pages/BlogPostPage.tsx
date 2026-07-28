@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { useParams, Link } from 'wouter';
 import { ArrowLeft, Calendar, Tag, User } from 'lucide-react';
 import { getPostBySlug } from '@/data/blogPosts';
+import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 
 // ---------------------------------------------------------------------------
 // Inline text renderer: handles **bold** and *italic* markers
@@ -257,7 +258,8 @@ export default function BlogPostPage() {
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                  href="#"
+                  href={INTAKE_FORMS.housing}
+                  {...EXTERNAL_FORM_LINK_PROPS}
                   className="px-7 py-3 rounded-full bg-[#D4A24C] text-[#0A0C10] font-bold text-sm hover:brightness-105 transition-all"
                   data-testid="btn-request-housing-cta"
                 >
