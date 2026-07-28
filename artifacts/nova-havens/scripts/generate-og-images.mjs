@@ -186,6 +186,17 @@ function svgFor(post) {
 }
 
 fs.mkdirSync(publicDir, { recursive: true });
+
+// Remove stale images for posts that were deleted or renamed,
+// so builds never ship og-blog-*.png files without a matching post.
+const validNames = new Set(posts.map((p) => `og-blog-${p.slug}.png`));
+for (const file of fs.readdirSync(publicDir)) {
+  if (/^og-blog-.*\.png$/.test(file) && !validNames.has(file)) {
+    fs.unlinkSync(path.join(publicDir, file));
+    console.log("removed stale", path.join(publicDir, file));
+  }
+}
+
 for (const post of posts) {
   const out = path.join(publicDir, `og-blog-${post.slug}.png`);
   await sharp(Buffer.from(svgFor(post))).png().toFile(out);
