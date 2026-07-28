@@ -35,6 +35,19 @@ const SOCIAL_PROFILE_URLS = [
 ];
 /** Single canonical entity @id — every Organization/LocalBusiness block must reference this. */
 const BUSINESS_ID = `${BASE_URL}/#organization`;
+/** Canonical WebSite node @id — referenced via `isPartOf` on page schemas. */
+const WEBSITE_ID = `${BASE_URL}/#website`;
+/**
+ * WebSite schema node emitted on every page that has structured data, so all
+ * `isPartOf: { '@id': WEBSITE_ID }` references resolve within the graph.
+ */
+const WEBSITE_SCHEMA = {
+  '@type': 'WebSite',
+  '@id': WEBSITE_ID,
+  name: SITE_NAME,
+  url: `${BASE_URL}/`,
+  publisher: { '@id': BUSINESS_ID },
+};
 const BUSINESS_PHONE = '+16294010054';
 const BUSINESS_EMAIL = 'info@novahavens.com';
 const BUSINESS_ADDRESS = {
@@ -140,6 +153,7 @@ const STATIC_META: Record<string, RouteMeta> = {
     jsonLd: {
       '@context': 'https://schema.org',
       '@graph': [
+        WEBSITE_SCHEMA,
         {
           '@type': 'LocalBusiness',
           '@id': BUSINESS_ID,
@@ -255,6 +269,7 @@ const STATIC_META: Record<string, RouteMeta> = {
     jsonLd: {
       '@context': 'https://schema.org',
       '@graph': [
+        WEBSITE_SCHEMA,
         {
           '@type': 'ItemList',
           name: 'Nova Havens Blog & Resources',
@@ -296,6 +311,7 @@ const STATIC_META: Record<string, RouteMeta> = {
     jsonLd: {
       '@context': 'https://schema.org',
       '@graph': [
+        WEBSITE_SCHEMA,
         {
           '@type': 'AboutPage',
           '@id': `${BASE_URL}/meet-the-team`,
@@ -389,6 +405,7 @@ const STATIC_META: Record<string, RouteMeta> = {
     jsonLd: {
       '@context': 'https://schema.org',
       '@graph': [
+        WEBSITE_SCHEMA,
         {
           '@type': 'Organization',
           '@id': BUSINESS_ID,
@@ -484,6 +501,7 @@ const STATIC_META: Record<string, RouteMeta> = {
     jsonLd: {
       '@context': 'https://schema.org',
       '@graph': [
+        WEBSITE_SCHEMA,
         {
           '@type': 'LocalBusiness',
           '@id': BUSINESS_ID,
@@ -633,7 +651,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
       },
     };
 
-    const graph: Record<string, unknown>[] = [blogPostingSchema];
+    const graph: Record<string, unknown>[] = [WEBSITE_SCHEMA, blogPostingSchema];
     if (faqSchema) graph.push(faqSchema);
 
     return [
