@@ -1,9 +1,12 @@
 // Generates 1200x630 OG images for each blog post into public/og-blog-<slug>.png
 // Brand: dark bg #0A0C10, gold #D4A24C, Plus Jakarta Sans.
+// Post list is derived from src/data/blogPosts.ts (run with --experimental-strip-types)
+// so adding a post there is the only step needed — the image is generated automatically.
 import sharp from "sharp";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import fs from "node:fs";
+import { BLOG_POSTS } from "../src/data/blogPosts.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -97,16 +100,53 @@ const motifs = {
     </g>`,
 };
 
-const posts = [
-  { slug: "how-ai-is-streamlining-temporary-housing-placements-for-adjusters", category: "Insurance Professionals", motif: "ai", lines: ["How AI Is Streamlining", "Temporary Housing Placements", "for Adjusters"] },
-  { slug: "what-to-look-for-in-a-housing-coordinator-for-large-loss-claims", category: "Insurance Professionals", motif: "checklist", lines: ["What to Look for in a", "Housing Coordinator for", "Large-Loss Claims"] },
-  { slug: "what-to-expect-when-your-insurer-places-you-in-temporary-housing", category: "Displaced Families", motif: "house", lines: ["What to Expect When Your", "Insurer Places You in", "Temporary Housing"] },
-  { slug: "bringing-pets-to-temporary-housing-what-you-need-to-know", category: "Displaced Families", motif: "paw", lines: ["Bringing Pets to Temporary", "Housing: What You", "Need to Know"] },
-  { slug: "how-to-list-your-furnished-property-with-nova-havens", category: "Property Owners", motif: "key", lines: ["How to List Your", "Furnished Property", "with Nova Havens"] },
-  { slug: "what-insurance-housing-coordinators-look-for-in-a-property", category: "Property Owners", motif: "magnifier", lines: ["What Insurance Housing", "Coordinators Look for", "in a Property"] },
-  { slug: "nova-havens-expands-to-48-states", category: "Company News", motif: "map", lines: ["Nova Havens Expands", "to 48 States"] },
-  { slug: "introducing-automated-claim-processing-at-nova-havens", category: "Company News", motif: "gears", lines: ["Introducing Automated", "Claim Processing", "at Nova Havens"] },
-];
+// Optional per-post motif overrides (keyed by slug). Posts without an entry
+// fall back to a motif chosen by category, so new posts never block the build.
+const motifBySlug = {
+  "how-ai-is-streamlining-temporary-housing-placements-for-adjusters": "ai",
+  "what-to-look-for-in-a-housing-coordinator-for-large-loss-claims": "checklist",
+  "what-to-expect-when-your-insurer-places-you-in-temporary-housing": "house",
+  "bringing-pets-to-temporary-housing-what-you-need-to-know": "paw",
+  "how-to-list-your-furnished-property-with-nova-havens": "key",
+  "what-insurance-housing-coordinators-look-for-in-a-property": "magnifier",
+  "nova-havens-expands-to-48-states": "map",
+  "introducing-automated-claim-processing-at-nova-havens": "gears",
+};
+
+const motifByCategory = {
+  "Insurance Professionals": "checklist",
+  "Displaced Families": "house",
+  "Property Owners": "key",
+  "Company News": "map",
+};
+
+// Wrap a title into up to `maxLines` lines of roughly `maxChars` characters.
+function wrapTitle(title, maxChars = 28, maxLines = 3) {
+  const words = title.split(/\s+/);
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    if (current && (current + " " + word).length > maxChars) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = current ? current + " " + word : word;
+    }
+  }
+  if (current) lines.push(current);
+  if (lines.length > maxLines) {
+    lines[maxLines - 1] = lines.slice(maxLines - 1).join(" ");
+    lines.length = maxLines;
+  }
+  return lines;
+}
+
+const posts = BLOG_POSTS.map((p) => ({
+  slug: p.slug,
+  category: p.category,
+  motif: motifBySlug[p.slug] ?? motifByCategory[p.category] ?? "house",
+  lines: wrapTitle(p.title),
+}));
 
 function escapeXml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
