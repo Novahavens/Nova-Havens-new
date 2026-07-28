@@ -33,6 +33,20 @@ const SOCIAL_PROFILE_URLS = [
   'https://www.instagram.com/novahavenshousing/',
   'https://www.facebook.com/novahavenshousing',
 ];
+/** Single canonical entity @id — every Organization/LocalBusiness block must reference this. */
+const BUSINESS_ID = `${BASE_URL}/#organization`;
+const BUSINESS_PHONE = '+16294010054';
+const BUSINESS_EMAIL = 'info@novahavens.com';
+const BUSINESS_ADDRESS = {
+  '@type': 'PostalAddress',
+  addressLocality: 'Nashville',
+  addressRegion: 'TN',
+  addressCountry: 'US',
+};
+const BUSINESS_AREA_SERVED = {
+  '@type': 'Country',
+  name: 'United States',
+};
 export const DEFAULT_DESCRIPTION =
   'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket.';
 
@@ -128,21 +142,13 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@graph': [
         {
           '@type': 'LocalBusiness',
-          '@id': `${BASE_URL}/#localbusiness`,
+          '@id': BUSINESS_ID,
           name: SITE_NAME,
           url: `${BASE_URL}/`,
-          telephone: '+16294010054',
-          email: 'info@novahavens.com',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: 'Nashville',
-            addressRegion: 'TN',
-            addressCountry: 'US',
-          },
-          areaServed: {
-            '@type': 'Country',
-            name: 'United States',
-          },
+          telephone: BUSINESS_PHONE,
+          email: BUSINESS_EMAIL,
+          address: BUSINESS_ADDRESS,
+          areaServed: BUSINESS_AREA_SERVED,
           sameAs: SOCIAL_PROFILE_URLS,
           serviceType: 'Insurance Housing Coordination',
           description:
@@ -307,7 +313,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             "Alexandra founded Nova Havens after coordinating housing for her own family following a house fire — an experience that revealed how fragmented and impersonal the insurance housing process had become. She leads Nova Havens' overall strategy, carrier partnerships, and vision for compassionate, technology-assisted placement.",
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         },
@@ -319,7 +325,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             'Marcus brings 14 years of large-loss adjuster experience to Nova Havens. As Head of Carrier Relations, he manages all insurer partnerships, ensures documentation meets carrier standards, and trains the coordination team on claims-specific communication and compliance.',
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         },
@@ -331,7 +337,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             'Priya leads the Nova Havens placement team responsible for matching displaced households to verified homes nationwide. Her expertise spans ALE policy interpretation, school-district proximity matching, pet-accommodation logistics, and multi-family accessibility requirements.',
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         },
@@ -343,7 +349,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             "Daniel oversees the growth and quality of Nova Havens' 20,000+ verified furnished property network across 48 states. As Property Network Manager, he sets inspection standards, manages property owner relationships, and ensures every listing meets the same livability benchmark.",
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         },
@@ -355,7 +361,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             'Sofia manages the active-placement lifecycle for Nova Havens — extensions, adjuster updates, property adjustments, and move-out coordination. Her role as Claims Coordination Lead ensures that adjusters receive proactive status notifications without having to follow up.',
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         },
@@ -367,7 +373,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             'James is typically the first Nova Havens voice a displaced family hears. As Family Support Specialist, he guides households through every step of the placement process — from the initial needs assessment to move-in day — with empathy, clarity, and 24/7 availability.',
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         },
@@ -385,7 +391,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@graph': [
         {
           '@type': 'Organization',
-          '@id': `${BASE_URL}/#organization`,
+          '@id': BUSINESS_ID,
           name: SITE_NAME,
           url: BASE_URL,
           logo: {
@@ -395,18 +401,10 @@ const STATIC_META: Record<string, RouteMeta> = {
           sameAs: SOCIAL_PROFILE_URLS,
           description:
             'Nova Havens is a Nashville, TN-based furnished housing coordination company that places families displaced by fire, water, or mold damage into verified furnished homes — working directly with insurance carriers, adjusters, and relocation specialists across all 48 contiguous US states.',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: 'Nashville',
-            addressRegion: 'TN',
-            addressCountry: 'US',
-          },
-          telephone: '+16294010054',
-          email: 'info@novahavens.com',
-          areaServed: {
-            '@type': 'Country',
-            name: 'United States',
-          },
+          address: BUSINESS_ADDRESS,
+          telephone: BUSINESS_PHONE,
+          email: BUSINESS_EMAIL,
+          areaServed: BUSINESS_AREA_SERVED,
           foundingLocation: {
             '@type': 'Place',
             name: 'Nashville, Tennessee',
@@ -427,7 +425,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours, billed directly to carriers nationwide.',
           url: `${BASE_URL}/about-us`,
           isPartOf: { '@id': `${BASE_URL}/#website` },
-          about: { '@id': `${BASE_URL}/#organization` },
+          about: { '@id': BUSINESS_ID },
         },
         {
           '@type': 'FAQPage',
@@ -488,7 +486,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@graph': [
         {
           '@type': 'LocalBusiness',
-          '@id': `${BASE_URL}/#organization`,
+          '@id': BUSINESS_ID,
           name: SITE_NAME,
           url: BASE_URL,
           logo: {
@@ -497,18 +495,10 @@ const STATIC_META: Record<string, RouteMeta> = {
           },
           description:
             'Nova Havens coordinates furnished temporary housing for insurance-displaced families across all 48 contiguous US states, billed directly to carriers.',
-          telephone: '+16294010054',
-          email: 'info@novahavens.com',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: 'Nashville',
-            addressRegion: 'TN',
-            addressCountry: 'US',
-          },
-          areaServed: {
-            '@type': 'Country',
-            name: 'United States',
-          },
+          telephone: BUSINESS_PHONE,
+          email: BUSINESS_EMAIL,
+          address: BUSINESS_ADDRESS,
+          areaServed: BUSINESS_AREA_SERVED,
           openingHoursSpecification: {
             '@type': 'OpeningHoursSpecification',
             dayOfWeek: [
@@ -525,9 +515,9 @@ const STATIC_META: Record<string, RouteMeta> = {
           },
           contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '+16294010054',
+            telephone: BUSINESS_PHONE,
             contactType: 'customer service',
-            email: 'info@novahavens.com',
+            email: BUSINESS_EMAIL,
             availableLanguage: 'English',
             hoursAvailable: {
               '@type': 'OpeningHoursSpecification',
@@ -553,7 +543,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             'Reach Nova Havens at (629) 401-0054 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
           url: `${BASE_URL}/contact`,
           isPartOf: { '@id': `${BASE_URL}/#website` },
-          about: { '@id': `${BASE_URL}/#organization` },
+          about: { '@id': BUSINESS_ID },
         },
       ],
     },
@@ -601,13 +591,13 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
           jobTitle: post.author.role,
           worksFor: {
             '@type': 'Organization',
-            '@id': `${BASE_URL}/#organization`,
+            '@id': BUSINESS_ID,
             name: SITE_NAME,
           },
         }
       : {
           '@type': 'Organization',
-          '@id': `${BASE_URL}/#organization`,
+          '@id': BUSINESS_ID,
           name: SITE_NAME,
         };
 
@@ -624,7 +614,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
       author: authorSchema,
       publisher: {
         '@type': 'Organization',
-        '@id': `${BASE_URL}/#organization`,
+        '@id': BUSINESS_ID,
         name: SITE_NAME,
         logo: {
           '@type': 'ImageObject',
