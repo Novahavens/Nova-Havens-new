@@ -27,6 +27,12 @@ export interface RouteMeta {
 
 const SITE_NAME = 'Nova Havens';
 const BASE_URL = 'https://novahavens.com';
+/** Official social profiles — used in Organization schema `sameAs`. */
+const SOCIAL_PROFILE_URLS = [
+  'https://www.linkedin.com/company/novahavenshousing',
+  'https://www.instagram.com/novahavenshousing/',
+  'https://www.facebook.com/novahavenshousing',
+];
 export const DEFAULT_DESCRIPTION =
   'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket.';
 
@@ -364,6 +370,7 @@ const STATIC_META: Record<string, RouteMeta> = {
             '@type': 'ImageObject',
             url: `${BASE_URL}/og-image.png`,
           },
+          sameAs: SOCIAL_PROFILE_URLS,
           description:
             'Nova Havens is a Nashville, TN-based furnished housing coordination company that places families displaced by fire, water, or mold damage into verified furnished homes — working directly with insurance carriers, adjusters, and relocation specialists across all 48 contiguous US states.',
           address: {
@@ -601,6 +608,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
           '@type': 'ImageObject',
           url: `${BASE_URL}/og-image.png`,
         },
+        sameAs: SOCIAL_PROFILE_URLS,
       },
       mainEntityOfPage: {
         '@type': 'WebPage',

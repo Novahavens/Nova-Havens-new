@@ -66,6 +66,11 @@ export default function HomePage() {
         "@type": "Country",
         "name": "United States"
       },
+      "sameAs": [
+        "https://www.linkedin.com/company/novahavenshousing",
+        "https://www.instagram.com/novahavenshousing/",
+        "https://www.facebook.com/novahavenshousing"
+      ],
       "serviceType": "Insurance Housing Coordination",
       "description": "Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call."
     });
