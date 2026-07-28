@@ -1,12 +1,14 @@
 /**
  * validate-prerender.ts — verifies that the *shipped* HTML contains the
- * structured data search engines see.
+ * structured data and social metadata search engines see.
  *
  * validate-jsonld.ts checks the metadata source (routeMeta.ts); this check
  * closes the loop on the build output: for every route in ALL_ROUTE_META that
  * declares `jsonLd`, the prerendered file under dist/public/ must exist and
  * contain a parseable <script type="application/ld+json" id="jsonld-route">
- * whose content matches the route's declared jsonLd exactly.
+ * whose content matches the route's declared jsonLd exactly. It also verifies
+ * title, description, canonical, Open Graph, and Twitter card values for every
+ * route, so a broken template replacement cannot silently ship bad previews.
  *
  * If dist/public/index.html is missing (no build yet), it runs the build
  * first (set SKIP_BUILD=1 to fail fast instead).
@@ -58,6 +60,48 @@ function routeToFilePath(route: string): string {
 const SCRIPT_RE =
   /<script type="application\/ld\+json" id="jsonld-route">([\s\S]*?)<\/script>/g;
 
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
+function extractAttribute(
+  html: string,
+  tagPattern: string,
+  attribute: string,
+): string | null {
+  const tag = html.match(new RegExp(`<${tagPattern}(?=\\s|>)\\s[^>]*>`, 'i'))?.[0]
+    ?? html.match(new RegExp(`<${tagPattern}(?=\\s|>)[^>]*>`, 'i'))?.[0];
+  if (!tag) return null;
+  const value = tag.match(
+    new RegExp(`${attribute}="([^"]*)"`, 'i'),
+  )?.[1];
+  return value === undefined ? null : decodeHtmlEntities(value);
+}
+
+function extractTitle(html: string): string | null {
+  const title = html.match(/<title>([\s\S]*?)<\/title>/i)?.[1];
+  return title === undefined ? null : decodeHtmlEntities(title);
+}
+
+function checkValue(
+  route: string,
+  relPath: string,
+  label: string,
+  actual: string | null,
+  expected: string,
+): void {
+  if (actual === null) {
+    fail(route, `${label} missing from ${relPath}`);
+  } else if (actual !== expected) {
+    fail(route, `${label} mismatch in ${relPath}: expected "${expected}", got "${actual}"`);
+  }
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 
 let failures = 0;
@@ -79,6 +123,72 @@ for (const [route, meta] of Object.entries(ALL_ROUTE_META)) {
 
   const html = readFileSync(filePath, 'utf-8');
   const matches = [...html.matchAll(SCRIPT_RE)];
+
+  checkValue(route, relPath, '<title>', extractTitle(html), meta.title);
+  checkValue(
+    route,
+    relPath,
+    'meta description',
+    extractAttribute(html, 'meta\\s+name="description"', 'content'),
+    meta.description,
+  );
+  checkValue(
+    route,
+    relPath,
+    'canonical URL',
+    extractAttribute(html, 'link\\s+rel="canonical"', 'href'),
+    meta.canonicalUrl,
+  );
+  checkValue(
+    route,
+    relPath,
+    'og:title',
+    extractAttribute(html, 'meta\\s+property="og:title"', 'content'),
+    meta.title,
+  );
+  checkValue(
+    route,
+    relPath,
+    'og:description',
+    extractAttribute(html, 'meta\\s+property="og:description"', 'content'),
+    meta.description,
+  );
+  checkValue(
+    route,
+    relPath,
+    'og:url',
+    extractAttribute(html, 'meta\\s+property="og:url"', 'content'),
+    meta.canonicalUrl,
+  );
+  const expectedImage = meta.ogImage ?? 'https://novahavens.com/og-image.png';
+  checkValue(
+    route,
+    relPath,
+    'og:image',
+    extractAttribute(html, 'meta\\s+property="og:image"', 'content'),
+    expectedImage,
+  );
+  checkValue(
+    route,
+    relPath,
+    'twitter:title',
+    extractAttribute(html, 'meta\\s+name="twitter:title"', 'content'),
+    meta.title,
+  );
+  checkValue(
+    route,
+    relPath,
+    'twitter:description',
+    extractAttribute(html, 'meta\\s+name="twitter:description"', 'content'),
+    meta.description,
+  );
+  checkValue(
+    route,
+    relPath,
+    'twitter:image',
+    extractAttribute(html, 'meta\\s+name="twitter:image"', 'content'),
+    expectedImage,
+  );
 
   if (!meta.jsonLd) {
     // Routes without structured data must not ship a stale block.
@@ -116,11 +226,11 @@ for (const [route, meta] of Object.entries(ALL_ROUTE_META)) {
 
 if (failures > 0) {
   console.error(
-    `\nPrerender JSON-LD validation FAILED: ${failures} problem(s) across ${Object.keys(ALL_ROUTE_META).length} routes.`,
+    `\nPrerender metadata validation FAILED: ${failures} problem(s) across ${Object.keys(ALL_ROUTE_META).length} routes.`,
   );
   process.exit(1);
 }
 
 console.log(
-  `Prerender JSON-LD validation passed: ${checked} route(s) with structured data verified in dist/public/ (${Object.keys(ALL_ROUTE_META).length} routes total).`,
+  `Prerender metadata validation passed: titles, descriptions, canonical URLs, Open Graph, Twitter cards, and ${checked} route(s) with structured data verified in dist/public/ (${Object.keys(ALL_ROUTE_META).length} routes total).`,
 );
