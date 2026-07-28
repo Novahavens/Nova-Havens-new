@@ -1,3 +1,14 @@
+/** Motif names available in scripts/generate-og-images.mjs for OG artwork. */
+export type BlogPostMotif =
+  | "ai"
+  | "checklist"
+  | "house"
+  | "paw"
+  | "key"
+  | "magnifier"
+  | "map"
+  | "gears";
+
 export interface BlogPost {
   id: number;
   slug: string;
@@ -9,6 +20,11 @@ export interface BlogPost {
   keywords: string[];
   /** Per-post OG image URL. Used in og:image meta and BlogPosting schema. */
   image?: string;
+  /**
+   * Optional OG image motif for scripts/generate-og-images.mjs.
+   * Falls back to a category default when omitted.
+   */
+  motif?: BlogPostMotif;
   author?: {
     name: string;
     role: string;
@@ -20,6 +36,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     id: 1,
     slug: "how-ai-is-streamlining-temporary-housing-placements-for-adjusters",
+    motif: "ai",
     category: "Insurance Professionals",
     title: "How AI Is Streamlining Temporary Housing Placements for Adjusters",
     date: "June 12, 2025",
@@ -83,6 +100,7 @@ Yes. Nova Havens discloses when and how automation plays a role in the placement
   {
     id: 2,
     slug: "what-to-look-for-in-a-housing-coordinator-for-large-loss-claims",
+    motif: "checklist",
     category: "Insurance Professionals",
     title: "What to Look for in a Housing Coordinator for Large-Loss Claims",
     date: "May 28, 2025",
@@ -159,6 +177,7 @@ Nova Havens targets housing options within 48 hours for standard large-loss plac
   {
     id: 3,
     slug: "what-to-expect-when-your-insurer-places-you-in-temporary-housing",
+    motif: "house",
     category: "Displaced Families",
     title: "What to Expect When Your Insurer Places You in Temporary Housing",
     date: "May 14, 2025",
@@ -243,6 +262,7 @@ Your insurance carrier determines how ALE housing is coordinated. If Nova Havens
   {
     id: 4,
     slug: "bringing-pets-to-temporary-housing-what-you-need-to-know",
+    motif: "paw",
     category: "Displaced Families",
     title: "Bringing Pets to Temporary Housing: What You Need to Know",
     date: "April 30, 2025",
@@ -323,6 +343,7 @@ Emotional support animals occupy a different legal category than service animals
   {
     id: 5,
     slug: "how-to-list-your-furnished-property-with-nova-havens",
+    motif: "key",
     category: "Property Owners",
     title: "How to List Your Furnished Property with Nova Havens",
     date: "April 15, 2025",
@@ -392,6 +413,7 @@ Nova Havens assigns a coordinator to every placement who serves as the point of 
   {
     id: 6,
     slug: "what-insurance-housing-coordinators-look-for-in-a-property",
+    motif: "magnifier",
     category: "Property Owners",
     title: "What Insurance Housing Coordinators Look for in a Property",
     date: "March 22, 2025",
@@ -465,6 +487,7 @@ Yes. Properties that accept large dogs, or pets beyond the standard cat/small do
   {
     id: 7,
     slug: "nova-havens-expands-to-48-states",
+    motif: "map",
     category: "Company News",
     title: "Nova Havens Expands to 48 States",
     date: "March 8, 2025",
@@ -533,6 +556,7 @@ Nova Havens has not announced a timeline for Alaska and Hawaii coverage. These m
   {
     id: 8,
     slug: "introducing-automated-claim-processing-at-nova-havens",
+    motif: "gears",
     category: "Company News",
     title: "Introducing Automated Claim Processing at Nova Havens",
     date: "February 19, 2025",

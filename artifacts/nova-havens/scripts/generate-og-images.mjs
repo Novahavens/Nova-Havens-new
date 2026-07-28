@@ -100,19 +100,8 @@ const motifs = {
     </g>`,
 };
 
-// Optional per-post motif overrides (keyed by slug). Posts without an entry
+// Posts may declare a `motif` field in blogPosts.ts; posts without one
 // fall back to a motif chosen by category, so new posts never block the build.
-const motifBySlug = {
-  "how-ai-is-streamlining-temporary-housing-placements-for-adjusters": "ai",
-  "what-to-look-for-in-a-housing-coordinator-for-large-loss-claims": "checklist",
-  "what-to-expect-when-your-insurer-places-you-in-temporary-housing": "house",
-  "bringing-pets-to-temporary-housing-what-you-need-to-know": "paw",
-  "how-to-list-your-furnished-property-with-nova-havens": "key",
-  "what-insurance-housing-coordinators-look-for-in-a-property": "magnifier",
-  "nova-havens-expands-to-48-states": "map",
-  "introducing-automated-claim-processing-at-nova-havens": "gears",
-};
-
 const motifByCategory = {
   "Insurance Professionals": "checklist",
   "Displaced Families": "house",
@@ -144,7 +133,7 @@ function wrapTitle(title, maxChars = 28, maxLines = 3) {
 const posts = BLOG_POSTS.map((p) => ({
   slug: p.slug,
   category: p.category,
-  motif: motifBySlug[p.slug] ?? motifByCategory[p.category] ?? "house",
+  motif: (p.motif && motifs[p.motif] ? p.motif : undefined) ?? motifByCategory[p.category] ?? "house",
   lines: wrapTitle(p.title),
 }));
 
