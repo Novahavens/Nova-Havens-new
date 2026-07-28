@@ -259,6 +259,92 @@ const STATIC_META: Record<string, RouteMeta> = {
       'Nova Havens is staffed by coordinators, carrier specialists, and family advocates who manage furnished housing placements across all 48 contiguous US states.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/meet-the-team`,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'AboutPage',
+          '@id': `${BASE_URL}/meet-the-team`,
+          name: 'Meet the Nova Havens Team',
+          description:
+            'The coordinators, carrier specialists, and family advocates behind Nova Havens — managing furnished housing placements across all 48 contiguous US states.',
+          url: `${BASE_URL}/meet-the-team`,
+          isPartOf: { '@id': `${BASE_URL}/#website` },
+        },
+        {
+          '@type': 'Person',
+          name: 'Alexandra Reyes',
+          jobTitle: 'Founder & CEO',
+          description:
+            "Alexandra founded Nova Havens after coordinating housing for her own family following a house fire — an experience that revealed how fragmented and impersonal the insurance housing process had become. She leads Nova Havens' overall strategy, carrier partnerships, and vision for compassionate, technology-assisted placement.",
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        },
+        {
+          '@type': 'Person',
+          name: 'Marcus Whitfield',
+          jobTitle: 'Head of Carrier Relations',
+          description:
+            'Marcus brings 14 years of large-loss adjuster experience to Nova Havens. As Head of Carrier Relations, he manages all insurer partnerships, ensures documentation meets carrier standards, and trains the coordination team on claims-specific communication and compliance.',
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        },
+        {
+          '@type': 'Person',
+          name: 'Priya Natarajan',
+          jobTitle: 'Director of Placements',
+          description:
+            'Priya leads the Nova Havens placement team responsible for matching displaced households to verified homes nationwide. Her expertise spans ALE policy interpretation, school-district proximity matching, pet-accommodation logistics, and multi-family accessibility requirements.',
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        },
+        {
+          '@type': 'Person',
+          name: 'Daniel Okafor',
+          jobTitle: 'Property Network Manager',
+          description:
+            "Daniel oversees the growth and quality of Nova Havens' 20,000+ verified furnished property network across 48 states. As Property Network Manager, he sets inspection standards, manages property owner relationships, and ensures every listing meets the same livability benchmark.",
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        },
+        {
+          '@type': 'Person',
+          name: 'Sofia Marchetti',
+          jobTitle: 'Claims Coordination Lead',
+          description:
+            'Sofia manages the active-placement lifecycle for Nova Havens — extensions, adjuster updates, property adjustments, and move-out coordination. Her role as Claims Coordination Lead ensures that adjusters receive proactive status notifications without having to follow up.',
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        },
+        {
+          '@type': 'Person',
+          name: 'James Calloway',
+          jobTitle: 'Family Support Specialist',
+          description:
+            'James is typically the first Nova Havens voice a displaced family hears. As Family Support Specialist, he guides households through every step of the placement process — from the initial needs assessment to move-in day — with empathy, clarity, and 24/7 availability.',
+          worksFor: {
+            '@type': 'Organization',
+            '@id': `${BASE_URL}/#organization`,
+            name: SITE_NAME,
+          },
+        },
+      ],
+    },
   },
   '/about-us': {
     title: `About Us | ${SITE_NAME}`,
@@ -266,6 +352,101 @@ const STATIC_META: Record<string, RouteMeta> = {
       'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours, billed directly to carriers nationwide.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/about-us`,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': `${BASE_URL}/#organization`,
+          name: SITE_NAME,
+          url: BASE_URL,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${BASE_URL}/og-image.png`,
+          },
+          description:
+            'Nova Havens is a Nashville, TN-based furnished housing coordination company that places families displaced by fire, water, or mold damage into verified furnished homes — working directly with insurance carriers, adjusters, and relocation specialists across all 48 contiguous US states.',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Nashville',
+            addressRegion: 'TN',
+            addressCountry: 'US',
+          },
+          telephone: '+16294010054',
+          email: 'info@novahavens.com',
+          areaServed: {
+            '@type': 'Country',
+            name: 'United States',
+          },
+          foundingLocation: {
+            '@type': 'Place',
+            name: 'Nashville, Tennessee',
+          },
+          knowsAbout: [
+            'Insurance housing coordination',
+            'Additional Living Expenses (ALE) coverage',
+            'Temporary furnished housing',
+            'Insurance claims management',
+            'Displaced family housing placement',
+          ],
+        },
+        {
+          '@type': 'AboutPage',
+          '@id': `${BASE_URL}/about-us`,
+          name: `About ${SITE_NAME}`,
+          description:
+            'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours, billed directly to carriers nationwide.',
+          url: `${BASE_URL}/about-us`,
+          isPartOf: { '@id': `${BASE_URL}/#website` },
+          about: { '@id': `${BASE_URL}/#organization` },
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'Who does Nova Havens serve?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Nova Havens serves three groups: displaced families who need furnished housing after a covered property loss; insurance carriers and independent adjusters who need a reliable, carrier-aligned housing coordinator; and property owners who want to list their furnished homes in a vetted network. All three are served through one coordinated team based in Nashville, TN.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'What makes Nova Havens different from other relocation companies?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Nova Havens is purpose-built for the insurance housing workflow. Unlike general relocation companies, Nova Havens assigns a single coordinator to each claim, bills carriers directly under ALE coverage, provides proactive documentation updates adjusters need, and operates a verified property network — not a third-party listing marketplace. As of 2025, Nova Havens operates across all 48 contiguous US states.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How does Nova Havens verify its properties?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: "Every property in the Nova Havens network is inspected by a Nova Havens coordinator before being listed. The inspection covers furnishing standards (beds with linens, stocked kitchen, Wi-Fi, washer/dryer), safety conditions, and overall livability. Properties that don't meet the standard are not added to the network. Nova Havens maintains 20,000+ verified homes as of 2025.",
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Does Nova Havens handle billing with insurance carriers directly?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: "Yes. When a family's Additional Living Expenses (ALE) coverage is active, Nova Havens bills the insurance carrier or adjuster directly — so the displaced family typically pays nothing out of pocket for housing. Nova Havens works with carriers including Allstate, Travelers, Farmers Insurance, State Farm, and others.",
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Where is Nova Havens headquartered?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054 or info@novahavens.com.',
+              },
+            },
+          ],
+        },
+      ],
+    },
   },
   '/contact': {
     title: `Contact Us | ${SITE_NAME}`,
@@ -273,6 +454,80 @@ const STATIC_META: Record<string, RouteMeta> = {
       'Reach Nova Havens at (629) 401-0054 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/contact`,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'LocalBusiness',
+          '@id': `${BASE_URL}/#organization`,
+          name: SITE_NAME,
+          url: BASE_URL,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${BASE_URL}/og-image.png`,
+          },
+          description:
+            'Nova Havens coordinates furnished temporary housing for insurance-displaced families across all 48 contiguous US states, billed directly to carriers.',
+          telephone: '+16294010054',
+          email: 'info@novahavens.com',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Nashville',
+            addressRegion: 'TN',
+            addressCountry: 'US',
+          },
+          areaServed: {
+            '@type': 'Country',
+            name: 'United States',
+          },
+          openingHoursSpecification: {
+            '@type': 'OpeningHoursSpecification',
+            dayOfWeek: [
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday',
+              'Sunday',
+            ],
+            opens: '00:00',
+            closes: '23:59',
+          },
+          contactPoint: {
+            '@type': 'ContactPoint',
+            telephone: '+16294010054',
+            contactType: 'customer service',
+            email: 'info@novahavens.com',
+            availableLanguage: 'English',
+            hoursAvailable: {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday',
+              ],
+              opens: '00:00',
+              closes: '23:59',
+            },
+          },
+        },
+        {
+          '@type': 'ContactPage',
+          '@id': `${BASE_URL}/contact`,
+          name: `Contact ${SITE_NAME}`,
+          description:
+            'Reach Nova Havens at (629) 401-0054 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
+          url: `${BASE_URL}/contact`,
+          isPartOf: { '@id': `${BASE_URL}/#website` },
+          about: { '@id': `${BASE_URL}/#organization` },
+        },
+      ],
+    },
   },
   '/privacy-policy': {
     title: `Privacy Policy | ${SITE_NAME}`,
