@@ -44,7 +44,64 @@ type PropertyCity = { city: string; lat: number; lng: number; count: number };
 type PropertyStats = {
   totalProperties: number;
   statesCovered: number;
+  byState: Record<string, number>;
   cities: PropertyCity[];
+};
+
+type StateCentroid = { name: string; lat: number; lng: number };
+
+const STATE_CENTROIDS: Record<string, StateCentroid> = {
+  AL: { name: 'Alabama', lat: 32.8067, lng: -86.7911 },
+  AK: { name: 'Alaska', lat: 61.3707, lng: -152.4044 },
+  AZ: { name: 'Arizona', lat: 33.7298, lng: -111.4312 },
+  AR: { name: 'Arkansas', lat: 34.9697, lng: -92.3731 },
+  CA: { name: 'California', lat: 36.1162, lng: -119.6816 },
+  CO: { name: 'Colorado', lat: 39.0598, lng: -105.3111 },
+  CT: { name: 'Connecticut', lat: 41.5978, lng: -72.7554 },
+  DE: { name: 'Delaware', lat: 39.3185, lng: -75.5071 },
+  FL: { name: 'Florida', lat: 27.7663, lng: -81.6868 },
+  GA: { name: 'Georgia', lat: 33.0406, lng: -83.6431 },
+  HI: { name: 'Hawaii', lat: 21.0943, lng: -157.4983 },
+  ID: { name: 'Idaho', lat: 44.2405, lng: -114.4788 },
+  IL: { name: 'Illinois', lat: 40.3495, lng: -88.9861 },
+  IN: { name: 'Indiana', lat: 39.8494, lng: -86.2583 },
+  IA: { name: 'Iowa', lat: 42.0115, lng: -93.2105 },
+  KS: { name: 'Kansas', lat: 38.5266, lng: -96.7265 },
+  KY: { name: 'Kentucky', lat: 37.6681, lng: -84.6701 },
+  LA: { name: 'Louisiana', lat: 31.1695, lng: -91.8678 },
+  ME: { name: 'Maine', lat: 44.6939, lng: -69.3819 },
+  MD: { name: 'Maryland', lat: 39.0639, lng: -76.8021 },
+  MA: { name: 'Massachusetts', lat: 42.2302, lng: -71.5301 },
+  MI: { name: 'Michigan', lat: 43.3266, lng: -84.5361 },
+  MN: { name: 'Minnesota', lat: 45.6945, lng: -93.9002 },
+  MS: { name: 'Mississippi', lat: 32.7416, lng: -89.6787 },
+  MO: { name: 'Missouri', lat: 38.4561, lng: -92.2884 },
+  MT: { name: 'Montana', lat: 47.0529, lng: -110.3626 },
+  NE: { name: 'Nebraska', lat: 41.1254, lng: -98.2681 },
+  NV: { name: 'Nevada', lat: 38.3135, lng: -117.0554 },
+  NH: { name: 'New Hampshire', lat: 43.4525, lng: -71.5639 },
+  NJ: { name: 'New Jersey', lat: 40.2989, lng: -74.521 },
+  NM: { name: 'New Mexico', lat: 34.8405, lng: -106.2485 },
+  NY: { name: 'New York', lat: 42.1657, lng: -74.9481 },
+  NC: { name: 'North Carolina', lat: 35.6301, lng: -79.8064 },
+  ND: { name: 'North Dakota', lat: 47.5289, lng: -99.784 },
+  OH: { name: 'Ohio', lat: 40.3888, lng: -82.7649 },
+  OK: { name: 'Oklahoma', lat: 35.5653, lng: -96.9289 },
+  OR: { name: 'Oregon', lat: 44.572, lng: -120.155 },
+  PA: { name: 'Pennsylvania', lat: 40.5908, lng: -77.2098 },
+  RI: { name: 'Rhode Island', lat: 41.6809, lng: -71.5118 },
+  SC: { name: 'South Carolina', lat: 33.8569, lng: -80.8964 },
+  SD: { name: 'South Dakota', lat: 44.2998, lng: -99.4388 },
+  TN: { name: 'Tennessee', lat: 35.7478, lng: -86.6923 },
+  TX: { name: 'Texas', lat: 31.0545, lng: -97.5635 },
+  UT: { name: 'Utah', lat: 40.1501, lng: -111.8624 },
+  VT: { name: 'Vermont', lat: 44.0459, lng: -72.7107 },
+  VA: { name: 'Virginia', lat: 37.7693, lng: -78.17 },
+  WA: { name: 'Washington', lat: 47.4009, lng: -121.4905 },
+  WV: { name: 'West Virginia', lat: 38.4912, lng: -80.9545 },
+  WI: { name: 'Wisconsin', lat: 44.2685, lng: -89.6165 },
+  WY: { name: 'Wyoming', lat: 42.7559, lng: -107.3025 },
+  DC: { name: 'Washington, DC', lat: 38.9072, lng: -77.0369 },
 };
 
 const FALLBACK_CITIES: PropertyCity[] = [
@@ -68,8 +125,10 @@ export default function HomePage() {
   const [propertyStats, setPropertyStats] = useState<PropertyStats>({
     totalProperties: 12000,
     statesCovered: 48,
+  byState: {},
     cities: FALLBACK_CITIES,
   });
+  const [selectedState, setSelectedState] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/property-stats.json', { cache: 'no-cache' })
@@ -81,6 +140,7 @@ export default function HomePage() {
         if (
           typeof stats.totalProperties !== 'number' ||
           typeof stats.statesCovered !== 'number' ||
+          !stats.byState ||
           !Array.isArray(stats.cities) ||
           stats.totalProperties === 0
         ) throw new Error('Invalid or not-yet-synced property stats');
@@ -276,12 +336,33 @@ export default function HomePage() {
         <div className="w-full min-h-[350px] bg-card rounded-[16px] border border-white/10 mb-12 relative overflow-hidden" data-testid="card-map">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(to right, #F5F5F2 1px, transparent 1px), linear-gradient(to bottom, #F5F5F2 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
           <div className="absolute inset-x-8 inset-y-6" aria-label="Property locations map">
+            {Object.entries(propertyStats.byState)
+              .filter(([stateCode, count]) => count > 0 && Boolean(STATE_CENTROIDS[stateCode]))
+              .map(([stateCode, count]) => {
+                const state = STATE_CENTROIDS[stateCode];
+                if (!state) return null;
+                const left = Math.max(2, Math.min(98, ((state.lng + 125) / 60) * 100));
+                const top = Math.max(5, Math.min(95, ((50 - state.lat) / 28) * 100));
+                const size = Math.min(54, 12 + Math.sqrt(count / 20) * 5);
+                const isSelected = selectedState === stateCode;
+                return (
+                  <button
+                    key={stateCode}
+                    type="button"
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#D4A24C]/70 border-2 border-[#F2CD6B] shadow-[0_0_22px_rgba(212,162,76,0.42)] transition-all hover:bg-[#F2CD6B] hover:z-20 focus:outline-none focus:ring-2 focus:ring-[#F2CD6B] focus:ring-offset-2 focus:ring-offset-[#151820] ${isSelected ? 'z-30 ring-2 ring-[#F2CD6B] ring-offset-2 ring-offset-[#151820]' : 'z-10'}`}
+                    style={{ left: `${left}%`, top: `${top}%`, width: size, height: size }}
+                    onClick={() => setSelectedState(isSelected ? null : stateCode)}
+                    aria-label={`${state.name} (${stateCode}): ${count.toLocaleString()} properties`}
+                    title={`${state.name} (${stateCode}): ${count.toLocaleString()} properties`}
+                  />
+                );
+              })}
             {propertyStats.cities.map((city) => {
               const left = Math.max(3, Math.min(97, ((city.lng + 125) / 60) * 100));
               const top = Math.max(5, Math.min(95, ((50 - city.lat) / 28) * 100));
               const size = Math.min(26, 10 + Math.log10(city.count + 1) * 5);
               return (
-                <div key={city.city} className="absolute -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${left}%`, top: `${top}%` }}>
+                <div key={city.city} className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${left}%`, top: `${top}%` }}>
                   <span
                     className="block rounded-full bg-[#D4A24C] border-2 border-[#F2CD6B]/70 shadow-[0_0_18px_rgba(212,162,76,0.45)]"
                     style={{ width: size, height: size }}
@@ -294,6 +375,15 @@ export default function HomePage() {
               );
             })}
           </div>
+          {selectedState && STATE_CENTROIDS[selectedState] && (
+            <div className="absolute top-4 right-4 z-40 rounded-lg border border-[#F2CD6B]/50 bg-[#0A0C10]/90 px-4 py-3 shadow-xl">
+              <div className="text-xs uppercase tracking-wider text-[#F2CD6B]">{selectedState}</div>
+              <div className="font-semibold text-foreground">{STATE_CENTROIDS[selectedState].name}</div>
+              <div className="text-sm text-muted-foreground">
+                {(propertyStats.byState[selectedState] ?? 0).toLocaleString()} properties
+              </div>
+            </div>
+          )}
           <div className="absolute bottom-4 left-5 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="w-2 h-2 rounded-full bg-[#D4A24C]" aria-hidden="true" /> Live mapped property markets
           </div>
