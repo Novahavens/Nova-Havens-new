@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,46 +41,8 @@ const FAQ_ITEMS = [
 ];
 
 export default function HomePage() {
-  useEffect(() => {
-    // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
-    // Inject page-specific structured data
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.id = 'jsonld-homepage';
-    // LocalBusiness schema (complements the HowTo schemas injected via routeMeta.ts)
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "@id": "https://novahavens.com/#localbusiness",
-      "name": "Nova Havens",
-      "url": "https://novahavens.com/",
-      "telephone": "+16294010054",
-      "email": "info@novahavens.com",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Nashville",
-        "addressRegion": "TN",
-        "addressCountry": "US"
-      },
-      "areaServed": {
-        "@type": "Country",
-        "name": "United States"
-      },
-      "sameAs": [
-        "https://www.linkedin.com/company/novahavenshousing",
-        "https://www.instagram.com/novahavenshousing/",
-        "https://www.facebook.com/novahavenshousing"
-      ],
-      "serviceType": "Insurance Housing Coordination",
-      "description": "Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call."
-    });
-    document.head.appendChild(script);
-
-    return () => {
-      document.getElementById('jsonld-homepage')?.remove();
-    };
-  }, []);
-
+  // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
+  // LocalBusiness structured data is emitted statically via routeMeta.ts ('/').
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 

@@ -127,6 +127,28 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@context': 'https://schema.org',
       '@graph': [
         {
+          '@type': 'LocalBusiness',
+          '@id': `${BASE_URL}/#localbusiness`,
+          name: SITE_NAME,
+          url: `${BASE_URL}/`,
+          telephone: '+16294010054',
+          email: 'info@novahavens.com',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Nashville',
+            addressRegion: 'TN',
+            addressCountry: 'US',
+          },
+          areaServed: {
+            '@type': 'Country',
+            name: 'United States',
+          },
+          sameAs: SOCIAL_PROFILE_URLS,
+          serviceType: 'Insurance Housing Coordination',
+          description:
+            'Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.',
+        },
+        {
           '@type': 'HowTo',
           name: 'How Insurance Adjusters & Carriers Work with Nova Havens',
           description:
