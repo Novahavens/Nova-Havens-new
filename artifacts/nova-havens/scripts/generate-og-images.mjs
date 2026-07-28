@@ -1,206 +1,152 @@
-/**
- * generate-og-images.mjs
- * Generates 1200×630 Open Graph images for each blog post using ImageMagick.
- * Run: node artifacts/nova-havens/scripts/generate-og-images.mjs
- */
+// Generates 1200x630 OG images for each blog post into public/og-blog-<slug>.png
+// Brand: dark bg #0A0C10, gold #D4A24C, Plus Jakarta Sans.
+import sharp from "sharp";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import fs from "node:fs";
 
-import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = path.join(__dirname, "..", "public");
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const publicDir = join(__dirname, '..', 'public');
+const GOLD = "#D4A24C";
+const BG = "#0A0C10";
+const CARD = "#111318";
+const FG = "#F5F5F2";
+const MUTED = "#9BA3AF";
 
-// Category palette — gradient stops + accent colour
-const CATEGORY_STYLES = {
-  'Insurance Professionals': {
-    bg1: '#0F2A5C',
-    bg2: '#1B3F7A',
-    accent: '#4A9EDB',
-    label: 'Insurance Professionals',
-  },
-  'Displaced Families': {
-    bg1: '#0B4C43',
-    bg2: '#0E6A5E',
-    accent: '#3EBFAB',
-    label: 'Displaced Families',
-  },
-  'Property Owners': {
-    bg1: '#5C2B0A',
-    bg2: '#7A3D10',
-    accent: '#E88C3A',
-    label: 'Property Owners',
-  },
-  'Company News': {
-    bg1: '#1E1B5E',
-    bg2: '#2D2A85',
-    accent: '#7B75E8',
-    label: 'Company News',
-  },
+// Topic-specific motif drawn in the right half, in gold with low opacity.
+const motifs = {
+  ai: `
+    <g stroke="${GOLD}" stroke-width="3" fill="none">
+      <circle cx="900" cy="200" r="16" fill="${GOLD}"/>
+      <circle cx="1040" cy="300" r="16" fill="${GOLD}"/>
+      <circle cx="880" cy="420" r="16" fill="${GOLD}"/>
+      <circle cx="1060" cy="480" r="16" fill="${GOLD}"/>
+      <circle cx="980" cy="120" r="10" fill="${GOLD}"/>
+      <line x1="900" y1="200" x2="1040" y2="300"/>
+      <line x1="1040" y1="300" x2="880" y2="420"/>
+      <line x1="880" y1="420" x2="1060" y2="480"/>
+      <line x1="980" y1="120" x2="900" y2="200"/>
+      <line x1="980" y1="120" x2="1040" y2="300"/>
+    </g>`,
+  checklist: `
+    <g stroke="${GOLD}" stroke-width="6" fill="none" stroke-linecap="round">
+      <rect x="860" y="150" width="260" height="340" rx="20" stroke-width="4"/>
+      <polyline points="895,230 915,252 955,208"/>
+      <line x1="985" y1="230" x2="1090" y2="230"/>
+      <polyline points="895,320 915,342 955,298"/>
+      <line x1="985" y1="320" x2="1090" y2="320"/>
+      <circle cx="915" cy="420" r="16" stroke-width="4"/>
+      <line x1="985" y1="420" x2="1090" y2="420"/>
+    </g>`,
+  house: `
+    <g stroke="${GOLD}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 850 330 L 990 210 L 1130 330"/>
+      <path d="M 880 310 L 880 470 L 1100 470 L 1100 310"/>
+      <rect x="955" y="370" width="70" height="100"/>
+      <circle cx="990" cy="160" r="18"/>
+    </g>`,
+  paw: `
+    <g fill="${GOLD}">
+      <ellipse cx="990" cy="380" rx="58" ry="50"/>
+      <ellipse cx="915" cy="290" rx="26" ry="34" transform="rotate(-20 915 290)"/>
+      <ellipse cx="965" cy="245" rx="26" ry="34" transform="rotate(-7 965 245)"/>
+      <ellipse cx="1025" cy="245" rx="26" ry="34" transform="rotate(7 1025 245)"/>
+      <ellipse cx="1075" cy="290" rx="26" ry="34" transform="rotate(20 1075 290)"/>
+    </g>`,
+  key: `
+    <g stroke="${GOLD}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="920" cy="250" r="60"/>
+      <circle cx="920" cy="250" r="24"/>
+      <line x1="963" y1="292" x2="1090" y2="420"/>
+      <line x1="1040" y1="370" x2="1005" y2="405"/>
+      <line x1="1090" y1="420" x2="1055" y2="455"/>
+    </g>`,
+  magnifier: `
+    <g stroke="${GOLD}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="950" cy="280" r="85"/>
+      <line x1="1012" y1="342" x2="1110" y2="440"/>
+      <path d="M 910 300 L 950 265 L 990 300 M 922 292 L 922 330 L 978 330 L 978 292"/>
+    </g>`,
+  map: `
+    <g fill="${GOLD}">
+      ${Array.from({ length: 20 }, (_, i) => {
+        const x = 860 + (i % 5) * 65;
+        const y = 200 + Math.floor(i / 5) * 75;
+        return `<path transform="translate(${x} ${y}) scale(1.1)" d="M0,-14 L4,-4 L15,-4 L6,3 L9,14 L0,7 L-9,14 L-6,3 L-15,-4 L-4,-4 Z"/>`;
+      }).join("")}
+    </g>`,
+  gears: `
+    <g stroke="${GOLD}" stroke-width="6" fill="none" stroke-linecap="round">
+      <circle cx="930" cy="270" r="62"/>
+      <circle cx="930" cy="270" r="24"/>
+      ${Array.from({ length: 8 }, (_, i) => {
+        const a = (i * Math.PI) / 4;
+        const x1 = 930 + 62 * Math.cos(a), y1 = 270 + 62 * Math.sin(a);
+        const x2 = 930 + 82 * Math.cos(a), y2 = 270 + 82 * Math.sin(a);
+        return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+      }).join("")}
+      <circle cx="1065" cy="410" r="42"/>
+      <circle cx="1065" cy="410" r="16"/>
+      ${Array.from({ length: 8 }, (_, i) => {
+        const a = (i * Math.PI) / 4 + 0.4;
+        const x1 = 1065 + 42 * Math.cos(a), y1 = 410 + 42 * Math.sin(a);
+        const x2 = 1065 + 58 * Math.cos(a), y2 = 410 + 58 * Math.sin(a);
+        return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+      }).join("")}
+    </g>`,
 };
 
-const POSTS = [
-  {
-    slug: 'how-ai-is-streamlining-temporary-housing-placements-for-adjusters',
-    category: 'Insurance Professionals',
-    title: 'How AI Is Streamlining Temporary Housing Placements for Adjusters',
-  },
-  {
-    slug: 'what-to-look-for-in-a-housing-coordinator-for-large-loss-claims',
-    category: 'Insurance Professionals',
-    title: 'What to Look for in a Housing Coordinator for Large-Loss Claims',
-  },
-  {
-    slug: 'what-to-expect-when-your-insurer-places-you-in-temporary-housing',
-    category: 'Displaced Families',
-    title: 'What to Expect When Your Insurer Places You in Temporary Housing',
-  },
-  {
-    slug: 'bringing-pets-to-temporary-housing-what-you-need-to-know',
-    category: 'Displaced Families',
-    title: 'Bringing Pets to Temporary Housing: What You Need to Know',
-  },
-  {
-    slug: 'how-to-list-your-furnished-property-with-nova-havens',
-    category: 'Property Owners',
-    title: 'How to List Your Furnished Property with Nova Havens',
-  },
-  {
-    slug: 'what-insurance-housing-coordinators-look-for-in-a-property',
-    category: 'Property Owners',
-    title: 'What Insurance Housing Coordinators Look for in a Property',
-  },
-  {
-    slug: 'nova-havens-expands-to-48-states',
-    category: 'Company News',
-    title: 'Nova Havens Expands to 48 States',
-  },
-  {
-    slug: 'introducing-automated-claim-processing-at-nova-havens',
-    category: 'Company News',
-    title: 'Introducing Automated Claim Processing at Nova Havens',
-  },
+const posts = [
+  { slug: "how-ai-is-streamlining-temporary-housing-placements-for-adjusters", category: "Insurance Professionals", motif: "ai", lines: ["How AI Is Streamlining", "Temporary Housing Placements", "for Adjusters"] },
+  { slug: "what-to-look-for-in-a-housing-coordinator-for-large-loss-claims", category: "Insurance Professionals", motif: "checklist", lines: ["What to Look for in a", "Housing Coordinator for", "Large-Loss Claims"] },
+  { slug: "what-to-expect-when-your-insurer-places-you-in-temporary-housing", category: "Displaced Families", motif: "house", lines: ["What to Expect When Your", "Insurer Places You in", "Temporary Housing"] },
+  { slug: "bringing-pets-to-temporary-housing-what-you-need-to-know", category: "Displaced Families", motif: "paw", lines: ["Bringing Pets to Temporary", "Housing: What You", "Need to Know"] },
+  { slug: "how-to-list-your-furnished-property-with-nova-havens", category: "Property Owners", motif: "key", lines: ["How to List Your", "Furnished Property", "with Nova Havens"] },
+  { slug: "what-insurance-housing-coordinators-look-for-in-a-property", category: "Property Owners", motif: "magnifier", lines: ["What Insurance Housing", "Coordinators Look for", "in a Property"] },
+  { slug: "nova-havens-expands-to-48-states", category: "Company News", motif: "map", lines: ["Nova Havens Expands", "to 48 States"] },
+  { slug: "introducing-automated-claim-processing-at-nova-havens", category: "Company News", motif: "gears", lines: ["Introducing Automated", "Claim Processing", "at Nova Havens"] },
 ];
 
-/** Wrap title into lines of at most maxLen chars, breaking on spaces. */
-function wrapTitle(title, maxLen = 36) {
-  const words = title.split(' ');
-  const lines = [];
-  let current = '';
-  for (const w of words) {
-    if (!current) {
-      current = w;
-    } else if ((current + ' ' + w).length <= maxLen) {
-      current += ' ' + w;
-    } else {
-      lines.push(current);
-      current = w;
-    }
-  }
-  if (current) lines.push(current);
-  return lines;
+function escapeXml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function xmlEscape(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-function generateSvg(post, style) {
-  const lines = wrapTitle(post.title, 36);
-  const lineHeight = 62;
-  // Vertically center the title block
-  const totalTitleHeight = lines.length * lineHeight;
-  const titleStartY = 315 - totalTitleHeight / 2 + 50; // nudge down slightly for logo above
-
-  const titleElements = lines
-    .map(
-      (line, i) =>
-        `  <text x="80" y="${titleStartY + i * lineHeight}" font-family="DejaVu Sans Bold" font-size="50" font-weight="bold" fill="#FFFFFF" opacity="0.97">${xmlEscape(line)}</text>`,
-    )
-    .join('\n');
-
-  const wordmarkY = titleStartY - 145;
-  const badgeWidth = Math.min(style.label.length * 11 + 28, 440);
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+function svgFor(post) {
+  const titleY = post.lines.length === 2 ? 330 : 300;
+  const title = post.lines
+    .map((l, i) => `<text x="80" y="${titleY + i * 66}" font-family="Plus Jakarta Sans, sans-serif" font-size="52" font-weight="800" fill="${FG}">${escapeXml(l)}</text>`)
+    .join("\n");
+  const catW = post.category.length * 12.5 + 48;
+  return `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${style.bg1}"/>
-      <stop offset="100%" stop-color="${style.bg2}"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12151C"/>
+      <stop offset="0.55" stop-color="${BG}"/>
+      <stop offset="1" stop-color="#0B0E14"/>
     </linearGradient>
-    <pattern id="lines" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="60" stroke="${style.accent}" stroke-width="0.6" opacity="0.10"/>
-    </pattern>
+    <radialGradient id="glow" cx="0.82" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="${GOLD}" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="${GOLD}" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-
-  <!-- Background -->
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#lines)"/>
-
-  <!-- Left accent bar -->
-  <rect x="0" y="0" width="6" height="630" fill="${style.accent}" opacity="0.85"/>
-
-  <!-- Bottom strip -->
-  <rect x="0" y="596" width="1200" height="34" fill="${style.accent}" opacity="0.12"/>
-
-  <!-- Nova Havens wordmark -->
-  <text x="80" y="${wordmarkY}" font-family="DejaVu Sans Bold" font-size="26" font-weight="bold" fill="${style.accent}" letter-spacing="4">NOVA HAVENS</text>
-
-  <!-- Separator -->
-  <rect x="80" y="${wordmarkY + 14}" width="56" height="3" fill="${style.accent}" opacity="0.65"/>
-
-  <!-- Category badge -->
-  <rect x="78" y="${wordmarkY + 28}" width="${badgeWidth}" height="34" rx="4" fill="${style.accent}" opacity="0.18"/>
-  <text x="90" y="${wordmarkY + 51}" font-family="DejaVu Sans" font-size="19" fill="${style.accent}" opacity="0.92">${xmlEscape(style.label)}</text>
-
-  <!-- Post title lines -->
-${titleElements}
-
-  <!-- Domain — bottom right -->
-  <text x="1120" y="618" font-family="DejaVu Sans" font-size="17" fill="#FFFFFF" opacity="0.38" text-anchor="end">novahavens.com</text>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g opacity="0.32">${motifs[post.motif]}</g>
+  <rect x="0" y="0" width="1200" height="8" fill="${GOLD}"/>
+  <text x="80" y="120" font-family="Plus Jakarta Sans, sans-serif" font-size="30" font-weight="800" letter-spacing="8" fill="${GOLD}">NOVA HAVENS</text>
+  <rect x="80" y="160" width="${catW}" height="44" rx="22" fill="${CARD}" stroke="${GOLD}" stroke-opacity="0.5"/>
+  <text x="${80 + catW / 2}" y="189" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="21" font-weight="600" fill="${GOLD}">${escapeXml(post.category)}</text>
+  ${title}
+  <line x1="80" y1="545" x2="1120" y2="545" stroke="#222732" stroke-width="2"/>
+  <text x="80" y="590" font-family="Plus Jakarta Sans, sans-serif" font-size="24" fill="${MUTED}">novahavens.com</text>
+  <text x="1120" y="590" text-anchor="end" font-family="Plus Jakarta Sans, sans-serif" font-size="24" font-weight="600" fill="${GOLD}">Insurance Housing Insights</text>
 </svg>`;
 }
 
-mkdirSync(publicDir, { recursive: true });
-
-let generated = 0;
-for (const post of POSTS) {
-  const style = CATEGORY_STYLES[post.category];
-  if (!style) {
-    console.warn(`  ⚠  Unknown category "${post.category}" for "${post.slug}" — skipping`);
-    continue;
-  }
-
-  const outFile = join(publicDir, `og-blog-${post.slug}.png`);
-
-  if (existsSync(outFile)) {
-    console.log(`  –  og-blog-${post.slug}.png (already exists, skipping)`);
-    generated++;
-    continue;
-  }
-
-  const svgContent = generateSvg(post, style);
-  const tmpSvg = `/tmp/og-${post.slug}.svg`;
-
-  writeFileSync(tmpSvg, svgContent, 'utf-8');
-
-  try {
-    execSync(
-      `magick -density 96 -background none "${tmpSvg}" -resize 1200x630! "${outFile}"`,
-      { stdio: 'pipe' },
-    );
-    console.log(`  ✓  og-blog-${post.slug}.png`);
-    generated++;
-  } catch (err) {
-    console.error(`  ✗  ${post.slug}: ${err.stderr?.toString() || err.message}`);
-  }
+fs.mkdirSync(publicDir, { recursive: true });
+for (const post of posts) {
+  const out = path.join(publicDir, `og-blog-${post.slug}.png`);
+  await sharp(Buffer.from(svgFor(post))).png().toFile(out);
+  console.log("wrote", out);
 }
-
-console.log(`\nDone — ${generated}/${POSTS.length} images ready in public/`);
