@@ -1,8 +1,7 @@
-import { useEffect, Fragment } from 'react';
+import { Fragment } from 'react';
 import { useParams, Link } from 'wouter';
 import { ArrowLeft, Calendar, Tag, User } from 'lucide-react';
 import { getPostBySlug } from '@/data/blogPosts';
-import { parseFaqsFromContent } from '@/lib/routeMeta';
 
 // ---------------------------------------------------------------------------
 // Inline text renderer: handles **bold** and *italic* markers
@@ -162,85 +161,6 @@ function renderContent(text: string) {
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const post = getPostBySlug(slug ?? '');
-
-  useEffect(() => {
-    if (post) {
-      const faqs = parseFaqsFromContent(post.content);
-
-      const graph: Record<string, unknown>[] = [
-        {
-          "@type": "BlogPosting",
-          "headline": post.title,
-          "description": post.excerpt,
-          "image": post.image ?? "https://novahavens.com/og-image.png",
-          "datePublished": post.dateISO,
-          "dateModified": post.dateISO,
-          "url": `https://novahavens.com/blog/${post.slug}`,
-          "keywords": post.keywords.join(', '),
-          "author": post.author
-            ? {
-                "@type": "Person",
-                "name": post.author.name,
-                "jobTitle": post.author.role,
-                "worksFor": {
-                  "@type": "Organization",
-                  "@id": "https://novahavens.com/#organization",
-                  "name": "Nova Havens"
-                }
-              }
-            : {
-                "@type": "Organization",
-                "@id": "https://novahavens.com/#organization",
-                "name": "Nova Havens"
-              },
-          "publisher": {
-            "@type": "Organization",
-            "@id": "https://novahavens.com/#organization",
-            "name": "Nova Havens",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://novahavens.com/og-image.png"
-            }
-          },
-          "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": `https://novahavens.com/blog/${post.slug}`
-          },
-          "articleSection": post.category,
-          "isPartOf": {
-            "@id": "https://novahavens.com/#website"
-          }
-        }
-      ];
-
-      if (faqs.length > 0) {
-        graph.push({
-          "@type": "FAQPage",
-          "mainEntity": faqs.map((faq) => ({
-            "@type": "Question",
-            "name": faq.question,
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": faq.answer
-            }
-          }))
-        });
-      }
-
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.id = 'jsonld-blogpost';
-      script.textContent = JSON.stringify({
-        "@context": "https://schema.org",
-        "@graph": graph
-      });
-      document.head.appendChild(script);
-    }
-
-    return () => {
-      document.getElementById('jsonld-blogpost')?.remove();
-    };
-  }, [post]);
 
   if (!post) {
     return (
