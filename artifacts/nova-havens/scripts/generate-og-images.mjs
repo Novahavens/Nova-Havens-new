@@ -130,10 +130,22 @@ function wrapTitle(title, maxChars = 28, maxLines = 3) {
   return lines;
 }
 
+// Fail loudly when a post declares a motif that isn't drawn above —
+// silent fallback to the category default hides typos and missing artwork.
+const unknownMotifs = BLOG_POSTS.filter((p) => p.motif && !motifs[p.motif]);
+if (unknownMotifs.length > 0) {
+  for (const p of unknownMotifs) {
+    console.error(
+      `Unknown motif "${p.motif}" on post "${p.slug}". Known motifs: ${Object.keys(motifs).join(", ")}`,
+    );
+  }
+  process.exit(1);
+}
+
 const posts = BLOG_POSTS.map((p) => ({
   slug: p.slug,
   category: p.category,
-  motif: (p.motif && motifs[p.motif] ? p.motif : undefined) ?? motifByCategory[p.category] ?? "house",
+  motif: p.motif ?? motifByCategory[p.category] ?? "house",
   lines: wrapTitle(p.title),
 }));
 
