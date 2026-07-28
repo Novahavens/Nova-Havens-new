@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-07-28T18:11:03.077Z",
-  "totalProperties": 12974,
+  "generatedAt": "2026-07-28T19:24:20.277Z",
+  "totalProperties": 12976,
   "statesCovered": 47,
-  "skippedNoState": 2798,
+  "skippedNoState": 2799,
   "byState": {
     "AK": 20,
     "AL": 120,
     "AR": 46,
     "AZ": 708,
-    "CA": 2458,
+    "CA": 2459,
     "CO": 264,
     "CT": 128,
     "DE": 10,
