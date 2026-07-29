@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'wouter';
-import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown } from 'lucide-react';
+import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown, Building2, HeartHandshake, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
@@ -242,21 +242,54 @@ export default function HomePage() {
       {/* 2. Trust Strip */}
       <section className="w-full border-y bg-card border-white/[0.08]">
         <div className="max-w-[1200px] mx-auto py-12 px-4 md:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-white/10">
-            <div className="flex flex-col items-center justify-center py-4 md:py-0" data-testid="stat-homes">
-              <span className="text-3xl md:text-4xl font-extrabold mb-2 text-foreground">20,000+</span>
-              <span className="text-sm font-medium uppercase tracking-wider mb-2 text-muted-foreground">Verified homes nationwide</span>
-              <span className="text-xs leading-relaxed max-w-[220px] text-tertiary">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2025.</span>
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5">
+            {/* Large tile */}
+            <div
+              className="md:col-span-4 relative overflow-hidden rounded-2xl border border-white/[0.08] bg-surface-1 p-8 md:p-10 flex flex-col items-start justify-between gap-8 transition-colors hover:border-primary/30"
+              data-testid="stat-homes"
+            >
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ background: 'radial-gradient(ellipse 480px 300px at 90% 110%, hsl(var(--primary)/0.07) 0%, transparent 70%)' }}
+                aria-hidden="true"
+              />
+              <div className="relative w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
+              </div>
+              <div className="relative">
+                <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">20,000+</span>
+                <span className="mt-3 block text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified homes nationwide</span>
+                <span className="mt-2 block text-sm leading-relaxed max-w-[420px] text-tertiary">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2025.</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center justify-center py-4 md:py-0" data-testid="stat-families">
-              <span className="text-3xl md:text-4xl font-extrabold mb-2 text-foreground">531+</span>
-              <span className="text-sm font-medium uppercase tracking-wider mb-2 text-muted-foreground">Families assisted this year</span>
-              <span className="text-xs leading-relaxed max-w-[220px] text-tertiary">Nova Havens has assisted 531+ families displaced by property damage in 2025, placing each into a verified furnished home.</span>
-            </div>
-            <div className="flex flex-col items-center justify-center py-4 md:py-0" data-testid="stat-days">
-              <span className="text-3xl md:text-4xl font-extrabold mb-2 text-foreground">&lt; 5 Days</span>
-              <span className="text-sm font-medium uppercase tracking-wider mb-2 text-muted-foreground">Average days to place</span>
-              <span className="text-xs leading-relaxed max-w-[220px] text-tertiary">Nova Havens achieves an average placement time of under 5 days from first contact to move-in, as of 2025.</span>
+            {/* Stacked pair */}
+            <div className="md:col-span-2 grid grid-cols-1 gap-4 md:gap-5">
+              <div
+                className="rounded-2xl border border-white/[0.08] bg-surface-1 p-6 md:p-7 flex flex-col items-start justify-between gap-6 transition-colors hover:border-primary/30"
+                data-testid="stat-families"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <HeartHandshake className="w-5 h-5 text-primary" aria-hidden="true" />
+                </div>
+                <div>
+                  <span className="block text-4xl font-extrabold tracking-tight text-foreground">531+</span>
+                  <span className="mt-2 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Families assisted this year</span>
+                  <span className="mt-2 block text-xs leading-relaxed text-tertiary">Nova Havens has assisted 531+ families displaced by property damage in 2025, placing each into a verified furnished home.</span>
+                </div>
+              </div>
+              <div
+                className="rounded-2xl border border-primary/30 bg-surface-1 p-6 md:p-7 flex flex-col items-start justify-between gap-6 transition-colors hover:border-primary/50"
+                data-testid="stat-days"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-primary" aria-hidden="true" />
+                </div>
+                <div>
+                  <span className="block text-4xl font-extrabold tracking-tight text-foreground">&lt; 5 Days</span>
+                  <span className="mt-2 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Average days to place</span>
+                  <span className="mt-2 block text-xs leading-relaxed text-tertiary">Nova Havens achieves an average placement time of under 5 days from first contact to move-in, as of 2025.</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
