@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, ChevronDown, Building2, HeartHandshake, Clock } from 'lucide-react';
+import { Link } from 'wouter';
+import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown, Building2, HeartHandshake, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
@@ -702,6 +703,26 @@ export default function HomePage() {
               )}
             </div>
           ))}
+        </div>
+      </section>
+      {/* 12. Emergency Contact Band */}
+      <section className="w-full py-12 px-4 bg-surface-1 border-y border-white/5">
+        <div className="max-w-[800px] mx-auto text-center flex flex-col items-center gap-4 text-foreground">
+          <Phone className="w-8 h-8 text-primary" />
+          <a href="tel:6294010054" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-phone">
+            (629) 401-0054
+          </a>
+          <p className="text-base md:text-lg font-medium text-muted-foreground" data-testid="text-emergency-desc">
+            Nova Havens is available 24/7 for emergency housing claims and placement inquiries
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-request-housing">
+              Request Housing
+            </a>
+            <Link href="/contact" className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors border border-primary text-primary hover:bg-primary/10 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-contact-page">
+              Contact Page
+            </Link>
+          </div>
         </div>
       </section>
       {/* 13. Closing CTA Band */}
