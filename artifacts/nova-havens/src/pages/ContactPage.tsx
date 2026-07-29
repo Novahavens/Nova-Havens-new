@@ -53,12 +53,12 @@ export default function ContactPage() {
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
         <div className="mx-auto max-w-[1200px] w-full">
           <div className="max-w-3xl">
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">Contact Nova Havens</p>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Contact Nova Havens</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6" data-testid="heading-contact-hero">
               Request Emergency Housing or Get in Touch
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed" data-testid="text-contact-subtitle">
-              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-[#D4A24C] font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a> or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
+              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a> or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
             </p>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function ContactPage() {
             <p className="text-muted-foreground mb-6 max-w-sm">
               If you have an active insurance claim and need immediate furnished housing placement, Nova Havens responds 24/7. Start your request here.
             </p>
-            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-request-housing">
+            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-request-housing">
               Request Housing Now
             </a>
           </div>
@@ -133,7 +133,7 @@ export default function ContactPage() {
           {/* Form Side */}
           <div className="lg:col-span-2 bg-card rounded-[16px] border border-white/10 p-8 md:p-10">
             <h2 className="text-2xl font-bold mb-2 text-foreground" data-testid="heading-form">Send a Message to Nova Havens</h2>
-            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-[#D4A24C] font-semibold">(629) 401-0054</a> directly — 24/7.</p>
+            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold">(629) 401-0054</a> directly — 24/7.</p>
             
             {isSubmitted ? (
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 text-center" data-testid="message-success">
@@ -151,7 +151,7 @@ export default function ContactPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Name *</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" className="bg-[#0A0C10] border-white/10 text-foreground" {...field} data-testid="input-name" />
+                            <Input placeholder="John Doe" className="bg-background border-white/10 text-foreground" {...field} data-testid="input-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Email *</FormLabel>
                           <FormControl>
-                            <Input placeholder="john@example.com" type="email" className="bg-[#0A0C10] border-white/10 text-foreground" {...field} data-testid="input-email" />
+                            <Input placeholder="john@example.com" type="email" className="bg-background border-white/10 text-foreground" {...field} data-testid="input-email" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -180,7 +180,7 @@ export default function ContactPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Phone (Optional)</FormLabel>
                           <FormControl>
-                            <Input placeholder="(555) 123-4567" className="bg-[#0A0C10] border-white/10 text-foreground" {...field} data-testid="input-phone" />
+                            <Input placeholder="(555) 123-4567" className="bg-background border-white/10 text-foreground" {...field} data-testid="input-phone" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -194,7 +194,7 @@ export default function ContactPage() {
                           <FormLabel className="text-muted-foreground">Subject *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-[#0A0C10] border-white/10 text-foreground" data-testid="select-subject">
+                              <SelectTrigger className="bg-background border-white/10 text-foreground" data-testid="select-subject">
                                 <SelectValue placeholder="Select a subject" />
                               </SelectTrigger>
                             </FormControl>
@@ -221,7 +221,7 @@ export default function ContactPage() {
                         <FormControl>
                           <Textarea 
                             placeholder="Describe your housing need, claim details, property, or question — the more context you provide, the faster Nova Havens can help." 
-                            className="bg-[#0A0C10] border-white/10 text-foreground min-h-[150px]" 
+                            className="bg-background border-white/10 text-foreground min-h-[150px]" 
                             {...field} 
                             data-testid="input-message"
                           />
@@ -231,7 +231,7 @@ export default function ContactPage() {
                     )}
                   />
 
-                  <Button type="submit" className="rounded-full bg-primary text-[#0A0C10] hover:brightness-105 font-bold px-8 py-6 h-auto" data-testid="btn-submit-contact">
+                  <Button type="submit" className="rounded-full bg-primary text-primary-foreground hover:brightness-105 font-bold px-8 py-6 h-auto" data-testid="btn-submit-contact">
                     Send Message
                   </Button>
                 </form>

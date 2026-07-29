@@ -63,7 +63,7 @@ export default function AboutPage() {
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
         <div className="mx-auto max-w-[1100px] w-full">
           <div className="max-w-3xl">
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">About Nova Havens</p>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">About Nova Havens</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6" data-testid="heading-about-title">
               A better place to land when life is turned upside down.
             </h1>
@@ -77,7 +77,7 @@ export default function AboutPage() {
       <section className="py-16 md:py-20 px-4 md:px-8">
         <div className="mx-auto max-w-[1100px] w-full grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-20 items-center">
           <div>
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">Why Nova Havens Exists</p>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Why Nova Havens Exists</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-6">
               What Problem Does Nova Havens Solve?
             </h2>
@@ -91,7 +91,7 @@ export default function AboutPage() {
             </div>
             <Link
               href="/meet-the-team"
-              className="inline-flex items-center gap-2 mt-8 text-[#D4A24C] font-bold hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2 mt-8 text-primary font-bold hover:gap-3 transition-all"
               data-testid="link-about-team"
             >
               Meet the people behind the work
@@ -99,15 +99,15 @@ export default function AboutPage() {
             </Link>
           </div>
 
-          <div className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-8 md:p-10">
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-6">Our promise</p>
+          <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-10">
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-6">Our promise</p>
             <blockquote className="text-2xl md:text-3xl font-bold text-foreground leading-tight mb-8">
               "Make the next step feel possible."
             </blockquote>
             <div className="space-y-4">
               {DIFFERENTIATORS.map((item) => (
                 <div key={item} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#F2CD6B] mt-0.5 shrink-0" aria-hidden="true" />
+                  <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" aria-hidden="true" />
                   <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
                 </div>
               ))}
@@ -119,7 +119,7 @@ export default function AboutPage() {
       <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10">
         <div className="mx-auto max-w-[1100px] w-full">
           <div className="max-w-2xl mb-10">
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">How Nova Havens Shows Up</p>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">How Nova Havens Shows Up</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4">What Principles Guide Every Nova Havens Placement?</h2>
             <p className="text-muted-foreground leading-relaxed">
               Nova Havens applies the same standard to every household, carrier relationship, and property in its network — regardless of claim size or market.
@@ -127,8 +127,8 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {PRINCIPLES.map((principle) => (
-              <div key={principle.title} className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-7">
-                <principle.icon className="w-8 h-8 text-[#D4A24C] mb-5" aria-hidden="true" />
+              <div key={principle.title} className="bg-card rounded-[16px] border border-white/[0.08] p-7">
+                <principle.icon className="w-8 h-8 text-primary mb-5" aria-hidden="true" />
                 <h3 className="text-lg font-bold text-foreground mb-2">{principle.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{principle.text}</p>
               </div>
@@ -141,14 +141,14 @@ export default function AboutPage() {
       <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10" data-testid="section-about-faq">
         <div className="mx-auto max-w-[760px] w-full">
           <div className="text-center mb-10">
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">Common Questions</p>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Common Questions</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">Questions About Nova Havens</h2>
           </div>
           <div className="space-y-3">
             {ABOUT_FAQ.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-[#111318] rounded-[16px] border border-white/[0.08] overflow-hidden"
+                className="bg-card rounded-[16px] border border-white/[0.08] overflow-hidden"
                 data-testid={`about-faq-item-${idx + 1}`}
               >
                 <button
@@ -158,7 +158,7 @@ export default function AboutPage() {
                 >
                   <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>
                   <ChevronDown
-                    className={`w-5 h-5 text-[#D4A24C] flex-shrink-0 transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`}
                     aria-hidden="true"
                   />
                 </button>
@@ -175,7 +175,7 @@ export default function AboutPage() {
 
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
         <div className="mx-auto max-w-[760px] w-full">
-          <div className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center">
+          <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Let's make the next step easier</h2>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
               Whether you are coordinating an insurance claim, a displaced family searching for a furnished home, or a property owner ready to join the Nova Havens network — contact us to get started.
@@ -183,7 +183,7 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-[#D4A24C] text-[#0A0C10] font-bold text-sm hover:brightness-105 transition-all"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
                 data-testid="link-about-contact"
               >
                 Talk with our team
@@ -191,7 +191,7 @@ export default function AboutPage() {
               </Link>
               <Link
                 href="/meet-the-team"
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-[#D4A24C] text-[#D4A24C] font-bold text-sm hover:bg-[#D4A24C]/10 transition-all"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
                 data-testid="link-about-meet-team"
               >
                 Meet the team

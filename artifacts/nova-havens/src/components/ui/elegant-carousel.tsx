@@ -4,7 +4,6 @@ export interface ElegantSlide {
   title: string;
   subtitle: string;
   description: string;
-  accent: string;
   imageUrl: string;
   imageAlt: string;
 }
@@ -110,7 +109,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       <div
         className="pointer-events-none absolute inset-0 transition-all duration-700"
         style={{
-          background: `radial-gradient(ellipse at 70% 50%, ${currentSlide.accent}18 0%, transparent 70%)`,
+          background: 'radial-gradient(ellipse at 70% 50%, hsl(var(--primary) / 0.09) 0%, transparent 70%)',
         }}
         aria-hidden="true"
       />
@@ -120,7 +119,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
         <div className="flex w-full items-center p-8 md:w-1/2 md:p-12 lg:p-16">
           <div className="w-full">
             <div className={`mb-6 flex items-center gap-3 transition-all duration-500 ${fadeClass}`}>
-              <span className="h-px w-10 bg-[#D4A24C]/60" aria-hidden="true" />
+              <span className="h-px w-10 bg-primary/60" aria-hidden="true" />
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {String(currentIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
               </span>
@@ -131,8 +130,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
             </h3>
 
             <p
-              className={`mb-4 text-sm font-bold uppercase tracking-widest transition-all duration-500 delay-100 ${fadeClass}`}
-              style={{ color: currentSlide.accent }}
+              className={`mb-4 text-sm font-bold uppercase tracking-widest text-primary transition-all duration-500 delay-100 ${fadeClass}`}
             >
               {currentSlide.subtitle}
             </p>
@@ -145,7 +143,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
               <button
                 type="button"
                 onClick={goPrev}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-foreground transition-colors hover:border-[#D4A24C] hover:text-[#F2CD6B]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-foreground transition-colors hover:border-primary hover:text-primary"
                 aria-label="Previous slide"
                 data-testid="btn-carousel-prev"
               >
@@ -156,7 +154,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
               <button
                 type="button"
                 onClick={goNext}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-foreground transition-colors hover:border-[#D4A24C] hover:text-[#F2CD6B]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-foreground transition-colors hover:border-primary hover:text-primary"
                 aria-label="Next slide"
                 data-testid="btn-carousel-next"
               >
@@ -179,20 +177,18 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
             />
             <div
               className="pointer-events-none absolute inset-0"
-              style={{ background: `linear-gradient(135deg, ${currentSlide.accent}22 0%, transparent 50%)` }}
+              style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.13) 0%, transparent 50%)' }}
               aria-hidden="true"
             />
           </div>
 
           {/* Decorative frame corners */}
           <div
-            className="pointer-events-none absolute left-3 top-7 hidden h-10 w-10 border-l-2 border-t-2 transition-colors duration-500 md:block"
-            style={{ borderColor: currentSlide.accent }}
+            className="pointer-events-none absolute left-3 top-7 hidden h-10 w-10 border-l-2 border-t-2 border-primary transition-colors duration-500 md:block"
             aria-hidden="true"
           />
           <div
-            className="pointer-events-none absolute bottom-7 right-3 hidden h-10 w-10 border-b-2 border-r-2 transition-colors duration-500 md:block"
-            style={{ borderColor: currentSlide.accent }}
+            className="pointer-events-none absolute bottom-7 right-3 hidden h-10 w-10 border-b-2 border-r-2 border-primary transition-colors duration-500 md:block"
             aria-hidden="true"
           />
         </div>
@@ -211,7 +207,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
           >
             <span className="block h-[3px] w-full overflow-hidden rounded-full bg-white/10">
               <span
-                className="block h-full rounded-full bg-[#D4A24C] transition-[width] duration-100 ease-linear"
+                className="block h-full rounded-full bg-primary transition-[width] duration-100 ease-linear"
                 style={{
                   width: index === currentIndex ? `${progress}%` : index < currentIndex ? '100%' : '0%',
                 }}

@@ -4,7 +4,7 @@ import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer style={{ backgroundColor: '#0A0C10', borderTop: '1px solid rgba(255,255,255,0.08)' }} className="pt-16 pb-8">
+    <footer className="pt-16 pb-8 bg-background border-t border-white/[0.08]">
       <div className="mx-auto max-w-[1200px] w-full px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
           <div className="flex flex-col">

@@ -71,12 +71,12 @@ export default function TeamPage() {
       {/* Hero */}
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
         <div className="mx-auto max-w-[1100px] w-full text-center">
-          <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">Our People</p>
+          <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Our People</p>
           <h1
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6"
             data-testid="heading-team-title"
           >
-            Meet the <span className="text-[#D4A24C]">Nova Havens Team</span>
+            Meet the <span className="text-foreground">Nova Havens Team</span>
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto" data-testid="text-team-intro">
             Nova Havens was founded on the belief that displaced families deserve more than a transactional housing placement — they deserve a coordinated, compassionate team that handles every detail from first call to move-in. Behind every placement is a group of coordinators, carrier specialists, and family advocates who bring that founding mission to life, 24 hours a day.
@@ -91,17 +91,17 @@ export default function TeamPage() {
             {TEAM.map((member) => (
               <div
                 key={member.name}
-                className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center hover:border-[#D4A24C]/30 transition-colors"
+                className="bg-card rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center hover:border-primary/30 transition-colors"
                 data-testid={`card-team-${member.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <div
-                  className="w-20 h-20 rounded-full bg-gradient-to-br from-[#D4A24C] to-[#8a6a2e] flex items-center justify-center mb-5"
+                  className="w-20 h-20 rounded-full bg-card border border-primary/60 flex items-center justify-center mb-5"
                   aria-hidden="true"
                 >
-                  <span className="text-xl font-extrabold text-[#0A0C10]">{member.initials}</span>
+                  <span className="text-xl font-extrabold text-primary">{member.initials}</span>
                 </div>
                 <h2 className="text-lg font-bold text-foreground mb-1">{member.name}</h2>
-                <p className="text-sm font-semibold text-[#F2CD6B] mb-4">{member.role}</p>
+                <p className="text-sm font-semibold text-primary mb-4">{member.role}</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">{member.bio}</p>
               </div>
             ))}
@@ -113,7 +113,7 @@ export default function TeamPage() {
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
         <div className="mx-auto max-w-[1100px] w-full">
           <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-4">How Nova Havens Works</p>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">How Nova Havens Works</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
               What every Nova Havens team member is accountable for
             </h2>
@@ -122,10 +122,10 @@ export default function TeamPage() {
             {VALUES.map((value) => (
               <div
                 key={value.title}
-                className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-8"
+                className="bg-card rounded-[16px] border border-white/[0.08] p-8"
                 data-testid={`card-value-${value.title.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <value.icon className="w-8 h-8 text-[#D4A24C] mb-4" aria-hidden="true" />
+                <value.icon className="w-8 h-8 text-primary mb-4" aria-hidden="true" />
                 <h3 className="text-lg font-bold text-foreground mb-2">{value.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{value.text}</p>
               </div>
@@ -137,7 +137,7 @@ export default function TeamPage() {
       {/* CTA */}
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
         <div className="mx-auto max-w-[760px] w-full">
-          <div className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center" data-testid="card-team-cta">
+          <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center" data-testid="card-team-cta">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Talk to a real person, right now</h2>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
               No phone trees, no ticket queues. Reach the Nova Havens coordination team directly — 24/7 for emergency housing claims.
@@ -145,7 +145,7 @@ export default function TeamPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="tel:+16294010054"
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-[#D4A24C] text-[#0A0C10] font-bold text-sm hover:brightness-105 transition-all"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
                 data-testid="link-team-call"
               >
                 <Phone className="w-4 h-4" aria-hidden="true" />
@@ -153,7 +153,7 @@ export default function TeamPage() {
               </a>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-[#D4A24C] text-[#D4A24C] font-bold text-sm hover:bg-[#D4A24C]/10 transition-all"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
                 data-testid="link-team-contact"
               >
                 <Mail className="w-4 h-4" aria-hidden="true" />

@@ -57,7 +57,7 @@ function renderContent(text: string) {
       return (
         <blockquote
           key={blockIdx}
-          className="border-l-4 border-[#D4A24C] bg-[#D4A24C]/5 rounded-r-lg px-5 py-4 mb-6 text-muted-foreground leading-[1.8] italic"
+          className="border-l-4 border-primary bg-primary/5 rounded-r-lg px-5 py-4 mb-6 text-muted-foreground leading-[1.8] italic"
         >
           {lines.map((l, i) => (
             <p key={i} className={i > 0 ? 'mt-2' : ''}>
@@ -196,7 +196,7 @@ export default function BlogPostPage() {
 
           <div className="flex items-center gap-3 mb-5">
             <span
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F2CD6B]/10 text-[#F2CD6B]"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary"
               data-testid="tag-post-category"
             >
               <Tag className="w-3 h-3" />
@@ -227,7 +227,7 @@ export default function BlogPostPage() {
               className="flex items-center gap-2 text-sm text-muted-foreground border-t border-white/10 pt-5"
               data-testid="text-post-author"
             >
-              <User className="w-4 h-4 text-[#D4A24C] shrink-0" />
+              <User className="w-4 h-4 text-primary shrink-0" />
               <span>
                 <span className="text-foreground font-medium">{post.author.name}</span>
                 {', '}
@@ -248,10 +248,10 @@ export default function BlogPostPage() {
           {/* Closing CTA */}
           <div className="mt-12 pt-8 border-t border-white/10">
             <div
-              className="bg-[#111318] rounded-[16px] border border-white/[0.08] p-8 text-center"
+              className="bg-card rounded-[16px] border border-white/[0.08] p-8 text-center"
               data-testid="card-post-cta"
             >
-              <p className="text-sm uppercase tracking-widest text-[#D4A24C] font-semibold mb-3">Nova Havens</p>
+              <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-3">Nova Havens</p>
               <h2 className="text-2xl font-bold text-foreground mb-3">Need housing assistance now?</h2>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 Our team is available 24/7 for emergency claims and placements nationwide.
@@ -260,14 +260,14 @@ export default function BlogPostPage() {
                 <a
                   href={INTAKE_FORMS.housing}
                   {...EXTERNAL_FORM_LINK_PROPS}
-                  className="px-7 py-3 rounded-full bg-[#D4A24C] text-[#0A0C10] font-bold text-sm hover:brightness-105 transition-all"
+                  className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
                   data-testid="btn-request-housing-cta"
                 >
                   Request Housing
                 </a>
                 <a
                   href="tel:+16294010054"
-                  className="px-7 py-3 rounded-full border border-[#D4A24C] text-[#D4A24C] font-bold text-sm hover:bg-[#D4A24C]/10 transition-all"
+                  className="px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
                   data-testid="link-call-cta"
                 >
                   (629) 401-0054

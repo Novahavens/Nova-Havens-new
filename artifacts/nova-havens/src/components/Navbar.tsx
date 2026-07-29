@@ -8,8 +8,8 @@ import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 export function Logo() {
   return (
     <Link href="/" className="text-xl md:text-2xl tracking-tight no-underline" data-testid="link-logo">
-      <span style={{ fontWeight: 800, color: '#F5F5F2' }}>Nova</span>
-      <span style={{ fontWeight: 800, color: '#D4A24C' }}>Havens</span>
+      <span className="font-extrabold text-foreground">Nova</span>
+      <span className="font-extrabold text-primary">Havens</span>
     </Link>
   );
 }
@@ -20,7 +20,7 @@ export default function Navbar() {
   const closeMenu = () => setOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full" style={{ backgroundColor: '#0A0C10', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+    <header className="sticky top-0 z-50 w-full bg-background border-b border-white/[0.08]">
       <div className="mx-auto max-w-[1200px] w-full px-4 md:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center">
           <Logo />
@@ -39,7 +39,7 @@ export default function Navbar() {
           <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-submit-property">
             Submit Property
           </a>
-          <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-request-housing">
+          <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-request-housing">
             Request Housing
           </a>
         </div>
@@ -53,7 +53,7 @@ export default function Navbar() {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-[#0A0C10] border-l border-white/10 p-6 flex flex-col">
+            <SheetContent side="right" className="bg-background border-l border-white/10 p-6 flex flex-col">
               <div className="mb-8">
                 <Logo />
               </div>
@@ -68,7 +68,7 @@ export default function Navbar() {
                 <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-submit-property">
                   Submit Property
                 </a>
-                <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-[#0A0C10] hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-request-housing">
+                <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={closeMenu} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-7 py-3 w-full" data-testid="btn-mobile-request-housing">
                   Request Housing
                 </a>
               </div>

@@ -40,7 +40,7 @@ export default function BlogPage() {
               onClick={() => setActiveFilter(filter)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-colors border ${
                 activeFilter === filter
-                  ? 'bg-primary text-[#0A0C10] border-primary hover:brightness-105'
+                  ? 'bg-primary text-primary-foreground border-primary hover:brightness-105'
                   : 'bg-transparent text-muted-foreground border-white/10 hover:border-white/20'
               }`}
               data-testid={`btn-filter-${filter.toLowerCase().replace(/\s+/g, '-')}`}
@@ -60,7 +60,7 @@ export default function BlogPage() {
             >
               <div className="mb-4">
                 <span
-                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#F2CD6B]/10 text-[#F2CD6B]"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary"
                   data-testid={`tag-category-${post.id}`}
                 >
                   {post.category}
