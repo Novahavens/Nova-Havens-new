@@ -13,6 +13,7 @@
  */
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
+import { ROLE_TBC, TEAM_MEMBERS } from '../data/teamMembers.ts';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -289,30 +290,11 @@ const TEAM_HTML = `
 
   <section>
     <h2>Our Team</h2>
-    <article>
-      <h3>Alexandra Reyes — Founder &amp; CEO</h3>
-      <p>After coordinating housing for her own family following a house fire, Alexandra founded Nova Havens to make displacement less traumatic for every family that follows.</p>
-    </article>
-    <article>
-      <h3>Marcus Whitfield — Head of Carrier Relations</h3>
-      <p>A former large-loss adjuster with 14 years in the field, Marcus speaks fluent claims — and makes sure carriers get documentation the way they need it.</p>
-    </article>
-    <article>
-      <h3>Priya Natarajan — Director of Placements</h3>
-      <p>Priya leads the team that matches displaced households to homes nationwide, balancing school districts, pets, accessibility needs, and claim budgets.</p>
-    </article>
-    <article>
-      <h3>Daniel Okafor — Property Network Manager</h3>
-      <p>Daniel builds and vets our network of furnished properties across 48 states, holding every listing to the same standard: would we place our own family here?</p>
-    </article>
-    <article>
-      <h3>Sofia Marchetti — Claims Coordination Lead</h3>
-      <p>Sofia keeps every placement moving — extensions, adjustments, and check-ins — so adjusters always know the status without having to ask.</p>
-    </article>
-    <article>
-      <h3>James Calloway — Family Support Specialist</h3>
-      <p>James is often the first voice a displaced family hears. He walks households through every step, from the first call to move-in day.</p>
-    </article>
+${TEAM_MEMBERS.map(
+  (member) => `    <article>
+      <h3>${member.name}${member.role !== ROLE_TBC ? ` — ${member.role}` : ''}</h3>
+    </article>`,
+).join('\n')}
   </section>
 
   <section>

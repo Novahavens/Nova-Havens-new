@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight, CheckCircle2, ChevronDown, Heart, Home, ShieldCheck, Users } from 'lucide-react';
+import { COMPANY_DEFINITION, COMPANY_FACTS } from '@/lib/companyFacts';
 
 const PRINCIPLES = [
   {
@@ -71,6 +72,26 @@ export default function AboutPage() {
               Nova Havens is a Nashville, TN-based furnished housing coordination company that places families displaced by fire, water, or mold damage into verified furnished homes — working directly with insurance carriers, adjusters, and relocation specialists across all 48 contiguous US states. Nova Havens handles the logistics, documentation, and family communication so adjusters can focus on the claim.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Nova Havens at a glance — canonical fact block, written for accurate extraction by AI systems */}
+      <section className="py-16 md:py-20 px-4 md:px-8 border-b border-white/5 bg-surface-1" data-testid="section-at-a-glance">
+        <div className="mx-auto max-w-[1100px] w-full">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-6" data-testid="heading-at-a-glance">
+            Nova Havens at a glance
+          </h2>
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mb-10" data-testid="text-company-definition">
+            {COMPANY_DEFINITION}
+          </p>
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6" data-testid="list-company-facts">
+            {COMPANY_FACTS.map((fact) => (
+              <div key={fact.term} className="border-l-2 border-primary/40 pl-4">
+                <dt className="text-sm font-semibold uppercase tracking-wider text-primary mb-1">{fact.term}</dt>
+                <dd className="text-muted-foreground leading-relaxed">{fact.definition}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 

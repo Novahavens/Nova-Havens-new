@@ -6,6 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-carousel';
+import AskAiAboutUs from '@/components/AskAiAboutUs';
 
 const PARTNER_LOGOS = [
   { name: 'Allstate', logo: '/logos/allstate.png', logoClass: 'h-8', showName: true },
@@ -294,6 +295,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      {/* 3b. Ask AI About Us */}
+      <AskAiAboutUs />
       {/* 4. Our Mission */}
       <section className="py-24 px-4 md:px-8 w-full border-y border-white/5 bg-surface-1">
         <div className="max-w-[800px] mx-auto text-center flex flex-col items-center">

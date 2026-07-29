@@ -1,6 +1,7 @@
 import { Link } from 'wouter';
 import { Logo } from './Navbar';
 import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
+import AskAiAboutUs from './AskAiAboutUs';
 
 export default function Footer() {
   return (
@@ -68,6 +69,10 @@ export default function Footer() {
               </a>
             </div>
           </div>
+        </div>
+
+        <div className="pt-8 pb-8 border-t border-white/10">
+          <AskAiAboutUs variant="compact" />
         </div>
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">

@@ -10,6 +10,8 @@
  */
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
+import { COMPANY_DEFINITION } from './companyFacts.ts';
+import { ROLE_TBC, TEAM_MEMBERS } from '../data/teamMembers.ts';
 
 export interface RouteMeta {
   title: string;
@@ -32,6 +34,17 @@ const SOCIAL_PROFILE_URLS = [
   'https://www.linkedin.com/company/novahavenshousing',
   'https://www.instagram.com/novahavenshousing/',
   'https://www.facebook.com/novahavenshousing',
+];
+/**
+ * sameAs profiles for the About-page Organization schema.
+ * TODO: replace the placeholder entries below with the real URLs —
+ *   - Google Business Profile: placeholder, needs the real g.page/maps share URL
+ *   - LinkedIn / Facebook: currently the known profiles; confirm before launch
+ */
+const ABOUT_SAMEAS_URLS = [
+  'https://www.google.com/maps?cid=PLACEHOLDER_GOOGLE_BUSINESS_PROFILE', // TODO: real Google Business Profile URL
+  'https://www.linkedin.com/company/novahavenshousing', // TODO: confirm this is the official LinkedIn URL
+  'https://www.facebook.com/novahavenshousing', // TODO: confirm this is the official Facebook URL
 ];
 /** Single canonical entity @id — every Organization/LocalBusiness block must reference this. */
 const BUSINESS_ID = `${BASE_URL}/#organization`;
@@ -60,6 +73,22 @@ const BUSINESS_AREA_SERVED = {
   '@type': 'Country',
   name: 'United States',
 };
+
+/**
+ * Person schema for each real team member. Placeholder roles ("[Role TBC]")
+ * and pending bios are deliberately omitted from structured data — we only
+ * publish verified facts about real people.
+ */
+const TEAM_PERSON_SCHEMAS = TEAM_MEMBERS.map((member) => ({
+  '@type': 'Person',
+  name: member.name,
+  ...(member.role !== ROLE_TBC ? { jobTitle: member.role } : {}),
+  worksFor: {
+    '@type': 'Organization',
+    '@id': BUSINESS_ID,
+    name: SITE_NAME,
+  },
+}));
 export const DEFAULT_DESCRIPTION =
   'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket.';
 
@@ -321,78 +350,7 @@ const STATIC_META: Record<string, RouteMeta> = {
           url: `${BASE_URL}/meet-the-team`,
           isPartOf: { '@id': `${BASE_URL}/#website` },
         },
-        {
-          '@type': 'Person',
-          name: 'Alexandra Reyes',
-          jobTitle: 'Founder & CEO',
-          description:
-            "Alexandra founded Nova Havens after coordinating housing for her own family following a house fire — an experience that revealed how fragmented and impersonal the insurance housing process had become. She leads Nova Havens' overall strategy, carrier partnerships, and vision for compassionate, technology-assisted placement.",
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
-        },
-        {
-          '@type': 'Person',
-          name: 'Marcus Whitfield',
-          jobTitle: 'Head of Carrier Relations',
-          description:
-            'Marcus brings 14 years of large-loss adjuster experience to Nova Havens. As Head of Carrier Relations, he manages all insurer partnerships, ensures documentation meets carrier standards, and trains the coordination team on claims-specific communication and compliance.',
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
-        },
-        {
-          '@type': 'Person',
-          name: 'Priya Natarajan',
-          jobTitle: 'Director of Placements',
-          description:
-            'Priya leads the Nova Havens placement team responsible for matching displaced households to verified homes nationwide. Her expertise spans ALE policy interpretation, school-district proximity matching, pet-accommodation logistics, and multi-family accessibility requirements.',
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
-        },
-        {
-          '@type': 'Person',
-          name: 'Daniel Okafor',
-          jobTitle: 'Property Network Manager',
-          description:
-            "Daniel oversees the growth and quality of Nova Havens' 20,000+ verified furnished property network across 48 states. As Property Network Manager, he sets inspection standards, manages property owner relationships, and ensures every listing meets the same livability benchmark.",
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
-        },
-        {
-          '@type': 'Person',
-          name: 'Sofia Marchetti',
-          jobTitle: 'Claims Coordination Lead',
-          description:
-            'Sofia manages the active-placement lifecycle for Nova Havens — extensions, adjuster updates, property adjustments, and move-out coordination. Her role as Claims Coordination Lead ensures that adjusters receive proactive status notifications without having to follow up.',
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
-        },
-        {
-          '@type': 'Person',
-          name: 'James Calloway',
-          jobTitle: 'Family Support Specialist',
-          description:
-            'James is typically the first Nova Havens voice a displaced family hears. As Family Support Specialist, he guides households through every step of the placement process — from the initial needs assessment to move-in day — with empathy, clarity, and 24/7 availability.',
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
-        },
+        ...TEAM_PERSON_SCHEMAS,
       ],
     },
   },
@@ -409,15 +367,16 @@ const STATIC_META: Record<string, RouteMeta> = {
         {
           '@type': 'Organization',
           '@id': BUSINESS_ID,
-          name: SITE_NAME,
+          name: 'Nova Havens Temporary Housing',
+          alternateName: SITE_NAME,
           url: BASE_URL,
           logo: {
             '@type': 'ImageObject',
             url: `${BASE_URL}/og-image.png`,
           },
-          sameAs: SOCIAL_PROFILE_URLS,
-          description:
-            'Nova Havens is a Nashville, TN-based furnished housing coordination company that places families displaced by fire, water, or mold damage into verified furnished homes — working directly with insurance carriers, adjusters, and relocation specialists across all 48 contiguous US states.',
+          sameAs: ABOUT_SAMEAS_URLS,
+          // description matches the canonical definition on the About page verbatim.
+          description: COMPANY_DEFINITION,
           address: BUSINESS_ADDRESS,
           telephone: BUSINESS_PHONE,
           email: BUSINESS_EMAIL,
