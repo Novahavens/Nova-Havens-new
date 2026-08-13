@@ -75,9 +75,9 @@ export function validateColorsPlugin(): Plugin {
       root = config.root;
     },
 
-    hotUpdate({ file, type }) {
-      // Only act on file creates and updates; ignore deletions
-      if (type !== 'create' && type !== 'update') return;
+    hotUpdate({ file }) {
+      // hotUpdate fires on create/update/delete; validateFile returns null
+      // for deleted files (readFileSync throws → caught → returns null).
       if (!isWatched(root, file)) return;
 
       const result = validateFile(root, file);

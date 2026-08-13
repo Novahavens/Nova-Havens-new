@@ -8,6 +8,7 @@
     "build": "node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && node --experimental-strip-types prerender.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:vite": "tsc -p tsconfig.vite.json --noEmit",
     "validate:jsonld": "node --experimental-strip-types scripts/validate-jsonld.ts",
     "validate:prerender": "node --experimental-strip-types scripts/validate-prerender.ts",
     "validate:colors": "node --experimental-strip-types scripts/validate-colors.ts",
