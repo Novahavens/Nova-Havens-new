@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 
 import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
 import { metaInjectPlugin } from './vitePluginMetaInject';
+import { validateColorsPlugin } from './vitePluginValidateColors';
 
 const rawPort = process.env.PORT;
 
@@ -32,6 +33,7 @@ export default defineConfig({
   base: basePath,
   plugins: [
     metaInjectPlugin(),
+    validateColorsPlugin(),
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
