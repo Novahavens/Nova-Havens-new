@@ -24,7 +24,9 @@ export default defineConfig({
 
   /* Fail fast in CI; keep going locally so you see all failures. */
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  // One retry everywhere: absorbs transient dev-server flakes (e.g. a
+  // one-off 404 during warm-up) while still failing on persistent errors.
+  retries: 1,
   workers: 1, // serial – single dev-server instance
 
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],

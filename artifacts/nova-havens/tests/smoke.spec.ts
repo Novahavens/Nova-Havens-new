@@ -11,11 +11,18 @@
  * On first run (or after `pnpm test:smoke:update`) Playwright writes the
  * baseline; subsequent runs report any visual drift.
  *
- * Routes covered: /, /about-us, /blog, /blog/:slug, /meet-the-team,
- *   /contact, /privacy-policy, /terms-of-service
+ * Route discovery is DYNAMIC: the suite iterates `ALL_ROUTES` from
+ * src/lib/routeMeta.ts (static pages + every blog post slug), so adding a
+ * page to the routeMeta manifest automatically adds it here — no manual
+ * edits to this file.  A separate guard test parses src/App.tsx and fails
+ * if any route registered in the router is missing from the manifest.
  */
 
 import { test, expect, Page, ConsoleMessage, Response, Request } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { ALL_ROUTES } from '../src/lib/routeMeta.ts';
 
 // ---------------------------------------------------------------------------
 // Allowlists
@@ -113,7 +120,8 @@ function attachRuntimeCollectors(page: Page): RuntimeErrors {
       text.includes(pattern),
     );
     if (!isAllowlisted) {
-      errors.consoleErrors.push(text);
+      const loc = msg.location();
+      errors.consoleErrors.push(loc?.url ? `${text} (${loc.url})` : text);
     }
   });
 
@@ -255,37 +263,59 @@ async function smokeTest(page: Page, path: string): Promise<void> {
 // Tests
 // ---------------------------------------------------------------------------
 
+/**
+ * Turn a route path into a stable, readable test title (also used for
+ * snapshot file names). '/' → 'home'; other paths lose the leading slash
+ * and use '-' for nested segments: '/blog/foo' → 'blog-foo'.
+ */
+function routeTitle(path: string): string {
+  return path === '/' ? 'home' : path.replace(/^\//, '').replace(/\//g, '-');
+}
+
 test.describe('Page smoke tests', () => {
-  test('home page renders correctly', async ({ page }) => {
-    await smokeTest(page, '/');
-  });
+  for (const route of ALL_ROUTES) {
+    test(`${routeTitle(route)} renders correctly`, async ({ page }) => {
+      await smokeTest(page, route);
+    });
+  }
+});
 
-  test('about-us page renders correctly', async ({ page }) => {
-    await smokeTest(page, '/about-us');
-  });
+// ---------------------------------------------------------------------------
+// Route-coverage guard
+// ---------------------------------------------------------------------------
 
-  test('blog index renders correctly', async ({ page }) => {
-    await smokeTest(page, '/blog');
-  });
+/**
+ * Fails when a route registered in the wouter router (src/App.tsx) is
+ * missing from the ALL_ROUTES manifest (src/lib/routeMeta.ts).  This keeps
+ * the dynamic discovery honest: a new page added to App.tsx without a
+ * routeMeta entry breaks this test instead of silently going untested.
+ */
+test.describe('Route coverage', () => {
+  test('every route in App.tsx is covered by the routeMeta manifest', () => {
+    const testDir = dirname(fileURLToPath(import.meta.url));
+    const appSource = readFileSync(resolve(testDir, '../src/App.tsx'), 'utf8');
 
-  test('blog post renders correctly', async ({ page }) => {
-    // Use the first real post slug from blogPosts.ts.
-    await smokeTest(page, '/blog/details-that-speed-up-housing-placement');
-  });
+    const registeredPaths = [...appSource.matchAll(/<Route\s+path="([^"]+)"/g)].map(
+      (m) => m[1],
+    );
+    expect(registeredPaths.length, 'No <Route path="..."> found in App.tsx').toBeGreaterThan(0);
 
-  test('meet-the-team renders correctly', async ({ page }) => {
-    await smokeTest(page, '/meet-the-team');
-  });
+    const uncovered = registeredPaths.filter((routePattern) => {
+      if (routePattern.includes(':')) {
+        // Dynamic route (e.g. /blog/:slug) — require at least one concrete
+        // manifest entry matching the pattern.
+        const regex = new RegExp(
+          '^' + routePattern.replace(/:[^/]+/g, '[^/]+') + '$',
+        );
+        return !ALL_ROUTES.some((r) => regex.test(r));
+      }
+      return !ALL_ROUTES.includes(routePattern);
+    });
 
-  test('contact page renders correctly', async ({ page }) => {
-    await smokeTest(page, '/contact');
-  });
-
-  test('privacy-policy renders correctly', async ({ page }) => {
-    await smokeTest(page, '/privacy-policy');
-  });
-
-  test('terms-of-service renders correctly', async ({ page }) => {
-    await smokeTest(page, '/terms-of-service');
+    expect(
+      uncovered,
+      `Routes registered in App.tsx but missing from ALL_ROUTES (src/lib/routeMeta.ts) — ` +
+        `add routeMeta entries so they are smoke-tested:\n${uncovered.join('\n')}`,
+    ).toHaveLength(0);
   });
 });
