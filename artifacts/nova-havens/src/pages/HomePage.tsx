@@ -219,14 +219,14 @@ export default function HomePage() {
     <div className="w-full overflow-hidden">
       {/* 1. Hero */}
       <section className="relative min-h-[100dvh] flex items-center justify-center flex-col px-4 pt-16" style={{ background: 'radial-gradient(ellipse 800px 400px at 50% 50%, hsl(var(--primary)/0.06) 0%, transparent 70%)' }}>
-        <div className="text-center max-w-[900px] z-10 flex flex-col items-center">
-          <div className="inline-flex items-center px-4 py-1.5 rounded-full mb-8 font-semibold text-[13px] bg-primary/10 text-primary" data-testid="tag-hero">
+        <div className="text-center max-w-content z-10 flex flex-col items-center">
+          <div className="inline-flex items-center px-4 py-1.5 rounded-full mb-8 font-semibold text-xs bg-primary/10 text-primary" data-testid="tag-hero">
             Nationwide Furnished Housing Coordination
           </div>
-          <h1 className="font-extrabold tracking-tight mb-6 text-foreground" style={{ fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 1.1 }} data-testid="heading-hero">
+          <h1 className="font-extrabold tracking-tight mb-6 text-foreground" style={{ fontSize: 'var(--text-hero)', lineHeight: 1.1 }} data-testid="heading-hero">
             A safe place to land, fast.
           </h1>
-          <p className="text-[18px] md:text-[20px] max-w-[680px] mb-10 mx-auto text-muted-foreground" data-testid="text-hero-subtitle">At Nova Havens, we specialize in providing prompt and compassionate relocation services for families in need. We understand the stress that comes with displacement, and it's our priority to ensure a seamless experience.</p>
+          <p className="text-lg md:text-xl max-w-2xl mb-10 mx-auto text-muted-foreground" data-testid="text-hero-subtitle">At Nova Havens, we specialize in providing prompt and compassionate relocation services for families in need. We understand the stress that comes with displacement, and it's our priority to ensure a seamless experience.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-hero-primary">
               Request Housing
@@ -239,7 +239,7 @@ export default function HomePage() {
       </section>
       {/* 2. Trust Strip */}
       <section className="w-full border-y bg-card border-white/[0.08]">
-        <div className="max-w-[1200px] mx-auto py-12 px-4 md:px-8">
+        <div className="max-w-site mx-auto py-12 px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5">
             {/* Large tile */}
             <div
@@ -257,7 +257,7 @@ export default function HomePage() {
               <div className="relative">
                 <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">20,000+</span>
                 <span className="mt-3 block text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified homes nationwide</span>
-                <span className="mt-2 block text-sm leading-relaxed max-w-[420px] text-tertiary">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2025.</span>
+                <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2025.</span>
               </div>
             </div>
             {/* Stacked pair */}
@@ -293,31 +293,31 @@ export default function HomePage() {
         </div>
       </section>
       {/* 3. Why Choose Nova Havens */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
+      <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-16" data-testid="heading-why">Why Choose Nova Havens for Insurance Housing?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          <div className="bg-card rounded-[16px] border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-1">
+          <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-1">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Zap className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Rapid Placements</h3>
             <p className="text-muted-foreground leading-relaxed">Nova Havens uses automation and agentic technology to process claims with precision — surfacing matched housing options within hours and completing most placements in under 5 days.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-2">
+          <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-2">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Users className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">One Team, One Point of Contact</h3>
             <p className="text-muted-foreground leading-relaxed">Nova Havens handles every step in-house — from processing the claim to delivering housing options and managing the stay. Families, carriers, and adjusters always have a single dedicated contact.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-3">
+          <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-3">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Globe className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Vetted Nationwide Network</h3>
             <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 20,000+ verified furnished properties across 48 states — each inspected and ready for immediate placement.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-4">
+          <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Heart className="w-6 h-6 text-primary" />
             </div>
@@ -330,8 +330,8 @@ export default function HomePage() {
       <AskAiAboutUs />
       {/* 4. Our Mission */}
       <section className="py-24 px-4 md:px-8 w-full border-y border-white/5 bg-surface-1">
-        <div className="max-w-[800px] mx-auto text-center flex flex-col items-center">
-          <span className="text-[13px] font-bold tracking-widest uppercase mb-4 text-primary" data-testid="eyebrow-mission">OUR MISSION</span>
+        <div className="max-w-prose-wide mx-auto text-center flex flex-col items-center">
+          <span className="text-xs font-bold tracking-widest uppercase mb-4 text-primary" data-testid="eyebrow-mission">OUR MISSION</span>
           <h2 className="text-3xl md:text-5xl font-extrabold mb-8 text-foreground" data-testid="heading-mission">What Is Nova Havens' Mission?</h2>
           <div className="space-y-6 text-lg md:text-xl text-muted-foreground leading-relaxed">
             <p data-testid="text-mission-p1">
@@ -344,39 +344,39 @@ export default function HomePage() {
         </div>
       </section>
       {/* 5. The Nova Havens Experience */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
+      <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4" data-testid="heading-experience">What Does a Nova Havens Furnished Home Include?</h2>
           <p className="text-lg text-muted-foreground" data-testid="subtitle-experience">Every verified Nova Havens property is move-in ready from day one</p>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-card rounded-[16px] border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-1">
+          <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-1">
             <BedDouble className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Cozy Bedding</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">Every Nova Havens home is furnished with quality linens and bedding so families can rest from the first night — no shopping required.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-2">
+          <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-2">
             <Tv className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Entertainment & Connectivity</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">Streaming-ready TVs, high-speed internet, and fully equipped living spaces keep families connected, comfortable, and productive throughout their stay.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-3">
+          <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-3">
             <MoveRight className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Seamless Transition</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">Nova Havens coordinates move-in logistics directly with carriers and adjusters — so families focus on recovery, not paperwork or scheduling.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-4">
+          <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-4">
             <PawPrint className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Pet Friendly</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">Nova Havens maintains a dedicated pool of pet-friendly verified properties. Tell your coordinator about your pets on the first call and they'll match accordingly.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-5">
+          <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-5">
             <PhoneCall className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">24/7 Support</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">Nova Havens' coordination team is reachable around the clock. Emergency claims receive the same same-day response as weekday business hours.</p>
           </div>
-          <div className="bg-card rounded-[16px] border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-6">
+          <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-6">
             <Map className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Nationwide Network</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">With 20,000+ verified homes across every major metro and many rural areas in 48 states, Nova Havens places families close to their schools, workplaces, and community.</p>
@@ -385,9 +385,9 @@ export default function HomePage() {
       </section>
       {/* 6. Pet-Friendly Feature */}
       <section className="w-full bg-card border-y border-white/5 overflow-hidden">
-        <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row min-h-[500px]">
+        <div className="max-w-site mx-auto flex flex-col md:flex-row min-h-[var(--min-h-map-lg)]">
           <div className="w-full md:w-1/2 p-10 md:p-16 lg:p-20 flex flex-col justify-center items-start">
-            <span className="text-[13px] font-bold tracking-widest uppercase mb-4 text-primary" data-testid="eyebrow-pets">PET-FRIENDLY PROPERTIES</span>
+            <span className="text-xs font-bold tracking-widest uppercase mb-4 text-primary" data-testid="eyebrow-pets">PET-FRIENDLY PROPERTIES</span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 text-foreground leading-tight" data-testid="heading-pets">Your furry friends are welcome</h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md" data-testid="text-pets">
               Nova Havens maintains a growing network of verified pet-friendly furnished homes across 48 states — so displaced families never have to choose between a safe place to stay and bringing their pets along. Share your pet details on the first call and Nova Havens will match your family to a compatible home.
@@ -396,7 +396,7 @@ export default function HomePage() {
               Find Pet-Friendly Homes
             </a>
           </div>
-          <div className="w-full md:w-1/2 relative min-h-[300px] md:min-h-full">
+          <div className="w-full md:w-1/2 relative min-h-[var(--min-h-map)] md:min-h-full">
             <img 
               src="/pet-friendly.webp" 
               alt="Cozy pet-friendly living room in a Nova Havens verified furnished home" 
@@ -412,10 +412,10 @@ export default function HomePage() {
         </div>
       </section>
       {/* 7. Where We Operate */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
+      <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12" data-testid="heading-map">Where Does Nova Havens Operate?</h2>
         
-        <div className="w-full min-h-[350px] bg-card rounded-[16px] border border-white/10 mb-12 relative overflow-hidden" data-testid="card-map">
+        <div className="w-full min-h-[var(--min-h-map-md)] bg-card rounded-lg border border-white/10 mb-12 relative overflow-hidden" data-testid="card-map">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
           <div className="absolute inset-x-8 inset-y-6" aria-label="Property locations map">
             {Object.entries(propertyStats.byState)
@@ -431,7 +431,7 @@ export default function HomePage() {
                   <button
                     key={stateCode}
                     type="button"
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/70 border-2 border-primary shadow-[0_0_22px_hsl(var(--primary)/0.42)] transition-all hover:bg-primary hover:z-20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-2 ${isSelected ? 'z-30 ring-2 ring-primary ring-offset-2 ring-offset-surface-2' : 'z-10'}`}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/70 border-2 border-primary shadow-[var(--shadow-glow-lg)] transition-all hover:bg-primary hover:z-20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-2 ${isSelected ? 'z-30 ring-2 ring-primary ring-offset-2 ring-offset-surface-2' : 'z-10'}`}
                     style={{ left: `${left}%`, top: `${top}%`, width: size, height: size }}
                     onClick={() => setSelectedState(isSelected ? null : stateCode)}
                     aria-label={`${state.name} (${stateCode}): ${count.toLocaleString()} properties`}
@@ -446,11 +446,11 @@ export default function HomePage() {
               return (
                 <div key={city.city} className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${left}%`, top: `${top}%` }}>
                   <span
-                    className="block rounded-full bg-primary border-2 border-primary/70 shadow-[0_0_18px_hsl(var(--primary)/0.45)]"
+                    className="block rounded-full bg-primary border-2 border-primary/70 shadow-[var(--shadow-glow-md)]"
                     style={{ width: size, height: size }}
                     title={`${city.city}: ${city.count.toLocaleString()} properties`}
                   />
-                  <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                     {city.city}
                   </span>
                 </div>
@@ -472,17 +472,17 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card border border-white/5 rounded-[16px] p-8 text-center" data-testid="stat-card-properties">
+          <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-properties">
             <div className="text-4xl font-extrabold text-foreground mb-2">{propertyStats.totalProperties.toLocaleString()}</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">Active Properties</div>
             <div className="text-xs text-tertiary leading-relaxed">Live property count from the Nova Havens PROPERTY DATABASE board.</div>
           </div>
-          <div className="bg-card border border-white/5 rounded-[16px] p-8 text-center" data-testid="stat-card-states">
+          <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-states">
             <div className="text-4xl font-extrabold text-foreground mb-2">{propertyStats.statesCovered}</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">States Covered</div>
             <div className="text-xs text-tertiary leading-relaxed">Distinct states with at least one approved property in the live database.</div>
           </div>
-          <div className="bg-card border border-white/5 rounded-[16px] p-8 text-center" data-testid="stat-card-speed">
+          <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-speed">
             <div className="text-4xl font-extrabold text-foreground mb-2">&lt; 5 Days</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">Average Days to Place</div>
             <div className="text-xs text-tertiary leading-relaxed">Nova Havens' average time from first contact to family move-in is under 5 days, as of 2025.</div>
@@ -490,7 +490,7 @@ export default function HomePage() {
         </div>
       </section>
       {/* 8. Property Photo Showcase */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full border-t border-white/5">
+      <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full border-t border-white/5">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4" data-testid="heading-showcase">What Do Nova Havens Properties Look Like?</h2>
           <p className="text-lg text-muted-foreground" data-testid="subtitle-showcase">Every property in the Nova Havens network is verified, fully furnished, and ready for immediate occupancy.</p>
@@ -500,9 +500,9 @@ export default function HomePage() {
       </section>
       {/* 9. Trusted Partnerships */}
       <section className="py-20 px-4 md:px-8 w-full bg-surface-1 border-y border-white/5">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-site mx-auto">
           <div className="text-center mb-12">
-            <h2 className="md:text-3xl font-extrabold mb-3 text-left text-[32px]" data-testid="heading-partners">Our trusted industry partners.</h2>
+            <h2 className="text-3xl font-extrabold mb-3 text-left" data-testid="heading-partners">Our trusted industry partners.</h2>
             <p className="text-muted-foreground" data-testid="subtitle-partners">Nova Havens coordinates placements alongside the nation's leading insurance carriers, including:</p>
           </div>
           
@@ -514,7 +514,7 @@ export default function HomePage() {
               {[0, 1].map((copy) => (
                 <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
                   {PARTNER_LOGOS.map((partner, idx) => (
-                    <div key={partner.name} className="flex items-center gap-4 bg-card border border-white/5 rounded-[12px] px-8 py-6 mx-3 shrink-0" data-testid={copy === 0 ? `card-partner-${idx}` : undefined}>
+                    <div key={partner.name} className="flex items-center gap-4 bg-card border border-white/5 rounded-sm px-8 py-6 mx-3 shrink-0" data-testid={copy === 0 ? `card-partner-${idx}` : undefined}>
                       <img src={partner.logo} alt={copy === 0 ? `${partner.name} logo` : ''} className={`w-auto object-contain ${partner.logoClass}`} loading="lazy" />
                       {partner.showName && (
                         <span className="font-extrabold text-lg md:text-xl text-foreground tracking-tight whitespace-nowrap">{partner.name}</span>
@@ -528,7 +528,7 @@ export default function HomePage() {
         </div>
       </section>
       {/* 10. How It Works */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
+      <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-16" data-testid="heading-how-it-works">How Does Nova Havens Place Families?</h2>
         
         <Tabs defaultValue="adjusters" className="w-full flex flex-col items-center">
@@ -540,20 +540,20 @@ export default function HomePage() {
           
           <TabsContent value="adjusters" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-[1px] bg-primary/30 z-0"></div>
+              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
               
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-1">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">1</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Submit a Claim</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Share the claim details with Nova Havens via phone or portal — household size, location, pets, and accessibility needs</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-2">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">2</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Review Placement Options</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens surfaces verified homes within your parameters within hours — scored by suitability, proximity, and availability</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-3">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">3</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Approve & Coordinate</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens handles all logistics with the family directly and keeps you updated with proactive status notifications</p>
               </div>
@@ -562,20 +562,20 @@ export default function HomePage() {
           
           <TabsContent value="families" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-[1px] bg-primary/30 z-0"></div>
+              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
               
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-families-1">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">1</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Receive Your Options</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Your adjuster or carrier connects you with Nova Havens — typically within hours of your ALE coverage being confirmed</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-families-2">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">2</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Choose Your Home</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Browse furnished options matched to your family's size, location, school district, pet needs, and accessibility requirements</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-families-3">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">3</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Move In</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens coordinates move-in logistics with your carrier and the property owner — you get the keys and a direct line to your coordinator</p>
               </div>
@@ -584,20 +584,20 @@ export default function HomePage() {
 
           <TabsContent value="owners" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-[1px] bg-primary/30 z-0"></div>
+              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
               
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-1">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">1</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Submit Your Property</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Tell Nova Havens about your furnished home — location, size, amenities, pet policy, and availability</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-2">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">2</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Get Verified</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">A Nova Havens coordinator inspects and onboards your property into the network, verifying it meets our furnishing and safety standards</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-3">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[0_0_15px_hsl(var(--primary)/0.15)]">3</div>
+                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Start Hosting</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens matches your property with displaced families and handles all coordination — you deal with us, not the family directly</p>
               </div>
@@ -607,7 +607,7 @@ export default function HomePage() {
       </section>
       {/* 11. Reviews Carousel */}
       <section className="py-20 md:py-24 w-full bg-surface-1 border-y border-white/5 overflow-hidden">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-8">
+        <div className="max-w-site mx-auto px-4 md:px-8">
           <div className="flex justify-between items-end mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold" data-testid="heading-reviews">What Our Clients Say</h2>
             <div className="hidden md:flex gap-3">
@@ -645,12 +645,12 @@ export default function HomePage() {
                 }
               ].map((review, idx) => (
                 <div key={idx} className="embla__slide flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 pl-6 first:pl-0 group">
-                  <div className="bg-card rounded-[16px] p-8 md:p-10 border border-white/5 h-full flex flex-col hover:border-white/10 transition-colors">
+                  <div className="bg-card rounded-lg p-8 md:p-10 border border-white/5 h-full flex flex-col hover:border-white/10 transition-colors">
                     <span className="text-5xl font-serif text-primary leading-none mb-4 inline-block">"</span>
                     <p className="text-lg text-foreground mb-8 flex-1 leading-relaxed">
                       {review.quote}
                     </p>
-                    <div className="w-12 h-[1px] bg-white/10 mb-6"></div>
+                    <div className="w-12 h-px bg-white/10 mb-6"></div>
                     <div>
                       <p className="font-bold text-foreground">{review.name}</p>
                       <p className="text-sm text-muted-foreground">{review.role}</p>
@@ -671,16 +671,16 @@ export default function HomePage() {
         </div>
       </section>
       {/* 11.5 FAQ */}
-      <section className="py-20 md:py-24 px-4 md:px-8 max-w-[800px] mx-auto w-full" data-testid="section-faq">
+      <section className="py-20 md:py-24 px-4 md:px-8 max-w-prose-wide mx-auto w-full" data-testid="section-faq">
         <div className="text-center mb-12">
-          <span className="text-[13px] font-bold tracking-widest uppercase mb-4 block text-primary">COMMON QUESTIONS</span>
+          <span className="text-xs font-bold tracking-widest uppercase mb-4 block text-primary">COMMON QUESTIONS</span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-foreground">Frequently Asked Questions</h2>
         </div>
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, idx) => (
             <div
               key={idx}
-              className="bg-card rounded-[16px] border border-white/10 overflow-hidden"
+              className="bg-card rounded-lg border border-white/10 overflow-hidden"
               data-testid={`faq-item-${idx + 1}`}
             >
               <button
@@ -705,7 +705,7 @@ export default function HomePage() {
       </section>
       {/* 12. Emergency Contact Band */}
       <section className="w-full py-12 px-4 bg-surface-1 border-y border-white/5">
-        <div className="max-w-[800px] mx-auto text-center flex flex-col items-center gap-4 text-foreground">
+        <div className="max-w-prose-wide mx-auto text-center flex flex-col items-center gap-4 text-foreground">
           <Phone className="w-8 h-8 text-primary" />
           <a href="tel:6294010054" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-phone">
             (629) 401-0054
@@ -725,7 +725,7 @@ export default function HomePage() {
       </section>
       {/* 13. Closing CTA Band */}
       <section className="py-24 px-4 md:px-8 w-full bg-card">
-        <div className="max-w-[800px] mx-auto text-center">
+        <div className="max-w-prose-wide mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-foreground" data-testid="heading-cta">Ready to get started with Nova Havens?</h2>
           <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed" data-testid="subtitle-cta">
             Request emergency furnished housing for a displaced family, or join our network as a property owner — Nova Havens responds to both 24/7.

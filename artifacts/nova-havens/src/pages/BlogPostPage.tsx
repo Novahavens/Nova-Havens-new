@@ -59,7 +59,7 @@ function renderContent(text: string) {
         return (
           <div
             key={blockIdx}
-            className="bg-card border border-primary/25 rounded-[16px] p-6 md:p-7 mb-8"
+            className="bg-card border border-primary/25 rounded-lg p-6 md:p-7 mb-8"
             data-testid="box-quick-summary"
           >
             <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">Quick summary</p>
@@ -202,7 +202,7 @@ export default function BlogPostPage() {
     <div className="w-full">
       {/* Hero */}
       <section className="bg-background pt-24 pb-12 px-4 md:px-8 border-b border-white/10">
-        <div className="mx-auto max-w-[760px] w-full">
+        <div className="mx-auto max-w-prose w-full">
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
@@ -258,7 +258,7 @@ export default function BlogPostPage() {
 
       {/* Article body */}
       <section className="py-12 px-4 md:px-8">
-        <div className="mx-auto max-w-[760px] w-full">
+        <div className="mx-auto max-w-prose w-full">
           <article className="text-base" data-testid="article-body">
             {renderContent(post.content)}
           </article>
@@ -267,7 +267,7 @@ export default function BlogPostPage() {
           {post.cta !== 'none' && (
             <div className="mt-12 pt-8 border-t border-white/10">
               <div
-                className="bg-card rounded-[16px] border border-white/[0.08] p-8 text-center"
+                className="bg-card rounded-lg border border-white/[0.08] p-8 text-center"
                 data-testid="card-post-cta"
               >
                 <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-3">Nova Havens</p>

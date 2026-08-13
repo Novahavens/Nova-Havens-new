@@ -83,7 +83,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
         role="dialog"
         aria-modal="true"
         aria-labelledby="team-modal-name"
-        className={`relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-primary/25 bg-card p-8 shadow-2xl transition-all duration-200 motion-reduce:transition-none ${
+        className={`relative w-full max-w-lg max-h-[var(--max-h-modal)] overflow-y-auto rounded-2xl border border-primary/25 bg-card p-8 shadow-2xl transition-all duration-200 motion-reduce:transition-none ${
           visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         }`}
         onClick={(event) => event.stopPropagation()}

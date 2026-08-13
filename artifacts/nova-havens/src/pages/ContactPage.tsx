@@ -51,7 +51,7 @@ export default function ContactPage() {
     <div className="w-full">
       {/* Hero */}
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
-        <div className="mx-auto max-w-[1200px] w-full">
+        <div className="mx-auto max-w-site w-full">
           <div className="max-w-3xl">
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Contact Nova Havens</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6" data-testid="heading-contact-hero">
@@ -64,10 +64,10 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
+      <section className="py-16 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         {/* Quick Action Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-          <div className="bg-card rounded-[16px] border border-white/10 p-8 flex flex-col items-center text-center">
+          <div className="bg-card rounded-lg border border-white/10 p-8 flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-3 text-foreground">Displaced Family or Adjuster?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
               If you have an active insurance claim and need immediate furnished housing placement, Nova Havens responds 24/7. Start your request here.
@@ -77,7 +77,7 @@ export default function ContactPage() {
             </a>
           </div>
           
-          <div className="bg-card rounded-[16px] border border-white/10 p-8 flex flex-col items-center text-center">
+          <div className="bg-card rounded-lg border border-white/10 p-8 flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-3 text-foreground">Own a Furnished Property?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
               Join the Nova Havens network of 20,000+ verified furnished homes and start hosting displaced families — with carrier billing handled entirely by Nova Havens.
@@ -92,7 +92,7 @@ export default function ContactPage() {
           
           {/* Contact Info Side */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-card rounded-[16px] border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-phone">
+            <div className="bg-card rounded-lg border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-phone">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Phone className="w-5 h-5 text-primary" />
               </div>
@@ -104,7 +104,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="bg-card rounded-[16px] border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-email">
+            <div className="bg-card rounded-lg border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-email">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-primary" />
               </div>
@@ -116,7 +116,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="bg-card rounded-[16px] border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-location">
+            <div className="bg-card rounded-lg border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-location">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <MapPin className="w-5 h-5 text-primary" />
               </div>
@@ -131,7 +131,7 @@ export default function ContactPage() {
           </div>
 
           {/* Form Side */}
-          <div className="lg:col-span-2 bg-card rounded-[16px] border border-white/10 p-8 md:p-10">
+          <div className="lg:col-span-2 bg-card rounded-lg border border-white/10 p-8 md:p-10">
             <h2 className="text-2xl font-bold mb-2 text-foreground" data-testid="heading-form">Send a Message to Nova Havens</h2>
             <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold">(629) 401-0054</a> directly — 24/7.</p>
             
@@ -221,7 +221,7 @@ export default function ContactPage() {
                         <FormControl>
                           <Textarea 
                             placeholder="Describe your housing need, claim details, property, or question — the more context you provide, the faster Nova Havens can help." 
-                            className="bg-background border-white/10 text-foreground min-h-[150px]" 
+                            className="bg-background border-white/10 text-foreground min-h-[var(--min-h-textarea)]" 
                             {...field} 
                             data-testid="input-message"
                           />

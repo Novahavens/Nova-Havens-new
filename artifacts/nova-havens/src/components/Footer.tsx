@@ -6,7 +6,7 @@ import AskAiAboutUs from './AskAiAboutUs';
 export default function Footer() {
   return (
     <footer className="pt-16 pb-8 bg-background border-t border-white/[0.08]">
-      <div className="mx-auto max-w-[1200px] w-full px-4 md:px-8">
+      <div className="mx-auto max-w-site w-full px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
           <div className="flex flex-col">
             <div className="mb-4">

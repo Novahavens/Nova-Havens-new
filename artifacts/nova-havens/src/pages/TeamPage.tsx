@@ -70,7 +70,7 @@ export default function TeamPage() {
     <div className="w-full">
       {/* Hero */}
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
-        <div className="mx-auto max-w-[1100px] w-full text-center">
+        <div className="mx-auto max-w-section w-full text-center">
           <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Our People</p>
           <h1
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6"
@@ -86,7 +86,7 @@ export default function TeamPage() {
 
       {/* Team grid */}
       <section className="py-16 px-4 md:px-8">
-        <div className="mx-auto max-w-[1100px] w-full">
+        <div className="mx-auto max-w-section w-full">
           <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {TEAM_MEMBERS.map((member, idx) => {
               const hasProfile = Boolean(member.profile);
@@ -111,7 +111,7 @@ export default function TeamPage() {
                   {hasProfile ? (
                     <button
                       type="button"
-                      className="team-card-interactive w-full h-full bg-card rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center"
+                      className="team-card-interactive w-full h-full bg-card rounded-lg border border-white/[0.08] p-8 flex flex-col items-center text-center"
                       onClick={(event) => openProfile(member, event.currentTarget)}
                       aria-haspopup="dialog"
                       data-testid={memberTestId(member)}
@@ -120,7 +120,7 @@ export default function TeamPage() {
                     </button>
                   ) : (
                     <div
-                      className="w-full h-full bg-card rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center"
+                      className="w-full h-full bg-card rounded-lg border border-white/[0.08] p-8 flex flex-col items-center text-center"
                       data-testid={memberTestId(member)}
                     >
                       {cardInner}
@@ -135,7 +135,7 @@ export default function TeamPage() {
 
       {/* Values */}
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
-        <div className="mx-auto max-w-[1100px] w-full">
+        <div className="mx-auto max-w-section w-full">
           <div className="text-center mb-12">
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">How Nova Havens Works</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
@@ -146,7 +146,7 @@ export default function TeamPage() {
             {VALUES.map((value) => (
               <div
                 key={value.title}
-                className="bg-card rounded-[16px] border border-white/[0.08] p-8"
+                className="bg-card rounded-lg border border-white/[0.08] p-8"
                 data-testid={`card-value-${value.title.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <value.icon className="w-8 h-8 text-primary mb-4" aria-hidden="true" />
@@ -160,8 +160,8 @@ export default function TeamPage() {
 
       {/* CTA */}
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
-        <div className="mx-auto max-w-[760px] w-full">
-          <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center" data-testid="card-team-cta">
+        <div className="mx-auto max-w-prose w-full">
+          <div className="bg-card rounded-lg border border-white/[0.08] p-8 md:p-12 text-center" data-testid="card-team-cta">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Talk to a real person, right now</h2>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
               No phone trees, no ticket queues. Reach the Nova Havens coordination team directly — 24/7 for emergency housing claims.

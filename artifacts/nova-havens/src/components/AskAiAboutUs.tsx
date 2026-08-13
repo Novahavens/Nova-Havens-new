@@ -59,14 +59,14 @@ export default function AskAiAboutUs({ variant = 'full' }: AskAiAboutUsProps) {
           <span className="font-normal text-muted-foreground">Ask an AI assistant about us and see what it says.</span>
         </p>
         <div className="flex flex-wrap items-center gap-3">{buttons}</div>
-        <p className="text-[11px] leading-relaxed text-tertiary">{AI_TRADEMARK_NOTICE}</p>
+        <p className="text-xs leading-relaxed text-tertiary">{AI_TRADEMARK_NOTICE}</p>
       </div>
     );
   }
 
   return (
     <section className="w-full border-y border-white/5 bg-surface-1 py-20 px-4 md:px-8" data-testid="ask-ai-section">
-      <div className="mx-auto flex max-w-[800px] flex-col items-center text-center">
+      <div className="mx-auto flex max-w-prose-wide flex-col items-center text-center">
         <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-4xl" data-testid="heading-ask-ai">
           Don't take our word for it.
         </h2>
@@ -74,7 +74,7 @@ export default function AskAiAboutUs({ variant = 'full' }: AskAiAboutUsProps) {
           Ask an AI assistant about us and see what it says.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">{buttons}</div>
-        <p className="mt-8 max-w-[560px] text-xs leading-relaxed text-tertiary" data-testid="text-ask-ai-smallprint">
+        <p className="mt-8 max-w-xl text-xs leading-relaxed text-tertiary" data-testid="text-ask-ai-smallprint">
           {AI_TRADEMARK_NOTICE}
         </p>
       </div>

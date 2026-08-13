@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function TermsOfServicePage() {
   return (
-    <div className="mx-auto max-w-[800px] w-full px-4 md:px-8 py-20 pb-32">
+    <div className="mx-auto max-w-prose-wide w-full px-4 md:px-8 py-20 pb-32">
       {/* Draft Banner */}
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-6 mb-12" data-testid="banner-draft">
         <p className="text-amber-500 font-medium text-sm leading-relaxed" data-testid="text-draft-notice">

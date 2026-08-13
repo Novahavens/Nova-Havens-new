@@ -62,7 +62,7 @@ export default function AboutPage() {
   return (
     <div className="w-full">
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
-        <div className="mx-auto max-w-[1100px] w-full">
+        <div className="mx-auto max-w-section w-full">
           <div className="max-w-3xl">
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">About Nova Havens</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6" data-testid="heading-about-title">
@@ -79,7 +79,7 @@ export default function AboutPage() {
       </section>
       {/* Nova Havens at a glance — canonical fact block, written for accurate extraction by AI systems */}
       <section className="py-16 md:py-20 px-4 md:px-8 border-b border-white/5 bg-surface-1" data-testid="section-at-a-glance">
-        <div className="mx-auto max-w-[1100px] w-full">
+        <div className="mx-auto max-w-section w-full">
           <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-6" data-testid="heading-at-a-glance">
             Nova Havens at a glance
           </h2>
@@ -97,7 +97,7 @@ export default function AboutPage() {
         </div>
       </section>
       <section className="py-16 md:py-20 px-4 md:px-8">
-        <div className="mx-auto max-w-[1100px] w-full grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-20 items-center">
+        <div className="mx-auto max-w-section w-full grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-20 items-center">
           <div>
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Why Nova Havens Exists</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-6">
@@ -121,7 +121,7 @@ export default function AboutPage() {
             </Link>
           </div>
 
-          <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-10">
+          <div className="bg-card rounded-lg border border-white/[0.08] p-8 md:p-10">
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-6">Our promise</p>
             <blockquote className="text-2xl md:text-3xl font-bold text-foreground leading-tight mb-8">
               "Make the next step feel possible."
@@ -138,7 +138,7 @@ export default function AboutPage() {
         </div>
       </section>
       <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10">
-        <div className="mx-auto max-w-[1100px] w-full">
+        <div className="mx-auto max-w-section w-full">
           <div className="max-w-2xl mb-10">
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">How Nova Havens Shows Up</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4">What Principles Guide Every Nova Havens Placement?</h2>
@@ -148,7 +148,7 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {PRINCIPLES.map((principle) => (
-              <div key={principle.title} className="bg-card rounded-[16px] border border-white/[0.08] p-7">
+              <div key={principle.title} className="bg-card rounded-lg border border-white/[0.08] p-7">
                 <principle.icon className="w-8 h-8 text-primary mb-5" aria-hidden="true" />
                 <h3 className="text-lg font-bold text-foreground mb-2">{principle.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{principle.text}</p>
@@ -159,7 +159,7 @@ export default function AboutPage() {
       </section>
       {/* About FAQ */}
       <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10" data-testid="section-about-faq">
-        <div className="mx-auto max-w-[760px] w-full">
+        <div className="mx-auto max-w-prose w-full">
           <div className="text-center mb-10">
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Common Questions</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">Questions About Nova Havens</h2>
@@ -168,7 +168,7 @@ export default function AboutPage() {
             {ABOUT_FAQ.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-card rounded-[16px] border border-white/[0.08] overflow-hidden"
+                className="bg-card rounded-lg border border-white/[0.08] overflow-hidden"
                 data-testid={`about-faq-item-${idx + 1}`}
               >
                 <button
@@ -193,8 +193,8 @@ export default function AboutPage() {
         </div>
       </section>
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
-        <div className="mx-auto max-w-[760px] w-full">
-          <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center">
+        <div className="mx-auto max-w-prose w-full">
+          <div className="bg-card rounded-lg border border-white/[0.08] p-8 md:p-12 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Let's make the next step easier</h2>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
               Whether you are coordinating an insurance claim, a displaced family searching for a furnished home, or a property owner ready to join the Nova Havens network — contact us to get started.

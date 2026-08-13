@@ -35,6 +35,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Content-width scale — generates max-w-site, max-w-section, etc. */
+  --width-site: 75rem;         /* 1200px — full site container */
+  --width-section: 68.75rem;   /* 1100px — section content container */
+  --width-content: 56.25rem;   /* 900px  — hero / mid content block */
+  --width-prose-wide: 50rem;   /* 800px  — wide prose / mission sections */
+  --width-prose: 47.5rem;      /* 760px  — article / FAQ / narrow sections */
+  --width-cta: 26.25rem;       /* 420px  — small CTA callout */
 }
 
 /*
@@ -77,6 +84,19 @@
 :root {
   --app-font-sans: 'Plus Jakarta Sans', sans-serif;
   --radius: 1rem; /* 16px for cards */
+  /* Architectural heights — use as min-h-[var(--min-h-*)] */
+  --min-h-textarea: 9.375rem;    /* 150px — contact form message field */
+  --min-h-map: 18.75rem;         /* 300px — mobile map container */
+  --min-h-map-md: 21.875rem;     /* 350px — tablet map container */
+  --min-h-map-lg: 31.25rem;      /* 500px — desktop map container */
+  /* Hero heading fluid size — use as fontSize: 'var(--text-hero)' */
+  --text-hero: clamp(3rem, 6vw, 5rem);   /* clamp(48px, 6vw, 80px) in rem */
+  /* Modal max-height — use as max-h-[var(--max-h-modal)] */
+  --max-h-modal: 85vh;
+  /* Glow shadows — reference primary token, use as shadow-[var(--shadow-glow-*)] */
+  --shadow-glow-lg: 0 0 22px hsl(var(--primary) / 0.42);
+  --shadow-glow-md: 0 0 18px hsl(var(--primary) / 0.45);
+  --shadow-glow-sm: 0 0 15px hsl(var(--primary) / 0.15);
 
   /* #0A0C10 as HSL: 224 28% 6% */
   --background: 220 23% 5%;

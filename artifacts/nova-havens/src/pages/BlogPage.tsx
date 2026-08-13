@@ -15,7 +15,7 @@ export default function BlogPage() {
     <div className="w-full">
       {/* Hero */}
       <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
-        <div className="mx-auto max-w-[1200px] w-full text-center">
+        <div className="mx-auto max-w-site w-full text-center">
           <h1
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6"
             data-testid="heading-blog-hero"
@@ -31,7 +31,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 px-4 md:px-8 max-w-[1200px] mx-auto w-full">
+      <section className="py-12 md:py-16 px-4 md:px-8 max-w-site mx-auto w-full">
         {/* Filters */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
           {BLOG_FILTERS.map((filter) => (
@@ -55,7 +55,7 @@ export default function BlogPage() {
           {filteredPosts.map((post) => (
             <article
               key={post.id}
-              className="bg-card rounded-[16px] border border-white/[0.08] p-6 md:p-8 flex flex-col hover:border-white/20 transition-colors"
+              className="bg-card rounded-lg border border-white/[0.08] p-6 md:p-8 flex flex-col hover:border-white/20 transition-colors"
               data-testid={`card-post-${post.id}`}
             >
               <div className="mb-4">
