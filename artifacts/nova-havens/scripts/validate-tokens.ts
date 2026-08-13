@@ -1,5 +1,5 @@
 /**
- * validate-tokens.ts — block hardcoded spacing and font sizes from sneaking into src files.
+ * validate-tokens.ts — block hardcoded spacing, font sizes, and ad-hoc widths from sneaking into src files.
  *
  * Scans every .tsx / .ts / .css file under src/pages/ and src/components/,
  * and fails if any of the following are found:
@@ -24,9 +24,17 @@
  *      (Lines whose property starts with `--` are exempt — those are token
  *       definitions, not hardcoded overrides.)
  *
- * These patterns bypass the type scale and spacing scale defined in the design
- * system (tailwind.config.ts / index.css tokens). Use Tailwind utility classes
- * or CSS custom properties instead.
+ *   4. Tailwind max-w-[…] arbitrary values whose numeric amount (px or rem)
+ *      exactly matches one of the named width-scale tokens from src/index.css.
+ *      These should use the token class instead:
+ *        max-w-[1200px] → max-w-site
+ *        max-w-[75rem]  → max-w-site
+ *        max-w-[900px]  → max-w-content
+ *      (Widths that do NOT match any token are left to check #1 above.)
+ *
+ * These patterns bypass the type scale, spacing scale, and width scale defined
+ * in the design system (tailwind.config.ts / index.css tokens). Use Tailwind
+ * utility classes or CSS custom properties instead.
  *
  * Exempted directory (shadcn auto-generated primitives ship hardcoded values by design):
  *   - src/components/ui/
@@ -58,6 +66,42 @@ const EXEMPTED_FILES = new Set([
 const EXEMPTED_DIR_PREFIXES = [
   'src/components/ui/',
 ];
+
+// ─── width-scale token map ────────────────────────────────────────────────────
+//
+// Canonical px values (at 1rem = 16px) → the Tailwind class that represents
+// that token in src/index.css @theme inline.  Kept in sync with the
+// --width-* entries there.
+
+const WIDTH_TOKEN_MAP: Map<number, string> = new Map([
+  [1200, 'max-w-site'],        // --width-site:       75rem
+  [1100, 'max-w-section'],     // --width-section:    68.75rem
+  [900,  'max-w-content'],     // --width-content:    56.25rem
+  [800,  'max-w-prose-wide'],  // --width-prose-wide: 50rem
+  [760,  'max-w-prose'],       // --width-prose:      47.5rem
+  [420,  'max-w-cta'],         // --width-cta:        26.25rem
+]);
+
+/**
+ * Tailwind max-w-[…] arbitrary value.  Captures the payload inside the
+ * brackets so we can parse the numeric value and compare to WIDTH_TOKEN_MAP.
+ *
+ *   max-w-[1200px] → use max-w-site
+ *   max-w-[75rem]  → use max-w-site
+ */
+const MAX_W_ARBITRARY_RE = /\bmax-w-\[([^\]]+)\]/g;
+
+/**
+ * Parse a bare CSS length string (px or rem only) into a canonical pixel
+ * value.  Returns null for anything more complex (calc, var, clamp, …).
+ */
+function parseWidthPx(value: string): number | null {
+  const px = value.match(/^([\d.]+)px$/);
+  if (px) return Math.round(parseFloat(px[1]));
+  const rem = value.match(/^([\d.]+)rem$/);
+  if (rem) return Math.round(parseFloat(rem[1]) * 16);
+  return null;
+}
 
 // ─── shared unit alternation ──────────────────────────────────────────────────
 const UNITS = '(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)';
@@ -185,6 +229,45 @@ function selfTest(): void {
     { input: 'color: red;',                  re: CSS_DECL_RE,           shouldMatch: false, label: 'CSS non-token prop exempt' },
   ];
 
+  // Width-token alias self-tests (tested separately, not via a single regex)
+  type WCase = { input: string; expectToken: string | null; label: string };
+  const wCases: WCase[] = [
+    { input: 'max-w-[1200px]',  expectToken: 'max-w-site',       label: 'WTA site px'        },
+    { input: 'max-w-[75rem]',   expectToken: 'max-w-site',       label: 'WTA site rem'       },
+    { input: 'max-w-[1100px]',  expectToken: 'max-w-section',    label: 'WTA section px'     },
+    { input: 'max-w-[900px]',   expectToken: 'max-w-content',    label: 'WTA content px'     },
+    { input: 'max-w-[800px]',   expectToken: 'max-w-prose-wide', label: 'WTA prose-wide px'  },
+    { input: 'max-w-[760px]',   expectToken: 'max-w-prose',      label: 'WTA prose px'       },
+    { input: 'max-w-[420px]',   expectToken: 'max-w-cta',        label: 'WTA cta px'         },
+    { input: 'max-w-[56.25rem]',expectToken: 'max-w-content',    label: 'WTA content rem'    },
+    // should NOT flag — no matching token
+    { input: 'max-w-[640px]',   expectToken: null,               label: 'WTA no-match px'    },
+    { input: 'max-w-[var(--width-site)]', expectToken: null,     label: 'WTA var() no-flag'  },
+    // non-max-w should NOT be caught by this check
+    { input: 'w-[1200px]',      expectToken: null,               label: 'WTA non-max-w'      },
+  ];
+
+  for (const c of wCases) {
+    MAX_W_ARBITRARY_RE.lastIndex = 0;
+    const m = MAX_W_ARBITRARY_RE.exec(c.input);
+    MAX_W_ARBITRARY_RE.lastIndex = 0;
+    let token: string | null = null;
+    if (m) {
+      const px = parseWidthPx(m[1]);
+      if (px !== null) token = WIDTH_TOKEN_MAP.get(px) ?? null;
+    }
+    const ok = token === c.expectToken;
+    if (!ok) {
+      console.error(
+        `${RED}SELF-TEST FAIL${RESET}: [${c.label}] "${c.input}" — ` +
+        `expected ${c.expectToken ? `"${c.expectToken}"` : 'null'}, got ${token ? `"${token}"` : 'null'}`,
+      );
+      failed = true;
+    } else {
+      console.log(`${GREEN}SELF-TEST OK${RESET}:   [${c.label}]`);
+    }
+  }
+
   let failed = false;
   for (const c of cases) {
     c.re.lastIndex = 0;
@@ -213,7 +296,9 @@ interface Hit {
   line: number;
   text: string;
   match: string;
-  kind: 'tailwind-arbitrary' | 'inline-style' | 'css-declaration';
+  kind: 'tailwind-arbitrary' | 'inline-style' | 'css-declaration' | 'width-token-alias';
+  /** Suggested replacement class (only set for width-token-alias hits). */
+  suggestion?: string;
 }
 
 const files = SCAN_DIRS.flatMap((d) => collectFiles(d));
@@ -256,6 +341,25 @@ for (const absPath of files) {
       while ((m = INLINE_STYLE_RE.exec(line)) !== null) {
         hits.push({ line: i + 1, text: line.trim(), match: m[0], kind: 'inline-style' });
       }
+
+      // Check for max-w-[…] arbitrary values that match a named width token.
+      // These should use the token class (e.g. max-w-site) instead.
+      MAX_W_ARBITRARY_RE.lastIndex = 0;
+      while ((m = MAX_W_ARBITRARY_RE.exec(line)) !== null) {
+        const px = parseWidthPx(m[1]);
+        if (px !== null) {
+          const suggestion = WIDTH_TOKEN_MAP.get(px);
+          if (suggestion) {
+            hits.push({
+              line: i + 1,
+              text: line.trim(),
+              match: m[0],
+              kind: 'width-token-alias',
+              suggestion,
+            });
+          }
+        }
+      }
     }
   }
 
@@ -266,6 +370,9 @@ for (const absPath of files) {
       const tag = `[${h.kind}]`;
       console.error(`    line ${h.line}: ${tag} ${h.match}`);
       console.error(`      ${h.text}`);
+      if (h.kind === 'width-token-alias' && h.suggestion) {
+        console.error(`      → Use the named token instead: ${h.suggestion}`);
+      }
     }
   }
 }
@@ -277,13 +384,14 @@ const checked = files.filter((f) => {
 
 if (failures > 0) {
   console.error(
-    `\nToken validation FAILED: ${failures} file(s) contain hardcoded spacing or font-size values (of ${checked} checked).`,
+    `\nToken validation FAILED: ${failures} file(s) contain hardcoded spacing, font-size, or ad-hoc width values (of ${checked} checked).`,
   );
   console.error('Use Tailwind scale utilities (text-sm, p-4, gap-6, etc.) or CSS custom properties instead.');
+  console.error('Width containers: use max-w-site / max-w-section / max-w-content / max-w-prose-wide / max-w-prose / max-w-cta (see src/index.css @theme).');
   console.error('For shadcn-generated files, add them to EXEMPTED_FILES or EXEMPTED_DIR_PREFIXES in validate-tokens.ts.');
   process.exit(1);
 }
 
 console.log(
-  `Token validation passed: no hardcoded spacing or font-size values found across ${checked} file(s).`,
+  `Token validation passed: no hardcoded spacing, font-size, or ad-hoc width values found across ${checked} file(s).`,
 );

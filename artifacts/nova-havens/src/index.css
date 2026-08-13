@@ -35,7 +35,24 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  /* Content-width scale — generates max-w-site, max-w-section, etc. */
+  /*
+   * ── Content-width scale ───────────────────────────────────────────────────
+   *
+   * These tokens generate Tailwind max-w-* utilities automatically.
+   * Always use the named class — never write a raw max-w-[Xpx] / max-w-[Xrem]
+   * whose value matches one of these; validate-tokens.ts will flag it.
+   *
+   *   max-w-site        75rem  / 1200px — full site container
+   *   max-w-section   68.75rem / 1100px — section content container
+   *   max-w-content   56.25rem /  900px — hero / mid content block
+   *   max-w-prose-wide  50rem  /  800px — wide prose / mission sections
+   *   max-w-prose      47.5rem /  760px — article / FAQ / narrow sections
+   *   max-w-cta       26.25rem /  420px — small CTA callout
+   *
+   * To add a new width stop: define --width-<name> here, then use max-w-<name>
+   * in components.  Do NOT introduce a one-off max-w-[Npx] in a component.
+   * ─────────────────────────────────────────────────────────────────────────
+   */
   --width-site: 75rem;         /* 1200px — full site container */
   --width-section: 68.75rem;   /* 1100px — section content container */
   --width-content: 56.25rem;   /* 900px  — hero / mid content block */
