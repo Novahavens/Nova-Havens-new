@@ -157,9 +157,9 @@ function ProseBlock({ content }: { content: string }) {
 
 export default function LlmsTxtPage() {
   return (
-    <div className="mx-auto max-w-prose-wide w-full px-4 md:px-8 py-20 pb-32">
+    <div className="mx-auto max-w-prose-wide w-full px-4 md:px-8 py-12 md:py-20 pb-20 md:pb-32">
       {/* Top banner */}
-      <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-12" data-testid="banner-llms-txt">
+      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 md:p-6 mb-8 md:mb-12" data-testid="banner-llms-txt">
         <p className="text-sm leading-relaxed text-muted-foreground">
           This page is a human-readable version of the{' '}
           <a
@@ -172,17 +172,17 @@ export default function LlmsTxtPage() {
           file — a machine-readable document that helps AI assistants understand Nova Havens,
           what we do, who we serve, and how to reach us. You can access the raw plain-text file
           directly at{' '}
-          <a href="/llms.txt" className="text-primary hover:underline font-mono text-xs">
+          <a href="/llms.txt" className="text-primary hover:underline font-mono text-xs sm:text-sm">
             /llms.txt
           </a>
           .
         </p>
       </div>
 
-      <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4" data-testid="heading-llms-txt">
+      <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4" data-testid="heading-llms-txt">
         llms.txt — AI &amp; Machine-Readable Site Index
       </h1>
-      <p className="text-muted-foreground mb-16 leading-relaxed">
+      <p className="text-muted-foreground mb-10 md:mb-16 leading-relaxed">
         Nova Havens publishes an <code className="text-xs bg-white/10 px-1.5 py-0.5 rounded">llms.txt</code> file
         to help AI assistants, chatbots, and large language models accurately understand our company,
         services, and how to reference us. The sections below reflect the full contents of that file.
