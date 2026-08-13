@@ -25,6 +25,7 @@ export default function Footer() {
             <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-contact">Contact</Link>
             <Link href="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-privacy">Privacy Policy</Link>
             <Link href="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-terms">Terms of Service</Link>
+            <Link href="/llms-txt" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-llms-txt">llms.txt</Link>
           </div>
 
           <div className="flex flex-col gap-3">

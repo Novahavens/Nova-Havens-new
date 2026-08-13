@@ -10,6 +10,7 @@ import BlogPostPage from '@/pages/BlogPostPage';
 import ContactPage from '@/pages/ContactPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import TermsOfServicePage from '@/pages/TermsOfServicePage';
+import LlmsTxtPage from '@/pages/LlmsTxtPage';
 import TeamPage from '@/pages/TeamPage';
 import AboutPage from '@/pages/AboutPage';
 
@@ -32,6 +33,7 @@ function Router() {
         <Route path="/contact" component={ContactPage} />
         <Route path="/privacy-policy" component={PrivacyPolicyPage} />
         <Route path="/terms-of-service" component={TermsOfServicePage} />
+        <Route path="/llms-txt" component={LlmsTxtPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

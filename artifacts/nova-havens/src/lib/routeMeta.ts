@@ -538,6 +538,13 @@ const STATIC_META: Record<string, RouteMeta> = {
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/terms-of-service`,
   },
+  '/llms-txt': {
+    title: `llms.txt — AI & Machine-Readable Site Index | ${SITE_NAME}`,
+    description:
+      'A human-readable version of the Nova Havens llms.txt file — the machine-readable document that helps AI assistants understand who we are, what we do, and how to reach us.',
+    ogType: 'website',
+    canonicalUrl: `${BASE_URL}/llms-txt`,
+  },
 };
 
 // ── Blog post routes derived from blogPosts.ts — no manual duplication ─────
