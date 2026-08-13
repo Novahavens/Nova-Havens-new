@@ -226,9 +226,7 @@ export default function HomePage() {
           <h1 className="font-extrabold tracking-tight mb-6 text-foreground" style={{ fontSize: 'clamp(48px, 6vw, 80px)', lineHeight: 1.1 }} data-testid="heading-hero">
             A safe place to land, fast.
           </h1>
-          <p className="text-[18px] md:text-[20px] max-w-[680px] mb-10 mx-auto text-muted-foreground" data-testid="text-hero-subtitle">
-            Nova Havens is a nationwide insurance housing coordination company based in Nashville, TN. When a family is displaced by fire, water, or mold damage, Nova Havens works directly with insurance carriers and adjusters to place them into a fully furnished home — typically within 5 days, across all 48 contiguous US states.
-          </p>
+          <p className="text-[18px] md:text-[20px] max-w-[680px] mb-10 mx-auto text-muted-foreground" data-testid="text-hero-subtitle">At Nova Havens, we specialize in providing prompt and compassionate relocation services for families in need. We understand the stress that comes with displacement, and it's our priority to ensure a seamless experience.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-hero-primary">
               Request Housing

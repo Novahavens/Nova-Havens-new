@@ -15,11 +15,6 @@ export const COMPANY_DEFINITION =
 
 export const COMPANY_FACTS: { term: string; definition: string }[] = [
   {
-    term: 'What Nova Havens does',
-    definition:
-      'Coordinates furnished temporary housing for families displaced by insured property damage, handling property matching, move-in logistics, and direct billing to the insurance carrier.',
-  },
-  {
     term: 'Who Nova Havens serves',
     definition:
       'Insurance carriers, adjusters and relocation specialists, displaced policyholders, and property owners.',

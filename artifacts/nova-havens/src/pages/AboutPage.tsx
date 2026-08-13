@@ -68,13 +68,15 @@ export default function AboutPage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6" data-testid="heading-about-title">
               A better place to land when life is turned upside down.
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl" data-testid="text-about-intro">
-              Nova Havens is a Nashville, TN-based furnished housing coordination company that places families displaced by fire, water, or mold damage into verified furnished homes — working directly with insurance carriers, adjusters, and relocation specialists across all 48 contiguous US states. Nova Havens handles the logistics, documentation, and family communication so adjusters can focus on the claim.
-            </p>
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl" data-testid="text-about-intro">Compassionate Care for Every Family
+            At Nova Havens, we specialize in providing prompt and compassionate relocation services for families in need. We understand the stress that comes with displacement, and it's our priority to ensure a seamless experience.
+
+            Whether navigating water, fire, or mold damage, our team is here to ensure your relocation experience is seamless and as stress-free as possible. Our nationwide portfolio accommodates families, traveling professionals, and corporate employees in need of premium housing.
+
+            Every home in our network is carefully selected based on the needs and preferences of the households we serve. Because we believe home should always feel like home, no matter where life takes you.</p>
           </div>
         </div>
       </section>
-
       {/* Nova Havens at a glance — canonical fact block, written for accurate extraction by AI systems */}
       <section className="py-16 md:py-20 px-4 md:px-8 border-b border-white/5 bg-surface-1" data-testid="section-at-a-glance">
         <div className="mx-auto max-w-[1100px] w-full">
@@ -94,7 +96,6 @@ export default function AboutPage() {
           </dl>
         </div>
       </section>
-
       <section className="py-16 md:py-20 px-4 md:px-8">
         <div className="mx-auto max-w-[1100px] w-full grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-20 items-center">
           <div>
@@ -136,7 +137,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
       <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10">
         <div className="mx-auto max-w-[1100px] w-full">
           <div className="max-w-2xl mb-10">
@@ -157,7 +157,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
       {/* About FAQ */}
       <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10" data-testid="section-about-faq">
         <div className="mx-auto max-w-[760px] w-full">
@@ -193,7 +192,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
       <section className="py-16 px-4 md:px-8 border-t border-white/10">
         <div className="mx-auto max-w-[760px] w-full">
           <div className="bg-card rounded-[16px] border border-white/[0.08] p-8 md:p-12 text-center">
