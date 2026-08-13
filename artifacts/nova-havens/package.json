@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "validate:jsonld": "node --experimental-strip-types scripts/validate-jsonld.ts",
     "validate:prerender": "node --experimental-strip-types scripts/validate-prerender.ts",
+    "validate:colors": "node --experimental-strip-types scripts/validate-colors.ts",
     "sync:property-stats": "node --experimental-strip-types scripts/sync-property-stats.ts"
   },
   "devDependencies": {

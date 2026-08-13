@@ -24,7 +24,7 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
     imageAlt: 'Bright furnished living room with modern sofa and open-plan kitchen — Nova Havens verified property',
   },
   {
-    title: 'Master Bedrooms',
+    title: 'Walk in showers',
     subtitle: 'Rest, Restored',
     description: 'Spacious bedrooms with quality linens and ample closet space, so displaced families can settle in immediately.',
     imageUrl: '/property-2.webp',
