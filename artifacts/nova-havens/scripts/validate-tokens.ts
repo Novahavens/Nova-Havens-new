@@ -268,7 +268,35 @@ function selfTest(): void {
     }
   }
 
+  // CSS max-width token alias self-tests (mirrors logic in the CSS scan loop)
+  type CSSWCase = { input: string; expectToken: string | null; label: string };
+  const cssWCases: CSSWCase[] = [
+    { input: 'max-width: 1200px;', expectToken: 'max-w-site',    label: 'CSS-WTA site px'     },
+    { input: 'max-width: 75rem;',  expectToken: 'max-w-site',    label: 'CSS-WTA site rem'    },
+    { input: 'max-width: 900px;',  expectToken: 'max-w-content', label: 'CSS-WTA content px'  },
+    { input: 'max-width: 640px;',  expectToken: null,            label: 'CSS-WTA no-match px' },
+  ];
+
   let failed = false;
+  for (const c of cssWCases) {
+    const valMatch = c.input.match(/max-width\s*:\s*([\d.]+(?:px|rem))/);
+    let token: string | null = null;
+    if (valMatch) {
+      const px = parseWidthPx(valMatch[1]);
+      if (px !== null) token = WIDTH_TOKEN_MAP.get(px) ?? null;
+    }
+    const ok = token === c.expectToken;
+    if (!ok) {
+      console.error(
+        `${RED}SELF-TEST FAIL${RESET}: [${c.label}] "${c.input}" — ` +
+        `expected ${c.expectToken ? `"${c.expectToken}"` : 'null'}, got ${token ? `"${token}"` : 'null'}`,
+      );
+      failed = true;
+    } else {
+      console.log(`${GREEN}SELF-TEST OK${RESET}:   [${c.label}]`);
+    }
+  }
+
   for (const c of cases) {
     c.re.lastIndex = 0;
     const matched = c.re.test(c.input);
@@ -327,6 +355,27 @@ for (const absPath of files) {
       if (!trimmed.startsWith('--')) {
         CSS_DECL_RE.lastIndex = 0;
         while ((m = CSS_DECL_RE.exec(line)) !== null) {
+          // Check if this max-width value numerically matches a named width token.
+          // If it does, suggest the token class instead of a generic flag.
+          if (/\bmax-width\s*:/.test(m[0])) {
+            const valMatch = m[0].match(/max-width\s*:\s*([\d.]+(?:px|rem))/);
+            if (valMatch) {
+              const px = parseWidthPx(valMatch[1]);
+              if (px !== null) {
+                const suggestion = WIDTH_TOKEN_MAP.get(px);
+                if (suggestion) {
+                  hits.push({
+                    line: i + 1,
+                    text: line.trim(),
+                    match: m[0],
+                    kind: 'width-token-alias',
+                    suggestion,
+                  });
+                  continue;
+                }
+              }
+            }
+          }
           hits.push({ line: i + 1, text: line.trim(), match: m[0], kind: 'css-declaration' });
         }
       }
