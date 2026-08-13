@@ -268,6 +268,35 @@ function selfTest(): void {
     }
   }
 
+  // Inline maxWidth token alias self-tests (mirrors logic in the inline-style scan loop)
+  type ISWCase = { input: string; expectToken: string | null; label: string };
+  const isWCases: ISWCase[] = [
+    { input: `maxWidth: '1200px'`, expectToken: 'max-w-site',    label: 'IS-WTA site px'      },
+    { input: `maxWidth: '75rem'`,  expectToken: 'max-w-site',    label: 'IS-WTA site rem'     },
+    { input: `maxWidth: '900px'`,  expectToken: 'max-w-content', label: 'IS-WTA content px'   },
+    { input: `maxWidth: '640px'`,  expectToken: null,            label: 'IS-WTA no-match px'  },
+    { input: `maxWidth: 'var(--width-site)'`, expectToken: null, label: 'IS-WTA var() no-flag' },
+  ];
+
+  for (const c of isWCases) {
+    const valMatch = c.input.match(/maxWidth\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/);
+    let token: string | null = null;
+    if (valMatch) {
+      const px = parseWidthPx(valMatch[1]);
+      if (px !== null) token = WIDTH_TOKEN_MAP.get(px) ?? null;
+    }
+    const ok = token === c.expectToken;
+    if (!ok) {
+      console.error(
+        `${RED}SELF-TEST FAIL${RESET}: [${c.label}] "${c.input}" — ` +
+        `expected ${c.expectToken ? `"${c.expectToken}"` : 'null'}, got ${token ? `"${token}"` : 'null'}`,
+      );
+      failed = true;
+    } else {
+      console.log(`${GREEN}SELF-TEST OK${RESET}:   [${c.label}]`);
+    }
+  }
+
   // CSS max-width token alias self-tests (mirrors logic in the CSS scan loop)
   type CSSWCase = { input: string; expectToken: string | null; label: string };
   const cssWCases: CSSWCase[] = [
@@ -388,6 +417,27 @@ for (const absPath of files) {
 
       INLINE_STYLE_RE.lastIndex = 0;
       while ((m = INLINE_STYLE_RE.exec(line)) !== null) {
+        // Check if this is a maxWidth inline style that matches a named width token.
+        // If so, emit a width-token-alias hit with the suggested class instead.
+        if (/\bmaxWidth\s*:/.test(m[0])) {
+          const valMatch = m[0].match(/maxWidth\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/);
+          if (valMatch) {
+            const px = parseWidthPx(valMatch[1]);
+            if (px !== null) {
+              const suggestion = WIDTH_TOKEN_MAP.get(px);
+              if (suggestion) {
+                hits.push({
+                  line: i + 1,
+                  text: line.trim(),
+                  match: m[0],
+                  kind: 'width-token-alias',
+                  suggestion,
+                });
+                continue;
+              }
+            }
+          }
+        }
         hits.push({ line: i + 1, text: line.trim(), match: m[0], kind: 'inline-style' });
       }
 
