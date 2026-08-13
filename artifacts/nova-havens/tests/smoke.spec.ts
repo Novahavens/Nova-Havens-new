@@ -41,6 +41,20 @@ const ALLOWLISTED_CONSOLE_ERRORS: readonly string[] = [
 ];
 
 /**
+ * Allowlist for uncaught page errors (window.onerror / unhandledrejection,
+ * both surfaced by Playwright as `pageerror`).  Each entry is matched against
+ * the error TYPE (e.g. 'TypeError'), the MESSAGE, and every STACK FRAME, so
+ * you can allowlist by any of:
+ *   - error type:   'ResizeObserver'          (matches the error name)
+ *   - message text: 'loop completed with undelivered notifications'
+ *   - stack frame:  'third-party-widget.js'   (matches a file in the stack)
+ */
+const ALLOWLISTED_PAGE_ERRORS: readonly string[] = [
+  // Add known-safe patterns here, e.g.:
+  // 'ResizeObserver loop',
+];
+
+/**
  * URL substrings for requests that may legitimately fail and should not fail
  * the test.  Typically third-party analytics / tracking endpoints that a
  * headless browser blocks.
@@ -78,7 +92,12 @@ function isAllowlistedUrl(url: string): boolean {
 // ---------------------------------------------------------------------------
 
 interface RuntimeErrors {
-  /** Uncaught JS exceptions captured via `page.on('pageerror')`. */
+  /**
+   * Uncaught JS exceptions and unhandled promise rejections captured via
+   * `page.on('pageerror')` (which surfaces both `window.onerror` and
+   * `unhandledrejection` events).  Each entry includes the full stack trace
+   * when available so the failing component/file can be identified.
+   */
   pageErrors: string[];
   /** `console.error(...)` calls not covered by the allowlist. */
   consoleErrors: string[];
@@ -107,9 +126,27 @@ function attachRuntimeCollectors(page: Page): RuntimeErrors {
     requestFailures: [],
   };
 
-  // ── Uncaught JS exceptions ────────────────────────────────────────────────
+  // ── Uncaught JS exceptions & unhandled promise rejections ────────────────
+  // Playwright's `pageerror` event fires for both `window.onerror` and
+  // `unhandledrejection`.  We record the full stack trace (which includes
+  // component/file frames) so failures point at the offending code, not just
+  // a cryptic message.
   page.on('pageerror', (err: Error) => {
-    errors.pageErrors.push(`${err.name}: ${err.message}`);
+    const stack = err.stack ?? '';
+    // Match the allowlist against error type, message, and every stack frame.
+    const haystack = `${err.name}\n${err.message}\n${stack}`;
+    const isAllowlisted = ALLOWLISTED_PAGE_ERRORS.some((pattern) =>
+      haystack.includes(pattern),
+    );
+    if (isAllowlisted) return;
+
+    // Prefer the stack (it usually starts with "Name: message" and then the
+    // frames); fall back to name/message when no stack is available.
+    const detail =
+      stack && stack.includes(err.message)
+        ? stack
+        : [`${err.name}: ${err.message}`, stack].filter(Boolean).join('\n');
+    errors.pageErrors.push(detail);
   });
 
   // ── console.error() calls ─────────────────────────────────────────────────
@@ -225,7 +262,7 @@ async function smokeTest(page: Page, path: string): Promise<void> {
 
   expect(
     errors.pageErrors,
-    `Uncaught JS exception(s) on ${path}:\n${errors.pageErrors.join('\n')}`,
+    `Uncaught JS exception(s) / unhandled rejection(s) on ${path}:\n\n${errors.pageErrors.join('\n\n')}`,
   ).toHaveLength(0);
 
   expect(
