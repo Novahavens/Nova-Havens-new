@@ -6,9 +6,9 @@
  * documented at the top of src/index.css: all color values must go through
  * design tokens (Tailwind classes or CSS custom properties).
  *
- * Exempted files (shadcn defaults that ship hex colors by design):
- *   - src/components/ui/chart.tsx
- *   - src/components/ui/toast.tsx
+ * Exemptions are defined in src/lib/validateRules.ts (COLOR_EXEMPTED_FILES).
+ * Edit that single file to add or remove exemptions — no need to touch this
+ * script or its Vite-plugin counterpart separately.
  *
  * Run with: node --experimental-strip-types scripts/validate-colors.ts
  * Exits non-zero if any violation is found.
@@ -16,6 +16,7 @@
 
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
+import { COLOR_EXEMPTED_FILES, HEX_COLOR_RE } from '../src/lib/validateRules.ts';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 
@@ -23,15 +24,6 @@ const SCAN_DIRS = [
   join(ROOT, 'src/pages'),
   join(ROOT, 'src/components'),
 ];
-
-/** Paths (relative to ROOT) that are allowed to contain hex colors. */
-const EXEMPTED = new Set([
-  'src/components/ui/chart.tsx',
-  'src/components/ui/toast.tsx',
-]);
-
-/** Matches any #-prefixed hex color: 3, 4, 6, or 8 hex digits. */
-const HEX_COLOR_RE = /#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g;
 
 function collectFiles(dir: string, out: string[] = []): string[] {
   let entries: string[];
@@ -60,7 +52,7 @@ let failures = 0;
 for (const absPath of files) {
   const rel = relative(ROOT, absPath);
 
-  if (EXEMPTED.has(rel)) continue;
+  if (COLOR_EXEMPTED_FILES.has(rel)) continue;
 
   const source = readFileSync(absPath, 'utf8');
   const lines = source.split('\n');
@@ -85,7 +77,7 @@ for (const absPath of files) {
   }
 }
 
-const checked = files.filter((f) => !EXEMPTED.has(relative(ROOT, f))).length;
+const checked = files.filter((f) => !COLOR_EXEMPTED_FILES.has(relative(ROOT, f))).length;
 
 if (failures > 0) {
   console.error(

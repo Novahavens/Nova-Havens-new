@@ -32,12 +32,9 @@
  *        max-w-[900px]  → max-w-content
  *      (Widths that do NOT match any token are left to check #1 above.)
  *
- * These patterns bypass the type scale, spacing scale, and width scale defined
- * in the design system (tailwind.config.ts / index.css tokens). Use Tailwind
- * utility classes or CSS custom properties instead.
- *
- * Exempted directory (shadcn auto-generated primitives ship hardcoded values by design):
- *   - src/components/ui/
+ * Exemptions and regexes are defined in src/lib/validateRules.ts.
+ * Edit that single file to add exempted paths, change a regex, or update the
+ * width-token map — no need to touch this script or its Vite-plugin counterpart.
  *
  * Run with: node --experimental-strip-types scripts/validate-tokens.ts
  * Exits non-zero if any violation is found.
@@ -45,6 +42,16 @@
 
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
+import {
+  TOKEN_EXEMPTED_FILES,
+  TOKEN_EXEMPTED_DIR_PREFIXES,
+  WIDTH_TOKEN_MAP,
+  parseWidthPx,
+  TAILWIND_ARBITRARY_RE,
+  MAX_W_ARBITRARY_RE,
+  INLINE_STYLE_RE,
+  CSS_DECL_RE,
+} from '../src/lib/validateRules.ts';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 
@@ -52,125 +59,6 @@ const SCAN_DIRS = [
   join(ROOT, 'src/pages'),
   join(ROOT, 'src/components'),
 ];
-
-/**
- * Specific file paths (relative to ROOT) that are exempt.
- * Kept in sync with validate-colors.ts exemptions.
- */
-const EXEMPTED_FILES = new Set([
-  'src/components/ui/chart.tsx',
-  'src/components/ui/toast.tsx',
-]);
-
-/** Any file whose relative path starts with one of these prefixes is also exempt. */
-const EXEMPTED_DIR_PREFIXES = [
-  'src/components/ui/',
-];
-
-// ─── width-scale token map ────────────────────────────────────────────────────
-//
-// Canonical px values (at 1rem = 16px) → the Tailwind class that represents
-// that token in src/index.css @theme inline.  Kept in sync with the
-// --width-* entries there.
-
-const WIDTH_TOKEN_MAP: Map<number, string> = new Map([
-  [1200, 'max-w-site'],        // --width-site:       75rem
-  [1100, 'max-w-section'],     // --width-section:    68.75rem
-  [900,  'max-w-content'],     // --width-content:    56.25rem
-  [800,  'max-w-prose-wide'],  // --width-prose-wide: 50rem
-  [760,  'max-w-prose'],       // --width-prose:      47.5rem
-  [420,  'max-w-cta'],         // --width-cta:        26.25rem
-]);
-
-/**
- * Tailwind max-w-[…] arbitrary value.  Captures the payload inside the
- * brackets so we can parse the numeric value and compare to WIDTH_TOKEN_MAP.
- *
- *   max-w-[1200px] → use max-w-site
- *   max-w-[75rem]  → use max-w-site
- */
-const MAX_W_ARBITRARY_RE = /\bmax-w-\[([^\]]+)\]/g;
-
-/**
- * Parse a bare CSS length string (px or rem only) into a canonical pixel
- * value.  Returns null for anything more complex (calc, var, clamp, …).
- */
-function parseWidthPx(value: string): number | null {
-  const px = value.match(/^([\d.]+)px$/);
-  if (px) return Math.round(parseFloat(px[1]));
-  const rem = value.match(/^([\d.]+)rem$/);
-  if (rem) return Math.round(parseFloat(rem[1]) * 16);
-  return null;
-}
-
-// ─── shared unit alternation ──────────────────────────────────────────────────
-const UNITS = '(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)';
-
-/**
- * Tailwind arbitrary-value bracket that contains a numeric unit *anywhere*
- * inside the payload — catches bare values, clamp(), calc(), etc.
- *
- *   text-[14px]                 ✓
- *   p-[calc(1rem+8px)]          ✓
- *   text-[clamp(48px,6vw,80px)] ✓
- *   text-[var(--foo)]           ✗ (no numeric unit)
- *   bg-[#fff]                   ✗ (handled by color check)
- */
-const TAILWIND_ARBITRARY_RE = new RegExp(
-  `[\\w-]+\\[[^\\]]*[\\d.]+${UNITS}[^\\]]*\\]`,
-  'g',
-);
-
-/**
- * JSX inline style property keys for font-size / spacing whose quoted value
- * contains a numeric unit anywhere inside, including CSS functions.
- *
- *   fontSize: '14px'                       ✓
- *   fontSize: 'clamp(48px, 6vw, 80px)'    ✓
- *   marginTop: "32px"                      ✓
- *   padding: `8px`                         ✓
- */
-const JS_PROP =
-  '(?:fontSize|lineHeight|letterSpacing' +
-  '|margin(?:Top|Bottom|Left|Right)?' +
-  '|padding(?:Top|Bottom|Left|Right)?' +
-  '|gap|rowGap|columnGap' +
-  '|top|bottom|left|right' +
-  '|width|height|minWidth|maxWidth|minHeight|maxHeight)';
-
-const INLINE_STYLE_RE = new RegExp(
-  `\\b${JS_PROP}\\s*:\\s*` +
-  `(?:` +
-    `'[^']*[\\d.]+${UNITS}[^']*'` +    // single-quoted
-    `|"[^"]*[\\d.]+${UNITS}[^"]*"` +   // double-quoted
-    `|\`[^\`]*[\\d.]+${UNITS}[^\`]*\`` // backtick
-  + `)`,
-  'g',
-);
-
-/**
- * CSS property declarations (in .css files) with hardcoded numeric units.
- * Matches the property name through the rest of the declaration up to `;` or `{`.
- * Skips custom-property definitions (--var:) — those ARE the token definitions.
- *
- *   font-size: 14px;                      ✓
- *   padding: 20px 0;                      ✓
- *   margin-top: clamp(1rem, 5vw, 3rem);   ✓
- *   --spacing-4: 16px;                    ✗ (custom property — exempt)
- */
-const CSS_PROP =
-  '(?:font-size|line-height|letter-spacing' +
-  '|margin(?:-(?:top|bottom|left|right))?' +
-  '|padding(?:-(?:top|bottom|left|right))?' +
-  '|gap|row-gap|column-gap' +
-  '|top|bottom|left|right' +
-  '|width|height|min-width|max-width|min-height|max-height)';
-
-const CSS_DECL_RE = new RegExp(
-  // Require the line NOT to start with -- before the property (custom property)
-  `(?<!--)\\b${CSS_PROP}\\s*:[^;{]*[\\d.]+${UNITS}`,
-  'g',
-);
 
 // ─── file collection ──────────────────────────────────────────────────────────
 
@@ -247,6 +135,8 @@ function selfTest(): void {
     { input: 'w-[1200px]',      expectToken: null,               label: 'WTA non-max-w'      },
   ];
 
+  let failed = false;
+
   for (const c of wCases) {
     MAX_W_ARBITRARY_RE.lastIndex = 0;
     const m = MAX_W_ARBITRARY_RE.exec(c.input);
@@ -306,7 +196,6 @@ function selfTest(): void {
     { input: 'max-width: 640px;',  expectToken: null,            label: 'CSS-WTA no-match px' },
   ];
 
-  let failed = false;
   for (const c of cssWCases) {
     const valMatch = c.input.match(/max-width\s*:\s*([\d.]+(?:px|rem))/);
     let token: string | null = null;
@@ -365,7 +254,7 @@ let failures = 0;
 for (const absPath of files) {
   const rel = relative(ROOT, absPath);
 
-  if (EXEMPTED_FILES.has(rel) || EXEMPTED_DIR_PREFIXES.some((p) => rel.startsWith(p))) continue;
+  if (TOKEN_EXEMPTED_FILES.has(rel) || TOKEN_EXEMPTED_DIR_PREFIXES.some((p) => rel.startsWith(p))) continue;
 
   const isCss = absPath.endsWith('.css');
   const source = readFileSync(absPath, 'utf8');
@@ -478,7 +367,7 @@ for (const absPath of files) {
 
 const checked = files.filter((f) => {
   const rel = relative(ROOT, f);
-  return !EXEMPTED_FILES.has(rel) && !EXEMPTED_DIR_PREFIXES.some((p) => rel.startsWith(p));
+  return !TOKEN_EXEMPTED_FILES.has(rel) && !TOKEN_EXEMPTED_DIR_PREFIXES.some((p) => rel.startsWith(p));
 }).length;
 
 if (failures > 0) {
@@ -487,7 +376,7 @@ if (failures > 0) {
   );
   console.error('Use Tailwind scale utilities (text-sm, p-4, gap-6, etc.) or CSS custom properties instead.');
   console.error('Width containers: use max-w-site / max-w-section / max-w-content / max-w-prose-wide / max-w-prose / max-w-cta (see src/index.css @theme).');
-  console.error('For shadcn-generated files, add them to EXEMPTED_FILES or EXEMPTED_DIR_PREFIXES in validate-tokens.ts.');
+  console.error('For shadcn-generated files, add them to TOKEN_EXEMPTED_FILES or TOKEN_EXEMPTED_DIR_PREFIXES in src/lib/validateRules.ts.');
   process.exit(1);
 }
 

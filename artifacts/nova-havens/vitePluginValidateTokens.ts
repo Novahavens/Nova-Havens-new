@@ -3,8 +3,8 @@
  * validation on every source file save during `vite dev`, so violations surface
  * immediately in the terminal instead of waiting for a full build.
  *
- * Mirrors the rules in scripts/validate-tokens.ts — keep the two in sync if
- * the exemption list or regexes ever change.
+ * Rules are sourced from src/lib/validateRules.ts — edit that file to add
+ * exemptions, change regexes, or update the width-token map.
  *
  * Flags:
  *   1. Tailwind arbitrary-value brackets with a numeric px/em/rem/… unit
@@ -20,78 +20,17 @@
 import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import type { Plugin } from 'vite';
-
-// ─── exemptions ───────────────────────────────────────────────────────────────
-
-const EXEMPTED_FILES = new Set([
-  'src/components/ui/chart.tsx',
-  'src/components/ui/toast.tsx',
-]);
-
-const EXEMPTED_DIR_PREFIXES = ['src/components/ui/'];
-
-const WATCHED_RE = /\.(tsx?|css)$/;
-
-// ─── width-token map (must match validate-tokens.ts) ─────────────────────────
-
-const WIDTH_TOKEN_MAP = new Map<number, string>([
-  [1200, 'max-w-site'],
-  [1100, 'max-w-section'],
-  [900,  'max-w-content'],
-  [800,  'max-w-prose-wide'],
-  [760,  'max-w-prose'],
-  [420,  'max-w-cta'],
-]);
-
-function parseWidthPx(value: string): number | null {
-  const px = value.match(/^([\d.]+)px$/);
-  if (px) return Math.round(parseFloat(px[1]));
-  const rem = value.match(/^([\d.]+)rem$/);
-  if (rem) return Math.round(parseFloat(rem[1]) * 16);
-  return null;
-}
-
-// ─── regexes (must match validate-tokens.ts) ─────────────────────────────────
-
-const UNITS = '(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)';
-
-const TAILWIND_ARBITRARY_RE = new RegExp(
-  `[\\w-]+\\[[^\\]]*[\\d.]+${UNITS}[^\\]]*\\]`,
-  'g',
-);
-
-const MAX_W_ARBITRARY_RE = /\bmax-w-\[([^\]]+)\]/g;
-
-const JS_PROP =
-  '(?:fontSize|lineHeight|letterSpacing' +
-  '|margin(?:Top|Bottom|Left|Right)?' +
-  '|padding(?:Top|Bottom|Left|Right)?' +
-  '|gap|rowGap|columnGap' +
-  '|top|bottom|left|right' +
-  '|width|height|minWidth|maxWidth|minHeight|maxHeight)';
-
-const INLINE_STYLE_RE = new RegExp(
-  `\\b${JS_PROP}\\s*:\\s*` +
-  `(?:` +
-    `'[^']*[\\d.]+${UNITS}[^']*'` +
-    `|"[^"]*[\\d.]+${UNITS}[^"]*"` +
-    `|\`[^\`]*[\\d.]+${UNITS}[^\`]*\`` +
-  `)`,
-  'g',
-);
-
-const CSS_PROP =
-  '(?:font-size|line-height|letter-spacing' +
-  '|margin(?:-(?:top|bottom|left|right))?' +
-  '|padding(?:-(?:top|bottom|left|right))?' +
-  '|gap|row-gap|column-gap' +
-  '|top|bottom|left|right' +
-  '|width|height|min-width|max-width|min-height|max-height)';
-
-const CSS_DECL_RE = new RegExp(
-  `(?<!--)\\b${CSS_PROP}\\s*:[^;{]*[\\d.]+${UNITS}`,
-  'g',
-);
+import {
+  TOKEN_EXEMPTED_FILES,
+  TOKEN_EXEMPTED_DIR_PREFIXES,
+  WIDTH_TOKEN_MAP,
+  parseWidthPx,
+  WATCHED_RE,
+  TAILWIND_ARBITRARY_RE,
+  MAX_W_ARBITRARY_RE,
+  INLINE_STYLE_RE,
+  CSS_DECL_RE,
+} from './src/lib/validateRules';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -123,8 +62,8 @@ function validateFile(
   const rel = relative(root, absPath);
 
   if (
-    EXEMPTED_FILES.has(rel) ||
-    EXEMPTED_DIR_PREFIXES.some((p) => rel.startsWith(p))
+    TOKEN_EXEMPTED_FILES.has(rel) ||
+    TOKEN_EXEMPTED_DIR_PREFIXES.some((p) => rel.startsWith(p))
   ) {
     return null;
   }

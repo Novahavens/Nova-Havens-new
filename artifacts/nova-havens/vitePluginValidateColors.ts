@@ -3,24 +3,18 @@
  * every source file save during `vite dev`, so violations surface immediately
  * in the terminal instead of waiting for a full build.
  *
- * Mirrors the rules in scripts/validate-colors.ts — keep the two in sync if
- * the exemption list or regex ever changes.
+ * Rules are sourced from src/lib/validateRules.ts — edit that file to add
+ * exemptions, change the regex, or extend the rule set.
  */
 
 import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import type { Plugin } from 'vite';
-
-/** Hex color regex: 3, 4, 6, or 8 digit forms. */
-const HEX_COLOR_RE = /#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g;
-
-/** Paths relative to the package root that are allowed to contain hex colors. */
-const EXEMPTED = new Set([
-  'src/components/ui/chart.tsx',
-  'src/components/ui/toast.tsx',
-]);
-
-const WATCHED_RE = /\.(tsx?|css)$/;
+import {
+  COLOR_EXEMPTED_FILES,
+  HEX_COLOR_RE,
+  WATCHED_RE,
+} from './src/lib/validateRules';
 
 function srcDir(root: string, sub: string) {
   return join(root, 'src', sub) + '/';
@@ -40,7 +34,7 @@ function validateFile(
   absPath: string,
 ): { rel: string; hits: { line: number; text: string; match: string }[] } | null {
   const rel = relative(root, absPath);
-  if (EXEMPTED.has(rel)) return null;
+  if (COLOR_EXEMPTED_FILES.has(rel)) return null;
 
   let source: string;
   try {
