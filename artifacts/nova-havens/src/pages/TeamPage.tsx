@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'wouter';
 import { Phone, Mail, HeartHandshake, Clock, ShieldCheck } from 'lucide-react';
-import { TEAM_MEMBERS } from '@/data/teamMembers';
+import { TEAM_MEMBERS, type TeamMember } from '@/data/teamMembers';
+import TeamMemberModal from '@/components/TeamMemberModal';
 
 const VALUES = [
   {
@@ -20,7 +22,50 @@ const VALUES = [
   },
 ];
 
+function memberTestId(member: TeamMember): string {
+  return `card-team-${member.name.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
 export default function TeamPage() {
+  const [activeMember, setActiveMember] = useState<TeamMember | null>(null);
+  const lastTriggerRef = useRef<HTMLElement | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Staggered fade-and-rise as cards scroll into view. Skipped entirely for
+  // users with prefers-reduced-motion (cards render visible immediately).
+  useEffect(() => {
+    const cards = gridRef.current?.querySelectorAll<HTMLElement>('[data-reveal]');
+    if (!cards || cards.length === 0) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cards.forEach((card) => card.classList.add('is-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15 },
+    );
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, []);
+
+  const openProfile = (member: TeamMember, trigger: HTMLElement) => {
+    lastTriggerRef.current = trigger;
+    setActiveMember(member);
+  };
+
+  const closeProfile = () => {
+    setActiveMember(null);
+    lastTriggerRef.current?.focus();
+    lastTriggerRef.current = null;
+  };
+
   return (
     <div className="w-full">
       {/* Hero */}
@@ -42,24 +87,48 @@ export default function TeamPage() {
       {/* Team grid */}
       <section className="py-16 px-4 md:px-8">
         <div className="mx-auto max-w-[1100px] w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TEAM_MEMBERS.map((member) => (
-              <div
-                key={member.name}
-                className="bg-card rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center hover:border-primary/30 transition-colors"
-                data-testid={`card-team-${member.name.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <div
-                  className="w-20 h-20 rounded-full bg-card border border-primary/60 flex items-center justify-center mb-5"
-                  aria-hidden="true"
-                >
-                  <span className="text-xl font-extrabold text-primary">{member.initials}</span>
+          <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {TEAM_MEMBERS.map((member, idx) => {
+              const hasProfile = Boolean(member.profile);
+              const delay = { '--reveal-delay': `${(idx % 3) * 70}ms` } as CSSProperties;
+              const cardInner = (
+                <>
+                  <div
+                    className="w-20 h-20 rounded-full bg-surface-1 border border-primary/60 flex items-center justify-center mb-5"
+                    aria-hidden="true"
+                  >
+                    <span className="text-xl font-extrabold text-primary">{member.initials}</span>
+                  </div>
+                  <span className="text-lg font-bold text-foreground mb-1">{member.name}</span>
+                  {member.role && (
+                    <span className="text-sm font-semibold text-primary">{member.role}</span>
+                  )}
+                </>
+              );
+
+              return (
+                <div key={member.name} data-reveal style={delay} className="team-card-reveal">
+                  {hasProfile ? (
+                    <button
+                      type="button"
+                      className="team-card-interactive w-full h-full bg-card rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center"
+                      onClick={(event) => openProfile(member, event.currentTarget)}
+                      aria-haspopup="dialog"
+                      data-testid={memberTestId(member)}
+                    >
+                      {cardInner}
+                    </button>
+                  ) : (
+                    <div
+                      className="w-full h-full bg-card rounded-[16px] border border-white/[0.08] p-8 flex flex-col items-center text-center"
+                      data-testid={memberTestId(member)}
+                    >
+                      {cardInner}
+                    </div>
+                  )}
                 </div>
-                <h2 className="text-lg font-bold text-foreground mb-1">{member.name}</h2>
-                <p className="text-sm font-semibold text-primary mb-4">{member.role}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{member.bio}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -118,6 +187,8 @@ export default function TeamPage() {
           </div>
         </div>
       </section>
+
+      {activeMember && <TeamMemberModal member={activeMember} onClose={closeProfile} />}
     </div>
   );
 }

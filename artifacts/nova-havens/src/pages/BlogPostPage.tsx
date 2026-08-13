@@ -52,8 +52,26 @@ function renderContent(text: string) {
       );
     }
 
-    // ── Blockquote / direct-answer box  (> text)
+    // ── Quick summary callout: the first block of every post is a blockquote
+    //    containing the summary text verbatim — render it as a labeled box.
     if (lines.every(l => l.startsWith('> '))) {
+      if (blockIdx === 0) {
+        return (
+          <div
+            key={blockIdx}
+            className="bg-card border border-primary/25 rounded-[16px] p-6 md:p-7 mb-8"
+            data-testid="box-quick-summary"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">Quick summary</p>
+            {lines.map((l, i) => (
+              <p key={i} className={`text-muted-foreground leading-[1.8] ${i > 0 ? 'mt-3' : ''}`}>
+                <InlineText text={l.slice(2)} />
+              </p>
+            ))}
+          </div>
+        );
+      }
+      // ── Blockquote / direct-answer box  (> text)
       return (
         <blockquote
           key={blockIdx}
@@ -245,36 +263,42 @@ export default function BlogPostPage() {
             {renderContent(post.content)}
           </article>
 
-          {/* Closing CTA */}
-          <div className="mt-12 pt-8 border-t border-white/10">
-            <div
-              className="bg-card rounded-[16px] border border-white/[0.08] p-8 text-center"
-              data-testid="card-post-cta"
-            >
-              <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-3">Nova Havens</p>
-              <h2 className="text-2xl font-bold text-foreground mb-3">Need housing assistance now?</h2>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Our team is available 24/7 for emergency claims and placements nationwide.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a
-                  href={INTAKE_FORMS.housing}
-                  {...EXTERNAL_FORM_LINK_PROPS}
-                  className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
-                  data-testid="btn-request-housing-cta"
-                >
-                  Request Housing
-                </a>
-                <a
-                  href="tel:+16294010054"
-                  className="px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
-                  data-testid="link-call-cta"
-                >
-                  (629) 401-0054
-                </a>
+          {/* Closing CTA — per post; 'none' means the body carries the action */}
+          {post.cta !== 'none' && (
+            <div className="mt-12 pt-8 border-t border-white/10">
+              <div
+                className="bg-card rounded-[16px] border border-white/[0.08] p-8 text-center"
+                data-testid="card-post-cta"
+              >
+                <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-3">Nova Havens</p>
+                <h2 className="text-2xl font-bold text-foreground mb-3">
+                  {post.cta === 'property' ? 'Own a furnished property?' : 'Need housing assistance now?'}
+                </h2>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  {post.cta === 'property'
+                    ? 'Join the Nova Havens network and host insurance-displaced families in your area.'
+                    : 'Our team is available 24/7 for emergency claims and placements nationwide.'}
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <a
+                    href={post.cta === 'property' ? INTAKE_FORMS.property : INTAKE_FORMS.housing}
+                    {...EXTERNAL_FORM_LINK_PROPS}
+                    className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
+                    data-testid={post.cta === 'property' ? 'btn-submit-property-cta' : 'btn-submit-housing-cta'}
+                  >
+                    {post.cta === 'property' ? 'Submit your property' : 'Submit a housing request'}
+                  </a>
+                  <a
+                    href="tel:+16294010054"
+                    className="px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
+                    data-testid="link-call-cta"
+                  >
+                    (629) 401-0054
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-8 text-center">
             <Link

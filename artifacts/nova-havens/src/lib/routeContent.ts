@@ -13,7 +13,8 @@
  */
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
-import { ROLE_TBC, TEAM_MEMBERS } from '../data/teamMembers.ts';
+import { TEAM_MEMBERS, type TeamMemberProfile } from '../data/teamMembers.ts';
+import { INTAKE_FORMS } from './intakeForms.ts';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -37,6 +38,26 @@ function contentToHtml(text: string): string {
   for (const block of blocks) {
     const lines = block.split('\n');
     const firstBulletIdx = lines.findIndex((l) => l.startsWith('- '));
+
+    // ── ## H2 heading (all post H2s are phrased as questions)
+    if (lines.length === 1 && block.startsWith('## ')) {
+      parts.push(`<h2>${esc(block.slice(3))}</h2>`);
+      continue;
+    }
+
+    // ── ### H3 heading
+    if (lines.length === 1 && block.startsWith('### ')) {
+      parts.push(`<h3>${esc(block.slice(4))}</h3>`);
+      continue;
+    }
+
+    // ── Blockquote: the first block of every post is the "Quick summary"
+    //    callout — strip the "> " markers and emit a labelled summary block.
+    if (lines.every((l) => l.startsWith('> '))) {
+      const body = lines.map((l) => `<p>${inlineToHtml(l.slice(2))}</p>`).join('');
+      parts.push(`<blockquote><p><strong>Quick summary</strong></p>${body}</blockquote>`);
+      continue;
+    }
 
     // Pure heading block: **Heading** alone on one line
     if (
@@ -217,6 +238,24 @@ function buildBlogPostHtml(slug: string): string {
     return `<main><h1>Post Not Found</h1><p>This article doesn't exist or may have moved.</p><a href="/blog">Back to Blog</a></main>`;
   }
 
+  // Closing CTA must match BlogPostPage.tsx: 'housing' and 'property' posts
+  // get the labelled JotForm button + phone link; 'none' gets no card at all.
+  const ctaFooter =
+    post.cta === 'none'
+      ? ''
+      : `    <footer>
+      <h2>${post.cta === 'property' ? 'Own a furnished property?' : 'Need housing assistance now?'}</h2>
+      <p>${
+        post.cta === 'property'
+          ? 'Join the Nova Havens network and host insurance-displaced families in your area.'
+          : 'Our team is available 24/7 for emergency claims and placements nationwide.'
+      }</p>
+      <p><a href="${esc(
+        post.cta === 'property' ? INTAKE_FORMS.property : INTAKE_FORMS.housing,
+      )}">${post.cta === 'property' ? 'Submit your property' : 'Submit a housing request'}</a></p>
+      <p>Call us: <a href="tel:+16294010054">(629) 401-0054</a></p>
+    </footer>`;
+
   return `
 <main>
   <article>
@@ -229,11 +268,7 @@ function buildBlogPostHtml(slug: string): string {
     <section>
       ${contentToHtml(post.content)}
     </section>
-    <footer>
-      <h2>Need housing assistance now?</h2>
-      <p>Our team is available 24/7 for emergency claims and placements nationwide.</p>
-      <p>Call us: <a href="tel:+16294010054">(629) 401-0054</a></p>
-    </footer>
+${ctaFooter}
   </article>
 </main>
 `;
@@ -290,11 +325,26 @@ const TEAM_HTML = `
 
   <section>
     <h2>Our Team</h2>
-${TEAM_MEMBERS.map(
-  (member) => `    <article>
-      <h3>${member.name}${member.role !== ROLE_TBC ? ` — ${member.role}` : ''}</h3>
-    </article>`,
-).join('\n')}
+${TEAM_MEMBERS.map((member) => {
+  const profileLabels: [keyof TeamMemberProfile, string][] = [
+    ['help', 'How I help our clients'],
+    ['favouritePart', 'My favourite part of working here'],
+    ['foods', 'Favourite foods'],
+    ['laugh', 'Guaranteed to make me laugh'],
+    ['spareTime', 'In my spare time'],
+  ];
+  const profileHtml = member.profile
+    ? `\n      <dl>\n${profileLabels
+        .map(
+          ([key, label]) =>
+            `        <dt>${label}</dt>\n        <dd>${esc(member.profile?.[key] ?? '')}</dd>`,
+        )
+        .join('\n')}\n      </dl>`
+    : '';
+  return `    <article>
+      <h3>${esc(member.name)}${member.role ? ` — ${esc(member.role)}` : ''}</h3>${profileHtml}
+    </article>`;
+}).join('\n')}
   </section>
 
   <section>

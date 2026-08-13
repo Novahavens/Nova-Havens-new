@@ -124,3 +124,42 @@
     .animate-marquee { animation: none; }
   }
 }
+/* ── Meet the Team: staggered reveal + interactive card hover ─────────────
+   Reveal runs once per card as it scrolls into view (JS adds .is-visible).
+   Hover lift/glow lives on a nested element so reveal delays never affect
+   hover timing. Both are fully disabled under prefers-reduced-motion. */
+.team-card-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease var(--reveal-delay, 0ms),
+    transform 0.5s ease var(--reveal-delay, 0ms);
+}
+.team-card-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.team-card-interactive {
+  transition: transform 0.25s ease, border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.team-card-interactive:hover,
+.team-card-interactive:focus-visible {
+  transform: translateY(-4px);
+  border-color: hsl(var(--primary) / 0.45);
+  box-shadow: 0 12px 36px -10px hsl(var(--primary) / 0.3);
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-card-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .team-card-interactive,
+  .team-card-interactive:hover,
+  .team-card-interactive:focus-visible {
+    transition: none;
+    transform: none;
+    box-shadow: none;
+  }
+}

@@ -37,45 +37,21 @@
 
 ## Blog Content Index
 
-### Insurance Professionals
+### For Insurance Professionals
 
-**How AI Is Streamlining Temporary Housing Placements for Adjusters**
-URL: https://novahavens.com/blog/how-ai-is-streamlining-temporary-housing-placements-for-adjusters
-Summary: Nova Havens uses agentic AI to automate claim intake and property matching, cutting average temporary housing placement times to under 48 hours in most US markets — fewer callbacks, faster ALE resolution, and better outcomes for displaced families.
+**Seven Details That Speed Up a Housing Placement**
+URL: https://novahavens.com/blog/details-that-speed-up-housing-placement
+Summary: The single biggest cause of delay in a housing placement isn't availability — it's incomplete requirements. Seven fields do most of the work: preferred city and state, bedrooms and bathrooms needed, occupancy counts, pet details, accessibility requirements, desired move-in date, and estimated duration. A request with all seven can be matched immediately. A request missing two or three usually means a phone call before anything moves.
 
-**What to Look for in a Housing Coordinator for Large-Loss Claims**
-URL: https://novahavens.com/blog/what-to-look-for-in-a-housing-coordinator-for-large-loss-claims
-Summary: A practical evaluation framework for insurance adjusters assessing temporary housing vendors for large-loss claims — covering network depth, single-point-of-contact accountability, real-time reporting, and documented edge-case protocols.
+**Hotel or Furnished Home? An Adjuster's Guide to ALE Housing Options**
+URL: https://novahavens.com/blog/hotel-or-furnished-home-adjusters-guide
+Summary: Hotels are faster to arrange and suit short displacements. Furnished homes generally cost less per day over longer periods, accommodate families and pets far better, and reduce escalation calls. The practical dividing line is expected duration: for anything beyond about two weeks, a furnished home is usually the better answer for both the file and the household.
 
-### Displaced Families
+### For Displaced Families
 
-**What to Expect When Your Insurer Places You in Temporary Housing**
-URL: https://novahavens.com/blog/what-to-expect-when-your-insurer-places-you-in-temporary-housing
-Summary: A step-by-step walkthrough of what happens when a family is displaced by a covered insurance loss — from first contact with Nova Havens through move-in, and what ALE coverage pays for.
-
-**Bringing Pets to Temporary Housing: What You Need to Know**
-URL: https://novahavens.com/blog/bringing-pets-to-temporary-housing-what-you-need-to-know
-Summary: Over 40% of Nova Havens properties are pet-friendly; this guide explains how to disclose pets at intake, what breed/weight restrictions exist, and how pet deposits are typically covered under ALE policies.
-
-### Property Owners
-
-**How to List Your Furnished Property with Nova Havens**
-URL: https://novahavens.com/blog/how-to-list-your-furnished-property-with-nova-havens
-Summary: Property owners can join the Nova Havens network through a 3-step process (submit, inspect, activate) — placements typically run 30–90 days with insurance carriers paying on net-30 terms.
-
-**What Insurance Housing Coordinators Look for in a Property**
-URL: https://novahavens.com/blog/what-insurance-housing-coordinators-look-for-in-a-property
-Summary: Nova Havens evaluates properties on five criteria — verified essentials, reliable Wi-Fi, laundry access, pet-friendliness, and consistent availability — and pet-friendly properties fill faster in most markets.
-
-### Company News
-
-**Nova Havens Expands to 48 States**
-URL: https://novahavens.com/blog/nova-havens-expands-to-48-states
-Summary: As of March 2025, Nova Havens operates in all 48 contiguous US states, giving insurance carriers a single housing coordination vendor for claims anywhere in the continental United States.
-
-**Introducing Automated Claim Processing at Nova Havens**
-URL: https://novahavens.com/blog/introducing-automated-claim-processing-at-nova-havens
-Summary: Nova Havens launched agentic AI-powered claim processing that reduced average time-to-options by over 60% in pilot markets — families now receive housing choices the same day in most cases, while coordinators remain in the loop for every placement decision.
+**Hotel or Furnished Home? What to Expect From Each**
+URL: https://novahavens.com/blog/hotel-or-furnished-home-what-to-expect
+Summary: If you'll be out of your home for more than a couple of weeks, a furnished home usually works better than a hotel — especially with children or pets. It has bedrooms, a kitchen, and space. Your adjuster decides what your policy covers; this explains what each option is actually like to live in.
 
 ---
 

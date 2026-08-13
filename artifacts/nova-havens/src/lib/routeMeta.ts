@@ -11,7 +11,7 @@
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
 import { COMPANY_DEFINITION } from './companyFacts.ts';
-import { ROLE_TBC, TEAM_MEMBERS } from '../data/teamMembers.ts';
+import { TEAM_MEMBERS } from '../data/teamMembers.ts';
 
 export interface RouteMeta {
   title: string;
@@ -75,14 +75,13 @@ const BUSINESS_AREA_SERVED = {
 };
 
 /**
- * Person schema for each real team member. Placeholder roles ("[Role TBC]")
- * and pending bios are deliberately omitted from structured data — we only
- * publish verified facts about real people.
+ * Person schema for each real team member. Members without a confirmed role
+ * simply omit jobTitle — we only publish verified facts about real people.
  */
 const TEAM_PERSON_SCHEMAS = TEAM_MEMBERS.map((member) => ({
   '@type': 'Person',
   name: member.name,
-  ...(member.role !== ROLE_TBC ? { jobTitle: member.role } : {}),
+  ...(member.role ? { jobTitle: member.role } : {}),
   worksFor: {
     '@type': 'Organization',
     '@id': BUSINESS_ID,
