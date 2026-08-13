@@ -29,6 +29,12 @@ const distDir = join(pkgDir, 'dist', 'public');
 
 // ── Ensure a build exists ──────────────────────────────────────────────────
 
+function routeToFilePath(route: string): string {
+  if (route === '/') return join(distDir, 'index.html');
+  const segments = route.replace(/^\//, '').split('/');
+  return join(distDir, ...segments, 'index.html');
+}
+
 if (!existsSync(join(distDir, 'index.html'))) {
   if (process.env.SKIP_BUILD === '1') {
     console.error(
@@ -47,15 +53,32 @@ if (!existsSync(join(distDir, 'index.html'))) {
       BASE_PATH: process.env.BASE_PATH ?? '/',
     },
   });
+} else {
+  // The Vite build exists but individual prerendered route files may be missing
+  // if new routes were added to routeMeta.ts after the last full build.
+  // Re-running prerender.ts is much faster than a full rebuild and keeps the
+  // prerendered HTML in sync with routeMeta.ts without requiring MONDAY_API_TOKEN.
+  const missingRoutes = Object.keys(ALL_ROUTE_META).filter(
+    (route) => !existsSync(routeToFilePath(route)),
+  );
+  if (missingRoutes.length > 0) {
+    console.log(
+      `validate-prerender: ${missingRoutes.length} route(s) missing prerendered HTML — re-running prerender step…`,
+    );
+    console.log('  Missing:', missingRoutes.join(', '));
+    execSync('node --experimental-strip-types prerender.ts', {
+      cwd: pkgDir,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        PORT: process.env.PORT ?? '5000',
+        BASE_PATH: process.env.BASE_PATH ?? '/',
+      },
+    });
+  }
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function routeToFilePath(route: string): string {
-  if (route === '/') return join(distDir, 'index.html');
-  const segments = route.replace(/^\//, '').split('/');
-  return join(distDir, ...segments, 'index.html');
-}
 
 const SCRIPT_RE =
   /<script type="application\/ld\+json" id="jsonld-route">([\s\S]*?)<\/script>/g;

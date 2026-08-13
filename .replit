@@ -12,6 +12,17 @@ env = { "CI" = "true" }
 runButton = "Project"
 
 [[workflows.workflow]]
+name = "smoke-tests"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/nova-havens exec playwright install chromium && pnpm --filter @workspace/nova-havens test:smoke"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
 name = "jsonld"
 author = "agent"
 
