@@ -1,3 +1,43 @@
+# Daily Team-Profile Sync — Scheduled Deployment
+
+## What this does
+
+`scripts/sync-team.js` reads the team-profile Google Form responses sheet,
+downloads each member's Drive photo, and writes `team/team.json` (plus
+`team/<slug>.<ext>` images) to Object Storage. The Meet the Team page fetches
+`/api/team/team.json` at runtime; if the fetch fails it falls back to the
+hardcoded list in `src/data/teamMembers.ts`, so the page never renders empty.
+
+## Google prerequisites (one-time)
+
+1. The responses **sheet** must be shared as **Anyone with the link can view**.
+2. The **Drive folder** holding the form photo uploads
+   (ID `1JBnfTrWklVqbgaWE_mR4aSr0Yp-0i6hjA4yKw44RErtHUmbGxr3xsdJBtF1dSOOzgBBN3AJe`)
+   must also be shared as **Anyone with the link can view**.
+
+Until both are shared the script exits with a descriptive error and leaves
+the existing `team.json` untouched — a failed run can never blank the page.
+
+## Run command
+
+```
+pnpm --filter @workspace/nova-havens run sync:team
+```
+
+## How to schedule it (one-time setup)
+
+1. Click **Deploy** (top-right corner of the workspace).
+2. Choose **Scheduled** as the deployment type.
+3. Set the schedule — **daily at 06:00 UTC** is recommended (team data
+   changes rarely; daily is plenty).
+4. Paste the run command above.
+5. Click **Publish**.
+
+Object Storage credentials are provided automatically in Scheduled
+Deployments, just as in development.
+
+---
+
 # Daily Property-Stats Sync — Scheduled Deployment
 
 ## What this does

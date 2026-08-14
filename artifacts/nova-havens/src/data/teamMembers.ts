@@ -1,15 +1,18 @@
 /**
- * teamMembers.ts — single source of truth for the Nova Havens roster.
+ * teamMembers.ts — FALLBACK roster for the Meet the Team page.
  *
- * Consumed by TeamPage.tsx (interactive grid), routeMeta.ts (Person JSON-LD)
- * and routeContent.ts (crawler HTML), so the page, structured data and
- * prerendered copy cannot drift.
+ * The live roster is synced daily from the Google Form responses sheet into
+ * Object Storage by scripts/sync-team.js (team/team.json), served at
+ * /api/team/team.json, and TeamPage.tsx fetches it at runtime. THIS FILE is
+ * only the offline fallback: it renders when the fetch fails or returns
+ * nothing, so the page never renders empty. It is also consumed by
+ * routeMeta.ts (Person JSON-LD) and routeContent.ts (crawler HTML) for
+ * build-time structured data and prerendered copy.
  *
  * Rules for this data (per client instruction):
- * - The five members with submitted responses are listed FIRST and carry a
- *   `profile`; their cards are interactive and open a profile modal.
- * - The remaining ten are quiet cards — avatar, name, and role only. Members
- *   without a confirmed role show no role line at all (no placeholders).
+ * - Only members who have submitted the profile form appear here. Every
+ *   listed member carries a `profile`; every card is interactive and opens
+ *   a profile modal.
  * - Profile answers are the members' own words — use them exactly as written.
  * - No phone numbers or emails for individuals; contact routing stays on the
  *   Contact page and intake forms.
@@ -35,12 +38,12 @@ export interface TeamMember {
   /** Omit entirely when no role is confirmed — the card shows no role line. */
   role?: string;
   initials: string;
-  /** Present only for the five members with submitted responses. */
-  profile?: TeamMemberProfile;
+  profile: TeamMemberProfile;
+  /** Synced profile photo URL (served from Object Storage). Null/absent = initials avatar. */
+  photoUrl?: string | null;
 }
 
 export const TEAM_MEMBERS: TeamMember[] = [
-  // ── Profiled members first (interactive cards) ──────────────────────────
   {
     name: "Paulina Avellaneda",
     role: "Senior Property Coordinator",
@@ -101,15 +104,4 @@ export const TEAM_MEMBERS: TeamMember[] = [
       spareTime: "Exploring — I recently started traveling.",
     },
   },
-  // ── Remaining members (quiet cards, not clickable) ──────────────────────
-  { name: "Dian Kühn", role: "Jr National Account Manager", initials: "DK" },
-  { name: "Fazal Abed", role: "AI Engineer", initials: "FA" },
-  { name: "Gabriela Sidoli", initials: "GS" },
-  { name: "Keti Barkalaia", initials: "KB" },
-  { name: "Maria Antonia", initials: "MA" },
-  { name: "Marie Evans", initials: "ME" },
-  { name: "Melissa Concepcion", role: "National Account Manager", initials: "MC" },
-  { name: "Salma Machkour", role: "Operations Support Specialist", initials: "SM" },
-  { name: "Samer Imad El Sawi", role: "Operations Support Specialist", initials: "SE" },
-  { name: "William Dotson", initials: "WD" },
 ];

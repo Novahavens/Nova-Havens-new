@@ -23,6 +23,7 @@ interface TeamMemberModalProps {
 export default function TeamMemberModal({ member, onClose }: TeamMemberModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const handleClose = () => {
     setVisible(false);
@@ -67,8 +68,6 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!member.profile) return null;
-
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 motion-reduce:transition-none ${
@@ -99,12 +98,21 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
         </button>
 
         <div className="flex flex-col items-center text-center mb-8">
-          <div
-            className="w-24 h-24 rounded-full bg-surface-1 border border-primary/60 flex items-center justify-center mb-5"
-            aria-hidden="true"
-          >
-            <span className="text-2xl font-extrabold text-primary">{member.initials}</span>
-          </div>
+          {member.photoUrl && !photoFailed ? (
+            <img
+              src={member.photoUrl}
+              alt={`Portrait of ${member.name}`}
+              className="w-24 h-24 rounded-full border border-primary/60 object-cover object-center mb-5"
+              onError={() => setPhotoFailed(true)}
+            />
+          ) : (
+            <div
+              className="w-24 h-24 rounded-full bg-surface-1 border border-primary/60 flex items-center justify-center mb-5"
+              aria-hidden="true"
+            >
+              <span className="text-2xl font-extrabold text-primary">{member.initials}</span>
+            </div>
+          )}
           <h2 id="team-modal-name" className="text-2xl font-bold text-foreground">
             {member.name}
           </h2>
@@ -120,7 +128,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
                 {section.label}
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {member.profile?.[section.key]}
+                {member.profile[section.key]}
               </p>
             </div>
           ))}

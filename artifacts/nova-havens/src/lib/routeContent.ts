@@ -333,14 +333,12 @@ ${TEAM_MEMBERS.map((member) => {
     ['laugh', 'Guaranteed to make me laugh'],
     ['spareTime', 'In my spare time'],
   ];
-  const profileHtml = member.profile
-    ? `\n      <dl>\n${profileLabels
-        .map(
-          ([key, label]) =>
-            `        <dt>${label}</dt>\n        <dd>${esc(member.profile?.[key] ?? '')}</dd>`,
-        )
-        .join('\n')}\n      </dl>`
-    : '';
+  const profileHtml = `\n      <dl>\n${profileLabels
+    .map(
+      ([key, label]) =>
+        `        <dt>${label}</dt>\n        <dd>${esc(member.profile[key])}</dd>`,
+    )
+    .join('\n')}\n      </dl>`;
   return `    <article>
       <h3>${esc(member.name)}${member.role ? ` — ${esc(member.role)}` : ''}</h3>${profileHtml}
     </article>`;
