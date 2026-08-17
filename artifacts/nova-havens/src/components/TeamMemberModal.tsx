@@ -65,8 +65,7 @@ export default function TeamMemberModal({ member, onClose }: TeamMemberModalProp
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // intentional: run once on mount
 
   return (
     <div
