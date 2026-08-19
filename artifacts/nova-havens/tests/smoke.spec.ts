@@ -252,6 +252,13 @@ async function waitForStable(page: Page): Promise<void> {
  * colours, and spacing are still fully compared.
  */
 async function smokeTest(page: Page, path: string): Promise<void> {
+  // Dark-mode projects deliberately use page.emulateMedia rather than relying
+  // on the browser's ambient preference, so the visual variant is explicit
+  // and stable across local runs and CI.
+  if (test.info().project.name.endsWith('-dark')) {
+    await page.emulateMedia({ colorScheme: 'dark' });
+  }
+
   // Attach collectors BEFORE navigation so no events are missed.
   const errors = attachRuntimeCollectors(page);
 
