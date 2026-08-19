@@ -235,6 +235,26 @@ async function waitForStable(page: Page): Promise<void> {
   );
 }
 
+/**
+ * Tablet pages must fit their viewport horizontally. Components may use
+ * internally clipped overflow (for example, the home-page partner marquee),
+ * but no route may make the document itself scroll sideways.
+ */
+async function expectPageToFitTabletViewport(page: Page, path: string): Promise<void> {
+  const dimensions = await page.evaluate(() => ({
+    viewportWidth: document.documentElement.clientWidth,
+    pageWidth: Math.max(
+      document.documentElement.scrollWidth,
+      document.body?.scrollWidth ?? 0,
+    ),
+  }));
+
+  expect(
+    dimensions.pageWidth,
+    `The page is wider than the ${dimensions.viewportWidth}px tablet viewport on ${path}: ${dimensions.pageWidth}px`,
+  ).toBeLessThanOrEqual(dimensions.viewportWidth);
+}
+
 // ---------------------------------------------------------------------------
 // Core smoke-test helper
 // ---------------------------------------------------------------------------
@@ -245,6 +265,7 @@ async function waitForStable(page: Page): Promise<void> {
  *   - Assert no `console.error` was emitted.
  *   - Assert no non-image HTTP request returned 4xx/5xx.
  *   - Assert no non-image request failed at the connection level.
+ *   - On tablet projects, assert the document does not scroll horizontally.
  *   - Assert the full-page screenshot matches the stored baseline.
  *
  * <img> elements are masked (replaced with a solid box) so that external or
@@ -290,6 +311,12 @@ async function smokeTest(page: Page, path: string): Promise<void> {
         .map((f) => `  ${f.errorText} — ${f.url}`)
         .join('\n'),
   ).toHaveLength(0);
+
+  // Keep the width check beside the existing per-route runtime and visual
+  // checks. All tablet projects are configured at a 768px-wide viewport.
+  if (test.info().project.name.startsWith('tablet-chrome')) {
+    await expectPageToFitTabletViewport(page, path);
+  }
 
   // ── Visual snapshot ───────────────────────────────────────────────────────
   const imgLocators = page.locator('img');

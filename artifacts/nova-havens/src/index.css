@@ -154,6 +154,12 @@
 }
 
 @layer utilities {
+  /*
+   * The partner marquee is intentionally wider than its own viewport while it
+   * animates. Its HomePage wrapper clips that animation; document-level
+   * horizontal overflow is not intentional and is enforced by tablet smoke
+   * tests.
+   */
   .animate-marquee {
     animation: marquee 30s linear infinite;
   }

@@ -27,7 +27,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-8">
           <Link href="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-home">Home</Link>
           <Link href="/blog" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-blog">Blog</Link>
           <Link href="/meet-the-team" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-team">Team</Link>
@@ -35,7 +35,7 @@ export default function Navbar() {
           <Link href="/contact" className="text-sm font-medium text-foreground hover:text-primary transition-colors" data-testid="link-nav-contact">Contact</Link>
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-4">
           <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-7 py-3" data-testid="btn-submit-property">
             Submit Property
           </a>
@@ -44,8 +44,8 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Mobile Nav */}
-        <div className="md:hidden flex items-center">
+        {/* Compact Nav: mobile and tablet widths */}
+        <div className="lg:hidden flex items-center">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground" data-testid="btn-mobile-menu">
