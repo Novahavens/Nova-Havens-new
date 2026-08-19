@@ -43,6 +43,16 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     {
+      name: 'tablet-chrome',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 768, height: 1024 },
+        deviceScaleFactor: 1,
+        isMobile: false,
+        hasTouch: true,
+      },
+    },
+    {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
@@ -58,7 +68,7 @@ export default defineConfig({
   ],
 
   snapshotDir: './tests/__snapshots__',
-  // Include {projectName} so desktop and mobile baselines live in separate dirs.
+  // Include {projectName} so desktop, tablet, and mobile baselines live in separate dirs.
   snapshotPathTemplate: '{snapshotDir}/{projectName}/{testFilePath}/{arg}{ext}',
 
   webServer: {
