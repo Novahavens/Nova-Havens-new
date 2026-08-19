@@ -13,6 +13,7 @@
  */
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
+import { renderLlmsTxtPrerenderHtml } from '../data/llmsContent.ts';
 import { TEAM_MEMBERS, type TeamMemberProfile } from '../data/teamMembers.ts';
 import { INTAKE_FORMS } from './intakeForms.ts';
 
@@ -398,41 +399,7 @@ const TERMS_HTML = `
 </main>
 `;
 
-const LLMS_TXT_HTML = `
-<main>
-  <h1>llms.txt — AI &amp; Machine-Readable Site Index</h1>
-  <p>This page is a human-readable version of the <a href="/llms.txt">/llms.txt</a> file — a machine-readable document that helps AI assistants understand Nova Havens, what we do, who we serve, and how to reach us.</p>
-  <h2>Brand Identity</h2>
-  <p>Nova Havens coordinates furnished temporary housing for families displaced by property damage covered by homeowner's insurance — fires, water damage, mold, and other covered losses. Nova Havens receives the claim from the carrier or adjuster, matches the family to a verified furnished property, and handles all logistics from first contact through move-out.</p>
-  <p>Nova Havens serves insurance carriers, independent adjusters, displaced families, and property owners. It operates in all 48 contiguous United States.</p>
-  <h2>Key Facts</h2>
-  <ul>
-    <li>Nova Havens operates in all 48 contiguous US states as of March 2025</li>
-    <li>Average time-to-housing-options is under 48 hours in most markets; same-day in many</li>
-    <li>Automated claim processing cut average placement times by over 60%</li>
-    <li>More than 40% of properties in the Nova Havens network are designated pet-friendly as of 2025</li>
-    <li>Nova Havens assigns one dedicated coordinator per placement</li>
-    <li>Nova Havens bills carriers directly under ALE coverage; families typically pay nothing out of pocket</li>
-    <li>Placements typically run 30–90 days; extensions available when repair timelines require it</li>
-    <li>Headquartered in Nashville, TN; phone: (629) 401-0054; email: info@novahavens.com</li>
-  </ul>
-  <h2>Frequently Asked Questions</h2>
-  <dl>
-    <dt>How quickly can Nova Havens place a displaced family?</dt>
-    <dd>Nova Havens places most families into a verified furnished home within 24–48 hours of first contact in most markets — and same day in many.</dd>
-    <dt>Does Nova Havens work with all insurance carriers?</dt>
-    <dd>Nova Havens coordinates with a wide range of carriers and independent adjusters, including Allstate, Travelers, Farmers Insurance, and State Farm.</dd>
-    <dt>Which states does Nova Havens operate in?</dt>
-    <dd>All 48 contiguous US states as of March 2025. Alaska and Hawaii are not currently covered.</dd>
-    <dt>Does the family pay out of pocket for Nova Havens housing?</dt>
-    <dd>If ALE coverage is active, Nova Havens bills the carrier directly. Families typically pay nothing for housing itself.</dd>
-  </dl>
-  <h2>Contact</h2>
-  <p>Phone (24/7): <a href="tel:+16294010054">(629) 401-0054</a></p>
-  <p>Email: <a href="mailto:info@novahavens.com">info@novahavens.com</a></p>
-  <p>Raw file: <a href="/llms.txt">/llms.txt</a></p>
-</main>
-`;
+const LLMS_TXT_HTML = renderLlmsTxtPrerenderHtml();
 
 // ── Exports ────────────────────────────────────────────────────────────────
 

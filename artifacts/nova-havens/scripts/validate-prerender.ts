@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 
 import { ALL_ROUTE_META } from '../src/lib/routeMeta.ts';
+import { renderLlmsTxtPrerenderHtml } from '../src/data/llmsContent.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgDir = join(__dirname, '..');
@@ -244,6 +245,17 @@ for (const [route, meta] of Object.entries(ALL_ROUTE_META)) {
   const actual = JSON.stringify(parsed);
   if (expected !== actual) {
     fail(route, `JSON-LD in ${relPath} does not match routeMeta.ts declaration`);
+  }
+}
+
+const llmsTxtFilePath = routeToFilePath('/llms-txt');
+if (!existsSync(llmsTxtFilePath)) {
+  fail('/llms-txt', `prerendered file missing: ${llmsTxtFilePath.replace(pkgDir + '/', '')}`);
+} else {
+  const llmsTxtHtml = readFileSync(llmsTxtFilePath, 'utf-8');
+  const expectedBody = `<div id="root">${renderLlmsTxtPrerenderHtml()}</div>`;
+  if (!llmsTxtHtml.includes(expectedBody)) {
+    fail('/llms-txt', 'prerendered body does not match the canonical llms.txt content model');
   }
 }
 
