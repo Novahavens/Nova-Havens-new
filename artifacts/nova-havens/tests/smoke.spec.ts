@@ -410,6 +410,46 @@ test.describe('Mobile layout regressions', () => {
     await expect(page.getByTestId('section-about-faq')).toBeVisible();
   });
 
+  test('mobile navigation opens and reaches About', async ({ page }) => {
+    test.skip(
+      !test.info().project.name.startsWith('mobile-chrome'),
+      'This regression check belongs to the mobile-chrome projects',
+    );
+
+    await page.setViewportSize({ width: 375, height: 812 });
+    const errors = attachRuntimeCollectors(page);
+    await page.goto('/');
+    await waitForStable(page);
+
+    const menuButton = page.getByTestId('btn-mobile-menu');
+    await expect(menuButton).toBeVisible();
+    await menuButton.click();
+
+    await expect(page.getByTestId('link-mobile-home')).toBeVisible();
+    await expect(page.getByTestId('link-mobile-blog')).toBeVisible();
+    await expect(page.getByTestId('link-mobile-team')).toBeVisible();
+    await expect(page.getByTestId('link-mobile-about')).toBeVisible();
+    await expect(page.getByTestId('link-mobile-contact')).toBeVisible();
+    await expect(page.getByTestId('btn-mobile-submit-property')).toBeVisible();
+    await expect(page.getByTestId('btn-mobile-request-housing')).toBeVisible();
+
+    await page.getByTestId('link-mobile-about').click();
+    await expect(page).toHaveURL(/\/about-us$/);
+    await expect(page.getByTestId('heading-about-title')).toBeVisible();
+    await expect(page.getByTestId('link-mobile-about')).toBeHidden();
+
+    expect(errors.pageErrors, `Uncaught errors:\n${errors.pageErrors.join('\n')}`).toHaveLength(0);
+    expect(errors.consoleErrors, `Console errors:\n${errors.consoleErrors.join('\n')}`).toHaveLength(0);
+    expect(
+      errors.httpFailures,
+      `HTTP failures:\n${errors.httpFailures.map((failure) => `${failure.status} ${failure.url}`).join('\n')}`,
+    ).toHaveLength(0);
+    expect(
+      errors.requestFailures,
+      `Request failures:\n${errors.requestFailures.map((failure) => `${failure.errorText} — ${failure.url}`).join('\n')}`,
+    ).toHaveLength(0);
+  });
+
   test('llms-txt stays usable at 375px', async ({ page }) => {
     test.skip(
       !test.info().project.name.startsWith('mobile-chrome'),
