@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "node --experimental-strip-types scripts/validate-llms.ts && node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && node --experimental-strip-types prerender.ts",
+    "build": "node --experimental-strip-types scripts/validate-llms.ts && pnpm run test:color-rule && node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && node --experimental-strip-types prerender.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:vite": "tsc -p tsconfig.vite.json --noEmit",
@@ -25,7 +25,8 @@
     "test:smoke": "pnpm test:chromium-libraries && bash scripts/with-nix-chromium-libs.sh playwright test --config playwright.config.ts",
     "test:smoke:update": "pnpm test:chromium-libraries && bash scripts/with-nix-chromium-libs.sh playwright test --config playwright.config.ts --update-snapshots",
     "test:token-plugin": "node --experimental-strip-types --test tests/vitePluginValidateTokens.test.ts",
-    "test:token-rule": "node --experimental-strip-types --test tests/noHardcodedTokenValues.test.ts"
+    "test:token-rule": "node --experimental-strip-types --test tests/noHardcodedTokenValues.test.ts",
+    "test:color-rule": "node --experimental-strip-types --test tests/noHardcodedColorValues.test.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

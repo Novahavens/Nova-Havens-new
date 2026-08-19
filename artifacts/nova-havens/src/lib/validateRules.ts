@@ -19,6 +19,7 @@ export const HEX_COLOR_RE = /#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b
  */
 export const COLOR_EXEMPTED_FILES = new Set([
   'src/components/ui/chart.tsx',
+  'src/components/ui/chart.css',
   'src/components/ui/toast.tsx',
 ]);
 

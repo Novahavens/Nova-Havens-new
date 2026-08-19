@@ -5,9 +5,9 @@
  * VS Code's Stylelint extension uses it to flag raw hex colors while CSS is
  * being edited, before a Vite save or build-time validation runs.
  *
- * CSS counterparts of every COLOR_EXEMPTED_FILES entry are derived from the
- * central source-of-truth list in validateRules.ts. Add an explicit .css path
- * to that list when a CSS file itself needs an exemption.
+ * CSS exemptions are read from the central COLOR_EXEMPTED_FILES source of
+ * truth in validateRules.ts. Add an explicit .css path to that list when a CSS
+ * file itself needs an exemption.
  */
 
 import { readFileSync } from 'node:fs';
@@ -30,7 +30,7 @@ if (!exemptedFilesMatch) {
 const colorExemptedCssFiles = [
   ...exemptedFilesMatch[1].matchAll(/'([^']+)'/g),
 ]
-  .map(([, path]) => path.replace(/\.(?:tsx?|jsx?)$/, '.css'))
+  .map(([, path]) => path)
   .filter((path) => path.endsWith('.css'));
 
 export default {
