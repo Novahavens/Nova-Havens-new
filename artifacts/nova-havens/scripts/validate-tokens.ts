@@ -36,12 +36,17 @@
  * Edit that single file to add exempted paths, change a regex, or update the
  * width-token map — no need to touch this script or its Vite-plugin counterpart.
  *
- * Run with: node --experimental-strip-types scripts/validate-tokens.ts
+ * Run with:
+ *   node --experimental-strip-types scripts/validate-tokens.ts
+ *   node --experimental-strip-types scripts/validate-tokens.ts --staged <file>...
+ *
+ * The --staged form only checks the supplied staged paths. lint-staged supplies
+ * those paths to the pre-commit hook, keeping the check limited to changed files.
  * Exits non-zero if any violation is found.
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
-import { join, relative } from 'path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
+import { isAbsolute, join, relative, resolve, sep } from 'path';
 import {
   TOKEN_EXEMPTED_FILES,
   TOKEN_EXEMPTED_DIR_PREFIXES,
@@ -59,6 +64,8 @@ const SCAN_DIRS = [
   join(ROOT, 'src/pages'),
   join(ROOT, 'src/components'),
 ];
+
+const STAGED_FLAG = '--staged';
 
 // ─── file collection ──────────────────────────────────────────────────────────
 
@@ -79,6 +86,32 @@ function collectFiles(dir: string, out: string[] = []): string[] {
     }
   }
   return out;
+}
+
+/**
+ * Restrict pre-commit validation to the paths handed to us by lint-staged.
+ * The hook already filters the extensions and directories, but validating the
+ * scope here as well keeps direct script usage predictable and safe.
+ */
+function collectStagedFiles(paths: string[]): string[] {
+  const files = new Set<string>();
+
+  for (const path of paths) {
+    const absPath = resolve(path);
+    if (!existsSync(absPath) || !/\.(tsx?|css)$/.test(absPath)) continue;
+
+    const isTokenSourceFile = SCAN_DIRS.some((dir) => {
+      const fromDir = relative(dir, absPath);
+      return fromDir !== '' &&
+        fromDir !== '..' &&
+        !fromDir.startsWith(`..${sep}`) &&
+        !isAbsolute(fromDir);
+    });
+
+    if (isTokenSourceFile) files.add(absPath);
+  }
+
+  return [...files];
 }
 
 // ─── self-test (runs inline, exits early on mismatch) ────────────────────────
@@ -255,7 +288,11 @@ interface Hit {
   suggestion?: string;
 }
 
-const files = SCAN_DIRS.flatMap((d) => collectFiles(d));
+const args = process.argv.slice(2);
+const stagedMode = args.includes(STAGED_FLAG);
+const files = stagedMode
+  ? collectStagedFiles(args.filter((arg) => arg !== STAGED_FLAG && arg !== '--'))
+  : SCAN_DIRS.flatMap((d) => collectFiles(d));
 
 let failures = 0;
 
@@ -388,5 +425,5 @@ if (failures > 0) {
 }
 
 console.log(
-  `Token validation passed: no hardcoded spacing, font-size, or ad-hoc width values found across ${checked} file(s).`,
+  `Token validation passed: no hardcoded spacing, font-size, or ad-hoc width values found across ${checked}${stagedMode ? ' staged' : ''} file(s).`,
 );
