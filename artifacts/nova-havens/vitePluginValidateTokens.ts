@@ -11,8 +11,9 @@
  *        text-[14px]  p-[calc(1rem+8px)]
  *   2. JSX inline style properties (font-size, spacing) with a hardcoded unit
  *        fontSize: '14px'   marginTop: "32px"
- *   3. CSS property declarations with hardcoded units (non-custom-property)
- *        font-size: 14px;   padding: 20px 0;
+ *   3. CSS property declarations with hardcoded units (non-custom-property),
+ *      including width declarations that map directly to named width tokens
+ *        font-size: 14px;   padding: 20px 0;   max-width: 1200px;
  *   4. Tailwind max-w-[…] values that exactly match a named width-scale token
  *        max-w-[1200px] → should be max-w-site
  */
@@ -88,6 +89,25 @@ function validateFile(
       if (!trimmed.startsWith('--')) {
         CSS_DECL_RE.lastIndex = 0;
         while ((m = CSS_DECL_RE.exec(line)) !== null) {
+          // Match the build-time validation behavior: a raw width value that
+          // equals a named design token gets a specific token-class suggestion.
+          const widthPropMatch = m[0].match(/\b(max-width|min-width|width)\s*:\s*([\d.]+(?:px|rem))/);
+          if (widthPropMatch) {
+            const px = parseWidthPx(widthPropMatch[2]);
+            const widthToken = px === null ? undefined : WIDTH_TOKEN_MAP.get(px);
+            if (widthToken) {
+              hits.push({
+                line: i + 1,
+                text: line.trim(),
+                match: m[0],
+                kind: 'width-token-alias',
+                suggestion: widthPropMatch[1] === 'min-width'
+                  ? widthToken.replace(/^max-w-/, 'min-w-')
+                  : widthToken,
+              });
+              continue;
+            }
+          }
           hits.push({ line: i + 1, text: line.trim(), match: m[0], kind: 'css-declaration' });
         }
       }
