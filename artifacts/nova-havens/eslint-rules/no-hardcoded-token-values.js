@@ -7,6 +7,19 @@
  * src/lib/validateRules.ts.
  */
 
+/**
+ * Mirrors JS_PROP, UNITS, and TAILWIND_ARBITRARY_RE from
+ * src/lib/validateRules.ts. The regression suite compares these sources
+ * directly so either side changing without the other fails immediately.
+ */
+export const TOKEN_RULE_PATTERNS = Object.freeze({
+  jsProperty:
+    /^(?:fontSize|lineHeight|letterSpacing|margin(?:Top|Bottom|Left|Right)?|padding(?:Top|Bottom|Left|Right)?|gap|rowGap|columnGap|top|bottom|left|right|width|height|minWidth|maxWidth|minHeight|maxHeight)$/,
+  numericUnit: /[\d.]+(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)/,
+  tailwindArbitrary:
+    /[\w-]+\[[^\]]*[\d.]+(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)[^\]]*\]/,
+});
+
 /** @type {import('eslint').Rule.RuleModule} */
 const rule = {
   meta: {
@@ -26,14 +39,6 @@ const rule = {
   },
 
   create(context) {
-    // Mirrors JS_PROP and UNITS from src/lib/validateRules.ts.
-    const JS_PROP_RE =
-      /^(?:fontSize|lineHeight|letterSpacing|margin(?:Top|Bottom|Left|Right)?|padding(?:Top|Bottom|Left|Right)?|gap|rowGap|columnGap|top|bottom|left|right|width|height|minWidth|maxWidth|minHeight|maxHeight)$/;
-    const NUMERIC_UNIT_RE = /[\d.]+(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)/;
-    // Mirrors TAILWIND_ARBITRARY_RE from src/lib/validateRules.ts.
-    const TAILWIND_ARBITRARY_RE =
-      /[\w-]+\[[^\]]*[\d.]+(?:px|em|rem|vh|vw|ch|ex|vmin|vmax)[^\]]*\]/;
-
     function staticText(node) {
       if (node.type === 'Literal' && typeof node.value === 'string') {
         return node.value;
@@ -59,10 +64,10 @@ const rule = {
     return {
       Property(node) {
         const name = propertyName(node);
-        if (!name || !JS_PROP_RE.test(name)) return;
+        if (!name || !TOKEN_RULE_PATTERNS.jsProperty.test(name)) return;
 
         const value = staticText(node.value);
-        if (value && NUMERIC_UNIT_RE.test(value)) {
+        if (value && TOKEN_RULE_PATTERNS.numericUnit.test(value)) {
           context.report({
             node: node.value,
             messageId: 'noHardcodedToken',
@@ -72,7 +77,10 @@ const rule = {
       },
 
       Literal(node) {
-        if (typeof node.value === 'string' && TAILWIND_ARBITRARY_RE.test(node.value)) {
+        if (
+          typeof node.value === 'string' &&
+          TOKEN_RULE_PATTERNS.tailwindArbitrary.test(node.value)
+        ) {
           context.report({
             node,
             messageId: 'noArbitraryToken',
@@ -83,7 +91,7 @@ const rule = {
 
       TemplateLiteral(node) {
         const value = staticText(node);
-        if (value && TAILWIND_ARBITRARY_RE.test(value)) {
+        if (value && TOKEN_RULE_PATTERNS.tailwindArbitrary.test(value)) {
           context.report({
             node,
             messageId: 'noArbitraryToken',
