@@ -11,8 +11,8 @@ import { defineConfig, devices } from '@playwright/test';
  *   pnpm test:smoke              – compare against saved snapshots
  *   pnpm test:smoke:update       – (re-)create baseline snapshots
  *
- * NixOS compatibility: the npm scripts prefix LD_LIBRARY_PATH with the Nix
- * store paths that Chromium headless shell needs (see package.json).
+ * NixOS compatibility: the npm smoke-test scripts resolve Chromium's Nix
+ * store libraries at runtime (see scripts/with-nix-chromium-libs.sh).
  */
 
 const TEST_PORT = 5174;

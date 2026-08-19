@@ -26,20 +26,20 @@ pnpm --filter @workspace/nova-havens test:smoke
 pnpm --filter @workspace/nova-havens test:smoke:update
 ```
 
-### Why the long `LD_LIBRARY_PATH`
+### Chromium libraries on NixOS
 
 The Replit NixOS environment ships Chromium's native dependencies in
 `/nix/store` rather than the standard system paths that Playwright expects.
-The `test:smoke` and `test:smoke:update` scripts in `package.json` prefix
-`LD_LIBRARY_PATH` with the required Nix store paths so the headless Chromium
-shell can locate `libgbm`, `libdrm`, `libX11`, and the other graphics
-libraries it needs.
+The `test:smoke` and `test:smoke:update` scripts use
+`scripts/with-nix-chromium-libs.sh`, which starts with the library paths
+provided by the active Nix environment and checks the installed Playwright
+Chromium binary for unresolved libraries. Any missing libraries are located in
+the current Nix store at runtime, so NixOS channel updates do not require
+committing new store hashes.
 
-The exact paths are pinned in `package.json`. If a NixOS channel bump changes
-any of those paths (you will see a `libgbm.so: cannot open shared object file`
-error), update the hash segments in the `LD_LIBRARY_PATH` prefix to match the
-new store paths reported by `nix-store -q --references $(which chromium)` or by
-inspecting the Nix profile.
+If a required library is not available in the current Nix environment, the
+wrapper fails with the unresolved library names and points to `replit.nix`
+instead of allowing Chromium to fail later with an opaque launch error.
 
 ## CI / validation workflow
 
