@@ -1,20 +1,21 @@
 /**
  * eslint.config.js — Flat ESLint config for nova-havens.
  *
- * Enforces design-token usage by flagging raw hex color literals with inline
- * squiggles in any editor that supports ESLint (VS Code, WebStorm, Neovim, …).
+ * Enforces design-token usage by flagging raw hex colors and hardcoded
+ * spacing/font-size values with inline squiggles in any ESLint-aware editor.
  *
  * This is the editor-time layer of a three-layer system:
  *   1. ESLint (here)          — red squiggle as you type, before saving
- *   2. vitePluginValidateColors.ts — terminal warning on every HMR save
- *   3. scripts/validate-colors.ts  — build fails if any violation slips through
+ *   2. Vite validation plugins — terminal warning on every HMR save
+ *   3. scripts/validate-*.ts   — build fails if any violation slips through
  *
- * Exemptions mirror COLOR_EXEMPTED_FILES in src/lib/validateRules.ts.
+ * Exemptions mirror the color and token exemption sets in validateRules.ts.
  * If you add a new exemption, update validateRules.ts AND the ignores list here.
  */
 
 import tsParser from '@typescript-eslint/parser';
 import noHardcodedHexColors from './eslint-rules/no-hardcoded-hex-colors.js';
+import noHardcodedTokenValues from './eslint-rules/no-hardcoded-token-values.js';
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
@@ -41,7 +42,7 @@ const config = [
     },
   },
 
-  // ── 3. No-hardcoded-hex-colors rule for TS/TSX source ───────────────────
+  // ── 3. Design-token rules for TS/TSX source ──────────────────────────────
   {
     files: [
       'src/pages/**/*.{ts,tsx}',
@@ -51,6 +52,7 @@ const config = [
       'nova-havens': {
         rules: {
           'no-hardcoded-hex-colors': noHardcodedHexColors,
+          'no-hardcoded-token-values': noHardcodedTokenValues,
         },
       },
     },
@@ -64,6 +66,17 @@ const config = [
     },
     rules: {
       'nova-havens/no-hardcoded-hex-colors': 'error',
+      'nova-havens/no-hardcoded-token-values': 'error',
+    },
+  },
+
+  // ── 4. Token-rule exemptions ────────────────────────────────────────────
+  // Mirrors TOKEN_EXEMPTED_FILES and TOKEN_EXEMPTED_DIR_PREFIXES in
+  // src/lib/validateRules.ts. These shadcn primitives may use raw values.
+  {
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'nova-havens/no-hardcoded-token-values': 'off',
     },
   },
 ];
