@@ -325,6 +325,44 @@ test.describe('Page smoke tests', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Mobile layout regression checks
+// ---------------------------------------------------------------------------
+
+test.describe('Mobile layout regressions', () => {
+  test('llms-txt stays usable at 375px', async ({ page }) => {
+    test.skip(
+      !test.info().project.name.startsWith('mobile-chrome'),
+      'This regression check belongs to the mobile-chrome projects',
+    );
+
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/llms-txt');
+    await waitForStable(page);
+
+    const dimensions = await page.evaluate(() => ({
+      viewportWidth: document.documentElement.clientWidth,
+      pageWidth: Math.max(
+        document.documentElement.scrollWidth,
+        document.body?.scrollWidth ?? 0,
+      ),
+    }));
+    expect(
+      dimensions.pageWidth,
+      `The page is wider than the 375px viewport: ${dimensions.pageWidth}px`,
+    ).toBeLessThanOrEqual(dimensions.viewportWidth);
+
+    const banner = page.getByTestId('banner-llms-txt');
+    await expect(banner).toBeVisible();
+
+    const rawFileLink = banner.getByTestId('link-raw-llms-txt');
+    await expect(rawFileLink).toBeVisible();
+    await expect(rawFileLink).toHaveAttribute('href', '/llms.txt');
+
+    await expect(page.locator('section h2').first()).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Route-coverage guard
 // ---------------------------------------------------------------------------
 
