@@ -356,6 +356,33 @@ test.describe('Page smoke tests', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Mobile layout regressions', () => {
+  test('a blog article stays usable at 375px', async ({ page }) => {
+    test.skip(
+      !test.info().project.name.startsWith('mobile-chrome'),
+      'This regression check belongs to the mobile-chrome projects',
+    );
+
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/blog/details-that-speed-up-housing-placement');
+    await waitForStable(page);
+
+    const dimensions = await page.evaluate(() => ({
+      viewportWidth: document.documentElement.clientWidth,
+      pageWidth: Math.max(
+        document.documentElement.scrollWidth,
+        document.body?.scrollWidth ?? 0,
+      ),
+    }));
+    expect(
+      dimensions.pageWidth,
+      `The blog article is wider than the 375px viewport: ${dimensions.pageWidth}px`,
+    ).toBeLessThanOrEqual(dimensions.viewportWidth);
+
+    await expect(page.getByTestId('btn-mobile-menu')).toBeVisible();
+    await expect(page.getByTestId('heading-post-title')).toBeVisible();
+    await expect(page.getByTestId('article-body')).toBeVisible();
+  });
+
   test('about-us stays usable at 375px', async ({ page }) => {
     test.skip(
       !test.info().project.name.startsWith('mobile-chrome'),
