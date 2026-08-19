@@ -31,7 +31,7 @@ import {
   MAX_W_ARBITRARY_RE,
   INLINE_STYLE_RE,
   CSS_DECL_RE,
-} from './src/lib/validateRules';
+} from './src/lib/validateRules.ts';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ interface Hit {
   suggestion?: string;
 }
 
-function validateFile(
+export function validateFile(
   root: string,
   absPath: string,
 ): { rel: string; hits: Hit[] } | null {
@@ -119,6 +119,29 @@ function validateFile(
 
       INLINE_STYLE_RE.lastIndex = 0;
       while ((m = INLINE_STYLE_RE.exec(line)) !== null) {
+        // Mirror the build-time validator: inline maxWidth/minWidth values
+        // that exactly match a named width token get a token suggestion.
+        if (/\b(?:maxWidth|minWidth)\s*:/.test(m[0])) {
+          const valueMatch = m[0].match(
+            /(maxWidth|minWidth)\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/,
+          );
+          if (valueMatch) {
+            const px = parseWidthPx(valueMatch[2]);
+            const widthToken = px === null ? undefined : WIDTH_TOKEN_MAP.get(px);
+            if (widthToken) {
+              hits.push({
+                line: i + 1,
+                text: line.trim(),
+                match: m[0],
+                kind: 'width-token-alias',
+                suggestion: valueMatch[1] === 'minWidth'
+                  ? widthToken.replace(/^max-w-/, 'min-w-')
+                  : widthToken,
+              });
+              continue;
+            }
+          }
+        }
         hits.push({ line: i + 1, text: line.trim(), match: m[0], kind: 'inline-style' });
       }
 
