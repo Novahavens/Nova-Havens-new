@@ -187,17 +187,25 @@ function selfTest(): void {
     }
   }
 
-  // CSS max-width token alias self-tests (mirrors logic in the CSS scan loop)
+  // CSS width / max-width / min-width token alias self-tests (mirrors logic in the CSS scan loop)
   type CSSWCase = { input: string; expectToken: string | null; label: string };
   const cssWCases: CSSWCase[] = [
-    { input: 'max-width: 1200px;', expectToken: 'max-w-site',    label: 'CSS-WTA site px'     },
-    { input: 'max-width: 75rem;',  expectToken: 'max-w-site',    label: 'CSS-WTA site rem'    },
-    { input: 'max-width: 900px;',  expectToken: 'max-w-content', label: 'CSS-WTA content px'  },
-    { input: 'max-width: 640px;',  expectToken: null,            label: 'CSS-WTA no-match px' },
+    // max-width
+    { input: 'max-width: 1200px;', expectToken: 'max-w-site',    label: 'CSS-WTA max-width site px'     },
+    { input: 'max-width: 75rem;',  expectToken: 'max-w-site',    label: 'CSS-WTA max-width site rem'    },
+    { input: 'max-width: 900px;',  expectToken: 'max-w-content', label: 'CSS-WTA max-width content px'  },
+    { input: 'max-width: 640px;',  expectToken: null,            label: 'CSS-WTA max-width no-match px' },
+    // width
+    { input: 'width: 1200px;',     expectToken: 'max-w-site',    label: 'CSS-WTA width site px'         },
+    { input: 'width: 900px;',      expectToken: 'max-w-content', label: 'CSS-WTA width content px'      },
+    { input: 'width: 640px;',      expectToken: null,            label: 'CSS-WTA width no-match px'     },
+    // min-width
+    { input: 'min-width: 1200px;', expectToken: 'max-w-site',    label: 'CSS-WTA min-width site px'     },
+    { input: 'min-width: 640px;',  expectToken: null,            label: 'CSS-WTA min-width no-match px' },
   ];
 
   for (const c of cssWCases) {
-    const valMatch = c.input.match(/max-width\s*:\s*([\d.]+(?:px|rem))/);
+    const valMatch = c.input.match(/\b(?:max-width|min-width|width)\s*:\s*([\d.]+(?:px|rem))/);
     let token: string | null = null;
     if (valMatch) {
       const px = parseWidthPx(valMatch[1]);
@@ -273,24 +281,23 @@ for (const absPath of files) {
       if (!trimmed.startsWith('--')) {
         CSS_DECL_RE.lastIndex = 0;
         while ((m = CSS_DECL_RE.exec(line)) !== null) {
-          // Check if this max-width value numerically matches a named width token.
-          // If it does, suggest the token class instead of a generic flag.
-          if (/\bmax-width\s*:/.test(m[0])) {
-            const valMatch = m[0].match(/max-width\s*:\s*([\d.]+(?:px|rem))/);
-            if (valMatch) {
-              const px = parseWidthPx(valMatch[1]);
-              if (px !== null) {
-                const suggestion = WIDTH_TOKEN_MAP.get(px);
-                if (suggestion) {
-                  hits.push({
-                    line: i + 1,
-                    text: line.trim(),
-                    match: m[0],
-                    kind: 'width-token-alias',
-                    suggestion,
-                  });
-                  continue;
-                }
+          // Check if this width / max-width / min-width value numerically matches
+          // a named width token. If it does, suggest the token class instead of
+          // a generic css-declaration flag.
+          const widthPropMatch = m[0].match(/\b(max-width|min-width|width)\s*:\s*([\d.]+(?:px|rem))/);
+          if (widthPropMatch) {
+            const px = parseWidthPx(widthPropMatch[2]);
+            if (px !== null) {
+              const suggestion = WIDTH_TOKEN_MAP.get(px);
+              if (suggestion) {
+                hits.push({
+                  line: i + 1,
+                  text: line.trim(),
+                  match: m[0],
+                  kind: 'width-token-alias',
+                  suggestion,
+                });
+                continue;
               }
             }
           }
