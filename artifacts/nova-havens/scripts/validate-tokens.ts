@@ -199,14 +199,20 @@ function selfTest(): void {
     { input: `maxWidth: '900px'`,  expectToken: 'max-w-content', label: 'IS-WTA content px'   },
     { input: `maxWidth: '640px'`,  expectToken: null,            label: 'IS-WTA no-match px'  },
     { input: `maxWidth: 'var(--width-site)'`, expectToken: null, label: 'IS-WTA var() no-flag' },
+    { input: `minWidth: '1200px'`, expectToken: 'min-w-site',    label: 'IS-WTA min site px'   },
+    { input: `minWidth: '75rem'`,  expectToken: 'min-w-site',    label: 'IS-WTA min site rem'  },
+    { input: `minWidth: '640px'`,  expectToken: null,            label: 'IS-WTA min no-match px' },
   ];
 
   for (const c of isWCases) {
-    const valMatch = c.input.match(/maxWidth\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/);
+    const valMatch = c.input.match(/(maxWidth|minWidth)\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/);
     let token: string | null = null;
     if (valMatch) {
-      const px = parseWidthPx(valMatch[1]);
-      if (px !== null) token = WIDTH_TOKEN_MAP.get(px) ?? null;
+      const px = parseWidthPx(valMatch[2]);
+      const widthToken = px === null ? null : WIDTH_TOKEN_MAP.get(px) ?? null;
+      if (widthToken) token = valMatch[1] === 'minWidth'
+        ? widthToken.replace(/^max-w-/, 'min-w-')
+        : widthToken;
     }
     const ok = token === c.expectToken;
     if (!ok) {
@@ -233,16 +239,20 @@ function selfTest(): void {
     { input: 'width: 900px;',      expectToken: 'max-w-content', label: 'CSS-WTA width content px'      },
     { input: 'width: 640px;',      expectToken: null,            label: 'CSS-WTA width no-match px'     },
     // min-width
-    { input: 'min-width: 1200px;', expectToken: 'max-w-site',    label: 'CSS-WTA min-width site px'     },
+    { input: 'min-width: 1200px;', expectToken: 'min-w-site',    label: 'CSS-WTA min-width site px'     },
+    { input: 'min-width: 75rem;',  expectToken: 'min-w-site',    label: 'CSS-WTA min-width site rem'    },
     { input: 'min-width: 640px;',  expectToken: null,            label: 'CSS-WTA min-width no-match px' },
   ];
 
   for (const c of cssWCases) {
-    const valMatch = c.input.match(/\b(?:max-width|min-width|width)\s*:\s*([\d.]+(?:px|rem))/);
+    const valMatch = c.input.match(/\b(max-width|min-width|width)\s*:\s*([\d.]+(?:px|rem))/);
     let token: string | null = null;
     if (valMatch) {
-      const px = parseWidthPx(valMatch[1]);
-      if (px !== null) token = WIDTH_TOKEN_MAP.get(px) ?? null;
+      const px = parseWidthPx(valMatch[2]);
+      const widthToken = px === null ? null : WIDTH_TOKEN_MAP.get(px) ?? null;
+      if (widthToken) token = valMatch[1] === 'min-width'
+        ? widthToken.replace(/^max-w-/, 'min-w-')
+        : widthToken;
     }
     const ok = token === c.expectToken;
     if (!ok) {
@@ -325,8 +335,11 @@ for (const absPath of files) {
           if (widthPropMatch) {
             const px = parseWidthPx(widthPropMatch[2]);
             if (px !== null) {
-              const suggestion = WIDTH_TOKEN_MAP.get(px);
-              if (suggestion) {
+              const widthToken = WIDTH_TOKEN_MAP.get(px);
+              if (widthToken) {
+                const suggestion = widthPropMatch[1] === 'min-width'
+                  ? widthToken.replace(/^max-w-/, 'min-w-')
+                  : widthToken;
                 hits.push({
                   line: i + 1,
                   text: line.trim(),
@@ -350,15 +363,18 @@ for (const absPath of files) {
 
       INLINE_STYLE_RE.lastIndex = 0;
       while ((m = INLINE_STYLE_RE.exec(line)) !== null) {
-        // Check if this is a maxWidth inline style that matches a named width token.
+        // Check if this is a maxWidth / minWidth inline style that matches a named width token.
         // If so, emit a width-token-alias hit with the suggested class instead.
-        if (/\bmaxWidth\s*:/.test(m[0])) {
-          const valMatch = m[0].match(/maxWidth\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/);
+        if (/\b(?:maxWidth|minWidth)\s*:/.test(m[0])) {
+          const valMatch = m[0].match(/(maxWidth|minWidth)\s*:\s*['"`]([\d.]+(?:px|rem))['"`]/);
           if (valMatch) {
-            const px = parseWidthPx(valMatch[1]);
+            const px = parseWidthPx(valMatch[2]);
             if (px !== null) {
-              const suggestion = WIDTH_TOKEN_MAP.get(px);
-              if (suggestion) {
+              const widthToken = WIDTH_TOKEN_MAP.get(px);
+              if (widthToken) {
+                const suggestion = valMatch[1] === 'minWidth'
+                  ? widthToken.replace(/^max-w-/, 'min-w-')
+                  : widthToken;
                 hits.push({
                   line: i + 1,
                   text: line.trim(),
