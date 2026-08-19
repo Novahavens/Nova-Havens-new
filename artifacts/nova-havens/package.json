@@ -13,6 +13,7 @@
     "validate:llms": "node --experimental-strip-types scripts/validate-llms.ts",
     "validate:prerender": "node --experimental-strip-types scripts/validate-prerender.ts",
     "validate:colors": "node --experimental-strip-types scripts/validate-colors.ts",
+    "validate:colors:staged": "node --experimental-strip-types scripts/validate-colors.ts --staged",
     "validate:tokens": "node --experimental-strip-types scripts/validate-tokens.ts",
     "validate:tokens:staged": "node --experimental-strip-types scripts/validate-tokens.ts --staged",
     "lint": "eslint src/pages src/components",

@@ -13,7 +13,10 @@
     "pre-commit": "pnpm exec lint-staged"
   },
   "lint-staged": {
-    "artifacts/nova-havens/src/{pages,components}/**/*.{ts,tsx,css}": "pnpm --filter @workspace/nova-havens run validate:tokens:staged --"
+    "artifacts/nova-havens/src/{pages,components}/**/*.{ts,tsx,css}": [
+      "pnpm --filter @workspace/nova-havens run validate:colors:staged --",
+      "pnpm --filter @workspace/nova-havens run validate:tokens:staged --"
+    ]
   },
   "private": true,
   "dependencies": {
