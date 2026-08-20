@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import {
   LLMS_TXT_SECTIONS,
   buildBlogIndexSubsections,
+  getQuickSummaryBlockquote,
   renderLlmsTxt,
   renderLlmsTxtPrerenderHtml,
   type LlmsSubsection,
@@ -31,6 +32,25 @@ const blogIndex = LLMS_TXT_SECTIONS.find(
 if (!blogIndex?.subsections) {
   console.error(
     'llms.txt validation FAILED: the canonical content model is missing its Blog Content Index.',
+  );
+  process.exit(1);
+}
+
+const postsMissingQuickSummary = BLOG_POSTS.filter(
+  (post) => getQuickSummaryBlockquote(post) === null,
+);
+
+if (postsMissingQuickSummary.length > 0) {
+  console.error(
+    `llms.txt validation FAILED: ${postsMissingQuickSummary.length} published post(s) do not open with a "> " quick-summary blockquote:`,
+  );
+
+  for (const post of postsMissingQuickSummary) {
+    console.error(`  - ${post.slug} ("${post.title}")`);
+  }
+
+  console.error(
+    'Every post body must begin with a "> " blockquote (the "Quick summary" callout documented in src/data/blogPosts.ts). That blockquote is what the Blog Content Index sends to AI tools; without it the index falls back to the shorter catalogue excerpt.',
   );
   process.exit(1);
 }

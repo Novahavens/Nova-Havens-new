@@ -34,20 +34,34 @@ export const BLOG_INDEX_URL_PREFIX = 'https://novahavens.com/blog/';
  * Machine-readable summary for a published post. Every post body opens with a
  * "> " quick-summary blockquote (see the body conventions in blogPosts.ts);
  * that blockquote is the canonical article summary, so it is what AI tools
- * receive. Posts without one fall back to the catalogue excerpt.
+ * receive. Posts without one fall back to the catalogue excerpt, and
+ * scripts/validate-llms.ts fails the build so the omission is caught at
+ * authoring time rather than shipping a shorter summary to AI tools.
  */
 export function getBlogPostSummary(post: BlogPost): string {
+  const quickSummary = getQuickSummaryBlockquote(post);
+
+  return quickSummary ?? post.excerpt.trim();
+}
+
+/**
+ * Returns the post's opening "> " quick-summary blockquote as plain text, or
+ * null when the body does not open with one.
+ */
+export function getQuickSummaryBlockquote(post: BlogPost): string | null {
   const firstBlock = post.content.split(/\n\n+/, 1)[0] ?? '';
 
   if (!firstBlock.startsWith('> ')) {
-    return post.excerpt.trim();
+    return null;
   }
 
-  return firstBlock
+  const text = firstBlock
     .split('\n')
     .map((line) => line.replace(/^>\s?/, ''))
     .join(' ')
     .trim();
+
+  return text === '' ? null : text;
 }
 
 /**
