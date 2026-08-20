@@ -134,7 +134,10 @@ function routeToFilePath(route: string): string {
 
 // ── Main ───────────────────────────────────────────────────────────────────
 
-const template = readFileSync(templatePath, 'utf-8');
+const template = readFileSync(templatePath, 'utf-8').replace(
+  /<div id="root">[\s\S]*?<\/div>(?=\s*<\/body>)/,
+  '<div id="root"></div>',
+);
 
 let written = 0;
 for (const route of ALL_ROUTES) {

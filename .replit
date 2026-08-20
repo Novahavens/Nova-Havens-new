@@ -107,6 +107,26 @@ router = "path"
 PORT = "8081"
 BASE_PATH = "/__mockup"
 
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "token-rule"
+
+[[workflows.workflow]]
+name = "token-rule"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/nova-havens run test:token-rule"
+
+[workflows.workflow.metadata]
+isValidation = true
+
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
