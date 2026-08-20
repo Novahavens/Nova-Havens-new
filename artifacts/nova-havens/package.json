@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "pnpm run validate:intake-forms && node --experimental-strip-types scripts/validate-llms.ts && pnpm run test:color-rule && node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && pnpm run validate:bundle-budget && node --experimental-strip-types prerender.ts",
+    "build": "pnpm run validate:intake-forms && node --experimental-strip-types scripts/validate-llms.ts && pnpm run test:color-rule && node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && pnpm run test:bundle-budget && pnpm run validate:bundle-budget && node --experimental-strip-types prerender.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:vite": "tsc -p tsconfig.vite.json --noEmit",
@@ -30,6 +30,7 @@
     "test:token-plugin": "node --experimental-strip-types --test tests/vitePluginValidateTokens.test.ts",
     "test:token-rule": "node --experimental-strip-types --test tests/noHardcodedTokenValues.test.ts",
     "test:color-rule": "node --experimental-strip-types --test tests/noHardcodedColorValues.test.ts",
+    "test:bundle-budget": "node --experimental-strip-types --test tests/validateBundleBudget.test.ts",
     "test:contact-form": "node --experimental-strip-types --test tests/contactFormValidation.test.ts"
   },
   "devDependencies": {
