@@ -236,6 +236,65 @@ Say so. Tell the team what doesn't fit — the area, the layout, the stairs — 
 **Can our pets come with us?**
 In many homes, yes. A large share of the properties Nova Havens works with accept pets. What matters is sharing the details at the start — how many, what type, breed and weight — so the search only includes homes that will welcome them.`,
   },
+  {
+    id: 4,
+    slug: "how-to-list-your-furnished-property",
+    motif: "key",
+    category: "For Property Owners",
+    title: "How to List Your Furnished Property for Insurance Housing",
+    date: "August 20, 2026",
+    dateISO: "2026-08-20",
+    keywords: [
+      "list furnished property for insurance housing",
+      "property owner insurance housing",
+      "furnished rental host application",
+      "temporary housing property submission",
+      "host displaced families",
+      "furnished property network",
+    ],
+    excerpt:
+      "Property owners can submit a furnished home for consideration in the Nova Havens network. A complete submission describes the home's layout, furnishings, availability, location, and pet or accessibility details so the team can determine whether it fits upcoming placement needs.",
+    cta: "property",
+    content: `> Property owners can submit a furnished home for consideration in the Nova Havens network. A complete submission describes the home's layout, furnishings, availability, location, and pet or accessibility details so the team can determine whether it fits upcoming placement needs. The first step is simply sharing accurate property information and a reliable way to reach you.
+
+## What should you prepare before submitting a property?
+
+Prepare the facts a coordinator needs to understand whether the home can suit a displaced household: its address or service area, bedroom and bathroom count, furnished spaces, current availability, pet policy, accessibility features, and the best contact details for you or your property manager.
+
+Photographs and a concise description of the home are useful when available. Be clear about any practical limits as well: stairs, parking constraints, HOA requirements, minimum stays, maintenance work, or dates when the property cannot be occupied. Accurate details at the start prevent a coordinator from presenting the home for a placement it cannot support.
+
+## What makes a property ready for a furnished placement?
+
+A property is ready for a furnished placement when a household can arrive and use it as a home, not as an empty rental. Bedrooms, seating, a functioning kitchen, utilities, and the ordinary essentials for day-to-day living should all be in place before the property is submitted as available.
+
+The layout matters as much as the furnishing list. A two-bedroom apartment may be a good fit for one household and not another; a ground-floor bedroom or step-free entry may be essential for a particular placement. Describe what is actually there rather than trying to predict which family it will suit.
+
+## How does Nova Havens review a submitted property?
+
+Nova Havens reviews the information you submit and follows up when more detail is needed. The team considers whether the property's location, setup, availability, and household fit align with current or upcoming housing needs.
+
+Submitting a property begins a conversation; it does not promise a placement or guarantee a particular timeline. A coordinator can explain the next steps for your property and request anything needed to evaluate it accurately.
+
+## Why do availability and house rules matter?
+
+Availability and house rules matter because each placement has a specific move-in date, household size, expected duration, and practical requirements. A home that is an excellent fit next month may not work for a family that needs it this week.
+
+Share the dates the property can be occupied, whether the dates are flexible, and any rules that affect a stay. If pets are accepted, list the types, sizes, or number of animals that work. If the property has stairs, a pool, gated access, parking limits, or community requirements, include those details too.
+
+## Frequently Asked Questions
+
+**Can I submit a property if it is not available today?**
+Yes. Include the earliest available date and any known future blackout dates. That information helps the team consider the property for placements with a matching timeline.
+
+**Do I need to know which family will stay before I submit?**
+No. Submit the property details first. When a household's requirements align with the home's location, layout, availability, and rules, a coordinator can discuss the potential placement with you.
+
+**What information should I include about pets?**
+Include whether pets are accepted and any limits by number, type, breed, or weight. If there are pet fees, deposits, or other requirements, identify them so they can be reviewed before the property is considered for a pet-owning household.
+
+**Can a property manager submit on an owner's behalf?**
+Yes. A property manager can submit the home when they can provide accurate property details and serve as the point of contact for follow-up questions.`,
+  },
 ];
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
