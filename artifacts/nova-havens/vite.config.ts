@@ -69,6 +69,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, 'dist/public'),
     emptyOutDir: true,
+    // Emitted so scripts/validate-bundle-budget.ts can map lazy-loaded route
+    // modules (src/pages/*.tsx) to their generated chunk files.
+    manifest: true,
   },
   server: {
     port,
