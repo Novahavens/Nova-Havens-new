@@ -442,7 +442,7 @@ test.describe('Mobile layout regressions', () => {
     await expect(page.getByTestId('section-about-faq')).toBeVisible();
   });
 
-  test('mobile navigation opens and reaches About', async ({ page }) => {
+  test('mobile navigation reaches About and targets both intake forms', async ({ page }) => {
     test.skip(
       !test.info().project.name.startsWith('mobile-chrome'),
       'This regression check belongs to the mobile-chrome projects',
@@ -462,8 +462,15 @@ test.describe('Mobile layout regressions', () => {
     await expect(page.getByTestId('link-mobile-team')).toBeVisible();
     await expect(page.getByTestId('link-mobile-about')).toBeVisible();
     await expect(page.getByTestId('link-mobile-contact')).toBeVisible();
-    await expect(page.getByTestId('btn-mobile-submit-property')).toBeVisible();
-    await expect(page.getByTestId('btn-mobile-request-housing')).toBeVisible();
+    const submitPropertyButton = page.getByTestId('btn-mobile-submit-property');
+    await expect(submitPropertyButton).toBeVisible();
+    await expect(submitPropertyButton).toHaveAttribute('href', INTAKE_FORMS.property);
+    await expect(submitPropertyButton).toHaveAttribute('target', '_blank');
+
+    const requestHousingButton = page.getByTestId('btn-mobile-request-housing');
+    await expect(requestHousingButton).toBeVisible();
+    await expect(requestHousingButton).toHaveAttribute('href', INTAKE_FORMS.housing);
+    await expect(requestHousingButton).toHaveAttribute('target', '_blank');
 
     await page.getByTestId('link-mobile-about').click();
     await expect(page).toHaveURL(/\/about-us$/);
