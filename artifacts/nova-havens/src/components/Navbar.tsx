@@ -44,7 +44,7 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Compact Nav: mobile and tablet widths */}
+        {/* Compact nav remains active through 1023px; desktop navigation starts at lg (1024px). */}
         <div className="lg:hidden flex items-center">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>

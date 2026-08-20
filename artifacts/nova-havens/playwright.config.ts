@@ -53,6 +53,19 @@ export default defineConfig({
       },
     },
     {
+      // Compact navigation remains active until Tailwind's lg breakpoint (1024px).
+      // Exercise the last viewport width before desktop navigation takes over.
+      name: 'compact-nav-chrome',
+      grep: /Compact-navigation breakpoint regressions/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1023, height: 1024 },
+        deviceScaleFactor: 1,
+        isMobile: false,
+        hasTouch: true,
+      },
+    },
+    {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
@@ -74,6 +87,18 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 768, height: 1024 },
+        deviceScaleFactor: 1,
+        isMobile: false,
+        hasTouch: true,
+      },
+    },
+    {
+      // Keep the overflow guard in parity with the light compact-nav viewport.
+      name: 'compact-nav-chrome-dark',
+      grep: /Compact-navigation breakpoint regressions/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1023, height: 1024 },
         deviceScaleFactor: 1,
         isMobile: false,
         hasTouch: true,

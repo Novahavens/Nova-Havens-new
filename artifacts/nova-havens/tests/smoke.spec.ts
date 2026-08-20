@@ -236,11 +236,11 @@ async function waitForStable(page: Page): Promise<void> {
 }
 
 /**
- * Tablet pages must fit their viewport horizontally. Components may use
+ * Compact-navigation pages must fit their viewport horizontally. Components may use
  * internally clipped overflow (for example, the home-page partner marquee),
  * but no route may make the document itself scroll sideways.
  */
-async function expectPageToFitTabletViewport(page: Page, path: string): Promise<void> {
+async function expectPageToFitViewport(page: Page, path: string): Promise<void> {
   const dimensions = await page.evaluate(() => ({
     viewportWidth: document.documentElement.clientWidth,
     pageWidth: Math.max(
@@ -251,7 +251,7 @@ async function expectPageToFitTabletViewport(page: Page, path: string): Promise<
 
   expect(
     dimensions.pageWidth,
-    `The page is wider than the ${dimensions.viewportWidth}px tablet viewport on ${path}: ${dimensions.pageWidth}px`,
+    `The page is wider than the ${dimensions.viewportWidth}px compact-navigation viewport on ${path}: ${dimensions.pageWidth}px`,
   ).toBeLessThanOrEqual(dimensions.viewportWidth);
 }
 
@@ -312,10 +312,11 @@ async function smokeTest(page: Page, path: string): Promise<void> {
         .join('\n'),
   ).toHaveLength(0);
 
-  // Keep the width check beside the existing per-route runtime and visual
-  // checks. All tablet projects are configured at a 768px-wide viewport.
+  // Keep the 768px width check beside the existing per-route runtime and
+  // visual checks. The 1023px compact-nav projects reuse the same assertion
+  // in their dedicated route-width regression check below.
   if (test.info().project.name.startsWith('tablet-chrome')) {
-    await expectPageToFitTabletViewport(page, path);
+    await expectPageToFitViewport(page, path);
   }
 
   // ── Visual snapshot ───────────────────────────────────────────────────────
@@ -346,6 +347,10 @@ function routeTitle(path: string): string {
 test.describe('Page smoke tests', () => {
   for (const route of ALL_ROUTES) {
     test(`${routeTitle(route)} renders correctly`, async ({ page }) => {
+      test.skip(
+        test.info().project.name.startsWith('compact-nav-chrome'),
+        'Compact-navigation projects use the dedicated route-width regression check below.',
+      );
       await smokeTest(page, route);
     });
   }
@@ -480,6 +485,35 @@ test.describe('Mobile layout regressions', () => {
     await expect(rawFileLink).toHaveAttribute('href', '/llms.txt');
 
     await expect(page.locator('section h2').first()).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Compact-navigation breakpoint regressions
+// ---------------------------------------------------------------------------
+
+test.describe('Compact-navigation breakpoint regressions', () => {
+  test('every route fits while compact navigation is active at 1023px', async ({ page }) => {
+    test.skip(
+      !test.info().project.name.startsWith('compact-nav-chrome'),
+      'This regression check belongs to the compact-navigation projects',
+    );
+
+    if (test.info().project.name.endsWith('-dark')) {
+      await page.emulateMedia({ colorScheme: 'dark' });
+    }
+
+    for (const path of ALL_ROUTES) {
+      await page.goto(path);
+      await waitForStable(page);
+      await expectPageToFitViewport(page, path);
+    }
+
+    // 1023px is still below Tailwind's lg breakpoint, so this project protects
+    // the actual compact menu rather than only a similarly sized desktop page.
+    await page.goto('/');
+    await expect(page.getByTestId('btn-mobile-menu')).toBeVisible();
+    await expect(page.getByTestId('link-nav-home')).toBeHidden();
   });
 });
 
