@@ -23,6 +23,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { ALL_ROUTES } from '../src/lib/routeMeta.ts';
+import { BLOG_POSTS } from '../src/data/blogPosts.ts';
+import { INTAKE_FORMS } from '../src/lib/intakeForms.ts';
 
 // ---------------------------------------------------------------------------
 // Allowlists
@@ -387,6 +389,31 @@ test.describe('Mobile layout regressions', () => {
     await expect(page.getByTestId('heading-post-title')).toBeVisible();
     await expect(page.getByTestId('article-body')).toBeVisible();
   });
+
+  for (const post of BLOG_POSTS.filter((post) => post.cta !== 'none')) {
+    test(`the closing ${post.cta} CTA is usable on "${post.slug}" at 375px`, async ({ page }) => {
+      test.skip(
+        !test.info().project.name.startsWith('mobile-chrome'),
+        'This regression check belongs to the mobile-chrome projects',
+      );
+
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.goto(`/blog/${post.slug}`);
+      await waitForStable(page);
+
+      const ctaCard = page.getByTestId('card-post-cta');
+      const ctaButton = ctaCard.getByTestId(
+        post.cta === 'property' ? 'btn-submit-property-cta' : 'btn-submit-housing-cta',
+      );
+
+      await expect(ctaCard).toBeVisible();
+      await expect(ctaButton).toBeVisible();
+      await expect(ctaButton).toHaveAttribute(
+        'href',
+        post.cta === 'property' ? INTAKE_FORMS.property : INTAKE_FORMS.housing,
+      );
+    });
+  }
 
   test('about-us stays usable at 375px', async ({ page }) => {
     test.skip(
