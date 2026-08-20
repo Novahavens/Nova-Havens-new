@@ -1,3 +1,5 @@
+import { BLOG_POSTS, type BlogPost } from './blogPosts.ts';
+
 export interface LlmsFaq {
   q: string;
   a: string;
@@ -25,6 +27,57 @@ export const LLMS_TXT_PAGE_TITLE = 'llms.txt — AI & Machine-Readable Site Inde
 
 export const LLMS_TXT_PAGE_INTRO =
   'Nova Havens publishes an llms.txt file to help AI assistants, chatbots, and large language models accurately understand our company, services, and how to reference us. The sections below reflect the full contents of that file.';
+
+export const BLOG_INDEX_URL_PREFIX = 'https://novahavens.com/blog/';
+
+/**
+ * Machine-readable summary for a published post. Every post body opens with a
+ * "> " quick-summary blockquote (see the body conventions in blogPosts.ts);
+ * that blockquote is the canonical article summary, so it is what AI tools
+ * receive. Posts without one fall back to the catalogue excerpt.
+ */
+export function getBlogPostSummary(post: BlogPost): string {
+  const firstBlock = post.content.split(/\n\n+/, 1)[0] ?? '';
+
+  if (!firstBlock.startsWith('> ')) {
+    return post.excerpt.trim();
+  }
+
+  return firstBlock
+    .split('\n')
+    .map((line) => line.replace(/^>\s?/, ''))
+    .join(' ')
+    .trim();
+}
+
+/**
+ * Renders the Blog Content Index straight from the published blog catalogue so
+ * titles and summaries can never drift from what the site publishes. Posts are
+ * grouped by category in catalogue order.
+ */
+export function buildBlogIndexSubsections(posts: BlogPost[]): LlmsSubsection[] {
+  const grouped = new Map<string, BlogPost[]>();
+
+  for (const post of posts) {
+    const bucket = grouped.get(post.category);
+
+    if (bucket) {
+      bucket.push(post);
+    } else {
+      grouped.set(post.category, [post]);
+    }
+  }
+
+  return [...grouped.entries()].map(([category, categoryPosts]) => ({
+    subheading: category,
+    content: categoryPosts
+      .map(
+        (post) =>
+          `**${post.title}**\nURL: ${BLOG_INDEX_URL_PREFIX}${post.slug}\nSummary: ${getBlogPostSummary(post)}`,
+      )
+      .join('\n\n'),
+  }));
+}
 
 export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   {
@@ -59,30 +112,7 @@ export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   {
     heading: 'Blog Content Index',
     rawDividerAfter: true,
-    subsections: [
-      {
-        subheading: 'For Insurance Professionals',
-        content: `**Seven Details That Speed Up a Housing Placement**
-URL: https://novahavens.com/blog/details-that-speed-up-housing-placement
-Summary: The single biggest cause of delay in a housing placement isn't availability — it's incomplete requirements. Seven fields do most of the work: preferred city and state, bedrooms and bathrooms needed, occupancy counts, pet details, accessibility requirements, desired move-in date, and estimated duration. A request with all seven can be matched immediately. A request missing two or three usually means a phone call before anything moves.
-
-**Hotel or Furnished Home? An Adjuster's Guide to ALE Housing Options**
-URL: https://novahavens.com/blog/hotel-or-furnished-home-adjusters-guide
-Summary: Hotels are faster to arrange and suit short displacements. Furnished homes generally cost less per day over longer periods, accommodate families and pets far better, and reduce escalation calls. The practical dividing line is expected duration: for anything beyond about two weeks, a furnished home is usually the better answer for both the file and the household.`,
-      },
-      {
-        subheading: 'For Displaced Families',
-        content: `**Hotel or Furnished Home? What to Expect From Each**
-URL: https://novahavens.com/blog/hotel-or-furnished-home-what-to-expect
-Summary: If you'll be out of your home for more than a couple of weeks, a furnished home usually works better than a hotel — especially with children or pets. It has bedrooms, a kitchen, and space. Your adjuster decides what your policy covers; this explains what each option is actually like to live in.`,
-      },
-      {
-        subheading: 'For Property Owners',
-        content: `**How to List Your Furnished Property for Insurance Housing**
-URL: https://novahavens.com/blog/how-to-list-your-furnished-property
-Summary: Property owners can submit a furnished home for consideration in the Nova Havens network. A complete submission describes the home's layout, furnishings, availability, location, and pet or accessibility details so the team can determine whether it fits upcoming placement needs.`,
-      },
-    ],
+    subsections: buildBlogIndexSubsections(BLOG_POSTS),
   },
   {
     heading: 'Frequently Asked Questions',
