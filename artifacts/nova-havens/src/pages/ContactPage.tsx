@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Link } from 'wouter';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,16 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
+import {
+  CONTACT_FORM_DEFAULT_VALUES,
+  contactFormResolver,
+  type ContactFormValues,
+} from '@/lib/contactFormValidation';
 
-const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().optional(),
-  subject: z.string().min(1, "Please select a subject"),
-  message: z.string().min(10, "Message must be at least 10 characters")
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = ContactFormValues;
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = React.useState(false);
@@ -29,14 +24,8 @@ export default function ContactPage() {
   }, []);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: ""
-    }
+    resolver: contactFormResolver,
+    defaultValues: CONTACT_FORM_DEFAULT_VALUES
   });
 
   const onSubmit = (data: FormValues) => {

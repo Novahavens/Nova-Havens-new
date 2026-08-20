@@ -427,9 +427,6 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
     devDependencies:
-      '@hookform/resolvers':
-        specifier: ^3.10.0
-        version: 3.10.0(react-hook-form@7.82.0(react@19.1.0))
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
@@ -625,9 +622,6 @@ importers:
       wouter:
         specifier: ^3.3.5
         version: 3.10.0(react@19.1.0)
-      zod:
-        specifier: 'catalog:'
-        version: 3.25.76
 
   lib/api-client-react:
     dependencies:

@@ -29,10 +29,10 @@
     "test:smoke:update": "pnpm test:chromium-libraries && bash scripts/with-nix-chromium-libs.sh playwright test --config playwright.config.ts --update-snapshots",
     "test:token-plugin": "node --experimental-strip-types --test tests/vitePluginValidateTokens.test.ts",
     "test:token-rule": "node --experimental-strip-types --test tests/noHardcodedTokenValues.test.ts",
-    "test:color-rule": "node --experimental-strip-types --test tests/noHardcodedColorValues.test.ts"
+    "test:color-rule": "node --experimental-strip-types --test tests/noHardcodedColorValues.test.ts",
+    "test:contact-form": "node --experimental-strip-types --test tests/contactFormValidation.test.ts"
   },
   "devDependencies": {
-    "@hookform/resolvers": "^3.10.0",
     "@playwright/test": "^1.62.1",
     "@radix-ui/react-accordion": "^1.2.4",
     "@radix-ui/react-alert-dialog": "^1.1.7",
@@ -97,8 +97,7 @@
     "tw-animate-css": "^1.4.0",
     "vaul": "^1.1.2",
     "vite": "catalog:",
-    "wouter": "^3.3.5",
-    "zod": "catalog:"
+    "wouter": "^3.3.5"
   },
   "dependencies": {
     "@replit/object-storage": "^1.0.0",
