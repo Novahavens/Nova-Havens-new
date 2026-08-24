@@ -346,9 +346,6 @@ export default function HomePage() {
             <p data-testid="text-mission-p1">
               Nova Havens was founded to provide fast, compassionate housing for families displaced by water, fire, or mold damage. Losing your home — even temporarily — disrupts every part of family life: schools, routines, pets, and the sense of stability children depend on.
             </p>
-            <p data-testid="text-mission-p2">
-              Nova Havens works directly with insurance carriers, adjusters, and relocation specialists to make that transition as smooth as possible. Every coordinator is trained on insurance workflows, carrier documentation standards, and the specific needs of displaced households — so nothing falls through the cracks.
-            </p>
           </div>
         </div>
       </section>
