@@ -80,9 +80,6 @@ export default function Footer() {
           <p className="text-sm text-muted-foreground" data-testid="text-footer-copyright">
             © {new Date().getFullYear()} Nova Havens. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider" data-testid="text-footer-staging-notice">
-            STAGING SITE — NOT FOR PUBLIC DISTRIBUTION
-          </p>
         </div>
       </div>
     </footer>
