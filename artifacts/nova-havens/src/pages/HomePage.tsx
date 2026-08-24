@@ -418,8 +418,8 @@ export default function HomePage() {
           </div>
           <div className="w-full md:w-1/2 relative min-h-[var(--min-h-map)] md:min-h-full">
             <img 
-              src="/pet-friendly.webp" 
-              alt="Cozy pet-friendly living room in a Nova Havens verified furnished home" 
+              src="/pet-friendly-family.webp" 
+              alt="Family relaxing with their dog in a Nova Havens verified furnished home" 
               className="absolute inset-0 w-full h-full object-cover"
               loading="eager"
               onError={(e) => {
