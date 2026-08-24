@@ -6,6 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-carousel';
+import GoogleRating from '@/components/GoogleRating';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 
 type PartnerLogo = { name: string; logo?: string; logoClass?: string; showName: boolean };
@@ -16,8 +17,8 @@ const PARTNER_LOGOS: PartnerLogo[] = [
   { name: 'Farmers Insurance', logo: '/logos/farmers.svg', logoClass: 'h-9', showName: true },
   { name: 'State Farm', logo: '/logos/state-farm.svg', logoClass: 'h-6', showName: false },
   { name: 'Mercury', showName: true },
-  { name: 'Lemonade', showName: true },
-  { name: 'Chubb', showName: true },
+  { name: 'Lemonade', logo: '/logos/lemonade.svg', logoClass: 'h-8 brightness-0 invert', showName: false },
+  { name: 'Chubb', logo: '/logos/chubb.png', logoClass: 'h-7', showName: false },
 ];
 
 const SHOWCASE_SLIDES: ElegantSlide[] = [
@@ -426,7 +427,7 @@ export default function HomePage() {
           Nova Havens operates across the 48 contiguous United States.
         </p>
 
-        <div className="w-full bg-card rounded-lg border border-white/10 mb-12 relative overflow-hidden p-6 md:p-10" data-testid="card-map">
+        <div className="w-full bg-card rounded-lg border border-white/10 mb-8 relative overflow-hidden p-6 md:p-10" data-testid="card-map">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
           <div className="relative flex flex-col gap-1.5 md:gap-2" role="img" aria-label="Map of the 48 contiguous United States with the states Nova Havens serves highlighted">
             {STATE_TILE_GRID.map((row, rowIdx) => (
@@ -455,6 +456,8 @@ export default function HomePage() {
             <span className="w-3 h-3 rounded-sm bg-primary/20 border border-primary/40" aria-hidden="true" /> States served by Nova Havens
           </div>
         </div>
+
+        <GoogleRating />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-properties">
