@@ -1,4 +1,4 @@
-import { Router, type IRouter, type Request } from "express";
+import { Router, type IRouter, type Request, type Response } from "express";
 
 /**
  * Receives messages from the Nova Havens contact page:
@@ -126,8 +126,8 @@ export function validateContactSubmission(
  * client from inserting rows in a loop. This deliberately avoids a dependency
  * and a shared store: a single API process serves the site, so an approximate
  * per-process limit is enough to keep the inbox usable. Counters live in memory
- * and expired windows are pruned on every check, so the map cannot grow beyond
- * the set of senders seen within one window.
+ * and expired windows are pruned on every check, so the maps cannot grow beyond
+ * the set of sender identities seen within one window.
  */
 export type RateLimitDecision =
   | { allowed: true; remaining: number }
@@ -212,9 +212,19 @@ export function looksLikeSpam(body: unknown): boolean {
 
 /**
  * Generous enough that a visitor who resends after a typo or a failed attempt
- * is never blocked, tight enough that a script cannot fill the table.
+ * is never blocked, tight enough that a script cannot fill the table. This is
+ * scoped to a normalized email below, so people sharing one address do not
+ * consume one another's allowance.
  */
 const RATE_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 } as const;
+
+/**
+ * The per-email limit above prevents one person from repeatedly submitting.
+ * Keep a separate, higher IP ceiling so a script cannot bypass that limit by
+ * rotating email addresses, while still leaving room for a shared office,
+ * hotel, or mobile carrier connection to submit several legitimate requests.
+ */
+const SENDER_RATE_LIMIT = { limit: 20, windowMs: 10 * 60 * 1000 } as const;
 
 /**
  * How many proxy hops sit in front of this server: exactly one, the Replit
@@ -239,9 +249,37 @@ function senderKey(req: Request): string {
   return req.ip ?? req.socket.remoteAddress ?? "unknown";
 }
 
+/**
+ * A shared office, hotel, or mobile carrier can put many real visitors behind
+ * one IP address. Email is already trimmed by validateContactSubmission; lower
+ * casing here keeps the throttling key aligned with email's case-insensitive
+ * semantics.
+ */
+function contactRateLimitKey(req: Request, email: string): string {
+  return `${senderKey(req)}:${email.toLowerCase()}`;
+}
+
+function sendRateLimitedResponse(
+  req: Request,
+  res: Response,
+  decision: Extract<RateLimitDecision, { allowed: false }>,
+): void {
+  req.log.warn(
+    { retryAfterSeconds: decision.retryAfterSeconds },
+    "Contact form submission throttled",
+  );
+  res.setHeader("Retry-After", String(decision.retryAfterSeconds));
+  res.status(429).json({
+    error:
+      "Too many messages sent from this connection. Please wait a few minutes and try again, or call (629) 401-0054.",
+  });
+}
+
 export type ContactRouterOptions = {
-  /** Overridable so tests can drive the window without waiting on the clock. */
+  /** Per-email limiter, overridable so tests can drive the window. */
   rateLimiter?: RateLimiter;
+  /** Aggregate sender-IP limiter, overridable for focused tests. */
+  senderRateLimiter?: RateLimiter;
 };
 
 export function createContactRouter(
@@ -251,23 +289,10 @@ export function createContactRouter(
 ): IRouter {
   const router: IRouter = Router();
   const rateLimiter = options.rateLimiter ?? createRateLimiter(RATE_LIMIT);
+  const senderRateLimiter =
+    options.senderRateLimiter ?? createRateLimiter(SENDER_RATE_LIMIT);
 
   router.post("/contact", async (req, res) => {
-    const decision = rateLimiter.check(senderKey(req));
-
-    if (!decision.allowed) {
-      req.log.warn(
-        { retryAfterSeconds: decision.retryAfterSeconds },
-        "Contact form submission throttled",
-      );
-      res.setHeader("Retry-After", String(decision.retryAfterSeconds));
-      res.status(429).json({
-        error:
-          "Too many messages sent from this connection. Please wait a few minutes and try again, or call (629) 401-0054.",
-      });
-      return;
-    }
-
     if (looksLikeSpam(req.body)) {
       // Nothing is stored and nothing is notified: the response deliberately
       // says no more than any other rejection so a bot learns nothing.
@@ -280,6 +305,22 @@ export function createContactRouter(
 
     if (!result.ok) {
       res.status(400).json({ error: result.error });
+      return;
+    }
+
+    const decision = rateLimiter.check(
+      contactRateLimitKey(req, result.value.email),
+    );
+
+    if (!decision.allowed) {
+      sendRateLimitedResponse(req, res, decision);
+      return;
+    }
+
+    const senderDecision = senderRateLimiter.check(senderKey(req));
+
+    if (!senderDecision.allowed) {
+      sendRateLimitedResponse(req, res, senderDecision);
       return;
     }
 

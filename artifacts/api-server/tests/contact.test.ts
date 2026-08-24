@@ -319,9 +319,97 @@ test("throttles repeated submissions from the same sender", async () => {
   );
 });
 
+test("separates people with different emails behind the same sender address", async () => {
+  const store = recordingStore();
+  const rateLimiter = createRateLimiter({
+    limit: 1,
+    windowMs: 60_000,
+    now: () => 0,
+  });
+  const senderRateLimiter = createRateLimiter({
+    limit: 10,
+    windowMs: 60_000,
+    now: () => 0,
+  });
+
+  await withServer(
+    store,
+    async (post) => {
+      const sharedAddress = "198.51.100.20";
+      const first = await post(
+        { ...VALID_SUBMISSION, email: "adjuster-one@example.com" },
+        sharedAddress,
+      );
+      const second = await post(
+        { ...VALID_SUBMISSION, email: "adjuster-two@example.com" },
+        sharedAddress,
+      );
+
+      assert.equal(first.status, 201);
+      assert.equal(second.status, 201);
+      assert.equal(store.saved.length, 2);
+
+      // The same person remains protected even when they change email casing
+      // or add form whitespace before resubmitting.
+      const repeated = await post(
+        { ...VALID_SUBMISSION, email: " ADJUSTER-ONE@EXAMPLE.COM " },
+        sharedAddress,
+      );
+      assert.equal(repeated.status, 429);
+      assert.match(
+        (repeated.body as { error: string }).error,
+        /call \(629\) 401-0054/,
+      );
+    },
+    undefined,
+    { rateLimiter, senderRateLimiter },
+  );
+});
+
+test("keeps an aggregate cap when a sender rotates email addresses", async () => {
+  const store = recordingStore();
+  const rateLimiter = createRateLimiter({
+    limit: 5,
+    windowMs: 60_000,
+    now: () => 0,
+  });
+  const senderRateLimiter = createRateLimiter({
+    limit: 3,
+    windowMs: 60_000,
+    now: () => 0,
+  });
+
+  await withServer(
+    store,
+    async (post) => {
+      const sharedAddress = "198.51.100.21";
+
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        const response = await post(
+          {
+            ...VALID_SUBMISSION,
+            email: `rotating-${attempt}@example.com`,
+          },
+          sharedAddress,
+        );
+        assert.equal(response.status, 201);
+      }
+
+      const blocked = await post(
+        { ...VALID_SUBMISSION, email: "rotating-four@example.com" },
+        sharedAddress,
+      );
+      assert.equal(blocked.status, 429);
+      assert.equal(store.saved.length, 3);
+    },
+    undefined,
+    { rateLimiter, senderRateLimiter },
+  );
+});
+
 test("lets a visitor resend after a validation error without being throttled", async () => {
   const store = recordingStore();
-  const rateLimiter = createRateLimiter({ limit: 5, windowMs: 60_000 });
+  const rateLimiter = createRateLimiter({ limit: 1, windowMs: 60_000 });
 
   await withServer(
     store,
