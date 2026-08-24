@@ -523,6 +523,98 @@ test.describe('Mobile layout regressions', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Contact form regressions
+// ---------------------------------------------------------------------------
+
+/**
+ * The Contact form's rules live in src/lib/contactFormValidation.ts and are
+ * unit-tested by tests/contactFormValidation.test.ts.  Those assertions only
+ * prove the resolver itself is correct — they say nothing about whether it is
+ * still wired into `useForm`, or whether a successful POST still swaps the
+ * form for the thank-you panel.  This test exercises the real page so that
+ * unwiring the resolver, or breaking the success state, fails CI instead of
+ * silently dropping visitors' messages.
+ */
+test.describe('Contact form', () => {
+  /** The four messages the empty form must surface (one per required field). */
+  const REQUIRED_FIELD_MESSAGES = [
+    'Name must be at least 2 characters',
+    'Please enter a valid email address',
+    'Please select a subject',
+    'Message must be at least 10 characters',
+  ] as const;
+
+  test('rejects an empty submission and accepts a complete one', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioural check — one viewport is enough; the other projects cover layout.',
+    );
+
+    const errors = attachRuntimeCollectors(page);
+
+    // The Vite dev server used by these tests serves the SPA only; stub the
+    // API so the test covers the page's own success handling rather than the
+    // availability of the separate API artifact.
+    let submittedBody: unknown = null;
+    await page.route('**/api/contact', async (route) => {
+      submittedBody = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto('/contact');
+    await waitForStable(page);
+
+    // ── Empty submission: every required field must complain ────────────────
+    await page.getByTestId('btn-submit-contact').click();
+
+    for (const message of REQUIRED_FIELD_MESSAGES) {
+      await expect(
+        page.getByText(message, { exact: true }),
+        `The empty Contact form did not report "${message}" — is contactFormResolver still passed to useForm?`,
+      ).toBeVisible();
+    }
+
+    // Nothing may be sent while the form is invalid.
+    await expect(page.getByTestId('message-success')).toBeHidden();
+    expect(submittedBody, 'An invalid submission still reached /api/contact').toBeNull();
+
+    // ── Valid submission: the success panel replaces the form ───────────────
+    await page.getByTestId('input-name').fill('Jane Doe');
+    await page.getByTestId('input-email').fill('jane@example.com');
+    await page.getByTestId('input-phone').fill('(555) 123-4567');
+    await page.getByTestId('select-subject').selectOption('Housing Request');
+    await page
+      .getByTestId('input-message')
+      .fill('We need furnished housing for a displaced family in Nashville.');
+
+    await page.getByTestId('btn-submit-contact').click();
+
+    await expect(page.getByTestId('message-success')).toBeVisible();
+    await expect(page.getByTestId('btn-submit-contact')).toBeHidden();
+    await expect(page.getByTestId('message-submit-error')).toBeHidden();
+
+    expect(submittedBody, 'The valid submission never reached /api/contact').toMatchObject({
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      subject: 'Housing Request',
+    });
+
+    expect(
+      errors.pageErrors,
+      `Uncaught errors:\n${errors.pageErrors.join('\n')}`,
+    ).toHaveLength(0);
+    expect(
+      errors.consoleErrors,
+      `Console errors:\n${errors.consoleErrors.join('\n')}`,
+    ).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Compact-navigation breakpoint regressions
 // ---------------------------------------------------------------------------
 
