@@ -201,12 +201,9 @@ export default function HomePage() {
   byState: {},
     cities: FALLBACK_CITIES,
   });
-  // Highlight the states with live coverage; before the stats file loads (or if
-  // it has no per-state breakdown yet) show the full contiguous footprint.
-  const mappedStates = Object.entries(propertyStats.byState)
-    .filter(([, count]) => count > 0)
-    .map(([code]) => code);
-  const coveredStates = new Set(mappedStates.length > 0 ? mappedStates : CONTIGUOUS_STATE_CODES);
+  // The map represents Nova Havens' service footprint, not only the states
+  // that happen to have a property count in the latest stats snapshot.
+  const coveredStates = new Set(CONTIGUOUS_STATE_CODES);
 
   useEffect(() => {
     fetch('/property-stats.json', { cache: 'no-cache' })
