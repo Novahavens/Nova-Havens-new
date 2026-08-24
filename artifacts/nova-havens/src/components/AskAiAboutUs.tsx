@@ -1,13 +1,11 @@
 import type React from 'react';
-import { AI_ASSISTANTS, AI_TRADEMARK_NOTICE, ASK_AI_QUESTION, type AiAssistant } from '@/lib/askAi';
-import { ChatGptIcon, ClaudeIcon, GeminiIcon, PerplexityIcon } from '@/components/icons/AiAssistantIcons';
-import { useToast } from '@/hooks/use-toast';
+import { AI_ASSISTANTS, AI_TRADEMARK_NOTICE, type AiAssistant } from '@/lib/askAi';
+import { ChatGptIcon, ClaudeIcon, PerplexityIcon } from '@/components/icons/AiAssistantIcons';
 
 const ICONS: Record<AiAssistant['id'], (props: { className?: string }) => React.JSX.Element> = {
   chatgpt: ChatGptIcon,
   claude: ClaudeIcon,
   perplexity: PerplexityIcon,
-  gemini: GeminiIcon,
 };
 
 interface AskAiAboutUsProps {
@@ -16,36 +14,27 @@ interface AskAiAboutUsProps {
 }
 
 export default function AskAiAboutUs({ variant = 'full' }: AskAiAboutUsProps) {
-  const { toast } = useToast();
-
-  const handleClick = async (assistant: AiAssistant) => {
-    if (!assistant.copyToClipboard) return;
-    // Gemini has no reliable URL prefill — copy the question, tell the user, then let the link open.
-    try {
-      await navigator.clipboard.writeText(ASK_AI_QUESTION);
-      toast({ description: 'Question copied — paste it into Gemini' });
-    } catch {
-      toast({ description: 'Could not copy automatically — the question is on our About page' });
-    }
-  };
-
   const buttons = AI_ASSISTANTS.map((assistant) => {
     const Icon = ICONS[assistant.id];
+    const className =
+      variant === 'full'
+        ? 'group inline-flex w-full items-center justify-center gap-3 rounded-full border border-white/10 bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary'
+        : 'group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary';
+    const iconClassName =
+      variant === 'full'
+        ? 'h-5 w-5 text-foreground transition-colors group-hover:text-primary'
+        : 'h-4 w-4 transition-colors group-hover:text-primary';
+
     return (
       <a
         key={assistant.id}
         href={assistant.url}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => void handleClick(assistant)}
-        className={
-          variant === 'full'
-            ? 'group inline-flex items-center gap-3 rounded-full border border-white/10 bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary'
-            : 'group inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary'
-        }
+        className={className}
         data-testid={`btn-ask-ai-${assistant.id}`}
       >
-        <Icon className={variant === 'full' ? 'h-5 w-5 text-foreground transition-colors group-hover:text-primary' : 'h-4 w-4 transition-colors group-hover:text-primary'} />
+        <Icon className={iconClassName} />
         {assistant.label}
       </a>
     );
@@ -58,8 +47,10 @@ export default function AskAiAboutUs({ variant = 'full' }: AskAiAboutUsProps) {
           Don't take our word for it.{' '}
           <span className="font-normal text-muted-foreground">Ask an AI assistant about us and see what it says.</span>
         </p>
-        <div className="flex flex-wrap items-center gap-3">{buttons}</div>
-        <p className="text-xs leading-relaxed text-tertiary">{AI_TRADEMARK_NOTICE}</p>
+        <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">{buttons}</div>
+        <p className="text-xs leading-relaxed text-tertiary">
+          {AI_TRADEMARK_NOTICE}
+        </p>
       </div>
     );
   }
@@ -73,7 +64,7 @@ export default function AskAiAboutUs({ variant = 'full' }: AskAiAboutUsProps) {
         <p className="mb-10 text-lg text-muted-foreground" data-testid="text-ask-ai-subtitle">
           Ask an AI assistant about us and see what it says.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-4">{buttons}</div>
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">{buttons}</div>
         <p className="mt-8 max-w-xl text-xs leading-relaxed text-tertiary" data-testid="text-ask-ai-smallprint">
           {AI_TRADEMARK_NOTICE}
         </p>

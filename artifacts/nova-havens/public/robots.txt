@@ -3,7 +3,7 @@ Allow: /
 
 # ── AI crawler policy ───────────────────────────────────────────────────────
 # The AI crawlers below are intentionally permitted so Nova Havens is visible
-# to AI assistants and answer engines (ChatGPT, Claude, Perplexity, Gemini).
+# to AI assistants and answer engines (ChatGPT, Claude, Perplexity).
 # To reverse this, change any "Allow: /" below to "Disallow: /".
 # Note: the site currently ships noindex/nofollow meta tags (staging) — that
 # stays in place until launch; this block is preparation so the crawler
