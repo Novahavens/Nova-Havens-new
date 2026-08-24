@@ -195,7 +195,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       </div>
 
       {/* Progress Indicators */}
-      <div className="relative grid grid-cols-3 gap-3 px-6 pb-6 md:grid-cols-6 md:px-10 md:pb-8">
+      <div className="relative grid grid-cols-3 gap-3 px-6 pb-6 md:grid-cols-9 md:px-10 md:pb-8">
         {slides.map((slide, index) => (
           <button
             key={slide.title}

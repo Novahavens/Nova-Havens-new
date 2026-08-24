@@ -63,6 +63,27 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
     imageUrl: '/property-6.webp',
     imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens 20,000+ property network',
   },
+  {
+    title: 'Fenced-In Yards',
+    subtitle: 'Room to Play',
+    description: 'Secure fenced-in yards give families and pets a comfortable outdoor space to relax, play, and settle in.',
+    imageUrl: '/fenced-yard-home.webp',
+    imageAlt: 'Well-kept furnished home with a secure fenced-in backyard and outdoor play space',
+  },
+  {
+    title: 'ADA-Compliant Homes',
+    subtitle: 'Designed for Access',
+    description: 'Accessible homes with step-free entries, ramps, and thoughtful layouts help every family feel at home.',
+    imageUrl: '/ada-compliant-home.webp',
+    imageAlt: 'Furnished accessible home with a step-free entry, ramp, and handrails',
+  },
+  {
+    title: 'Pet-Friendly Homes',
+    subtitle: 'Pets Are Family',
+    description: 'Pet-friendly furnished homes help families stay together with the companions they love during recovery.',
+    imageUrl: '/pet-friendly-family.webp',
+    imageAlt: 'Family relaxing with their dog in a bright Nova Havens furnished home',
+  },
 ];
 
 const FAQ_ITEMS = [
