@@ -9,16 +9,16 @@ import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-caro
 import GoogleRating from '@/components/GoogleRating';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 
-type PartnerLogo = { name: string; logo?: string; logoClass?: string; showName: boolean };
+type PartnerLogo = { name: string; websiteUrl: string; logo?: string; logoClass?: string; showName: boolean };
 
 const PARTNER_LOGOS: PartnerLogo[] = [
-  { name: 'Allstate', logo: '/logos/allstate.png', logoClass: 'h-8', showName: true },
-  { name: 'Travelers', logo: '/logos/travelers.png', logoClass: 'h-8', showName: true },
-  { name: 'Farmers Insurance', logo: '/logos/farmers.svg', logoClass: 'h-9', showName: true },
-  { name: 'State Farm', logo: '/logos/state-farm.svg', logoClass: 'h-6', showName: false },
-  { name: 'Mercury', showName: true },
-  { name: 'Lemonade', logo: '/logos/lemonade.svg', logoClass: 'h-8 brightness-0 invert', showName: false },
-  { name: 'Chubb', logo: '/logos/chubb.png', logoClass: 'h-7', showName: false },
+  { name: 'Allstate', websiteUrl: 'https://www.allstate.com/', logo: '/logos/allstate.png', logoClass: 'h-8', showName: true },
+  { name: 'Travelers', websiteUrl: 'https://www.travelers.com/', logo: '/logos/travelers.png', logoClass: 'h-8', showName: true },
+  { name: 'Farmers Insurance', websiteUrl: 'https://www.farmers.com/', logo: '/logos/farmers.svg', logoClass: 'h-9', showName: true },
+  { name: 'State Farm', websiteUrl: 'https://www.statefarm.com/', logo: '/logos/state-farm.svg', logoClass: 'h-6', showName: false },
+  { name: 'Mercury', websiteUrl: 'https://www.mercuryinsurance.com/', showName: true },
+  { name: 'Lemonade', websiteUrl: 'https://www.lemonade.com/', logo: '/logos/lemonade.svg', logoClass: 'h-8 brightness-0 invert', showName: false },
+  { name: 'Chubb', websiteUrl: 'https://www.chubb.com/', logo: '/logos/chubb.png', logoClass: 'h-7', showName: false },
 ];
 
 const SHOWCASE_SLIDES: ElegantSlide[] = [
@@ -499,14 +499,24 @@ export default function HomePage() {
               {[0, 1].map((copy) => (
                 <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
                   {PARTNER_LOGOS.map((partner, idx) => (
-                    <div key={partner.name} className="flex items-center gap-4 bg-card border border-white/5 rounded-sm px-8 py-6 mx-3 shrink-0" data-testid={copy === 0 ? `card-partner-${idx}` : undefined}>
-                      {partner.logo && (
-                        <img src={partner.logo} alt={copy === 0 ? `${partner.name} logo` : ''} className={`w-auto object-contain ${partner.logoClass ?? 'h-8'}`} loading="lazy" />
-                      )}
-                      {partner.showName && (
-                        <span className="font-extrabold text-lg md:text-xl text-foreground tracking-tight whitespace-nowrap">{partner.name}</span>
-                      )}
-                    </div>
+                    <a
+                      key={partner.name}
+                      href={partner.websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Visit ${partner.name} website`}
+                      data-testid={copy === 0 ? `link-partner-${idx}` : undefined}
+                      className="block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      <div className="flex items-center gap-4 bg-card border border-white/5 rounded-sm px-8 py-6 mx-3 shrink-0" data-testid={copy === 0 ? `card-partner-${idx}` : undefined}>
+                        {partner.logo && (
+                          <img src={partner.logo} alt={copy === 0 ? `${partner.name} logo` : ''} className={`w-auto object-contain ${partner.logoClass ?? 'h-8'}`} loading="lazy" />
+                        )}
+                        {partner.showName && (
+                          <span className="font-extrabold text-lg md:text-xl text-foreground tracking-tight whitespace-nowrap">{partner.name}</span>
+                        )}
+                      </div>
+                    </a>
                   ))}
                 </div>
               ))}
