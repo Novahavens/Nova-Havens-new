@@ -18,6 +18,7 @@ import type { AddressInfo } from "node:net";
 import {
   createContactRouter,
   type ContactStore,
+  type ContactNotifier,
   type ContactSubmissionInput,
 } from "../src/routes/contact.ts";
 
@@ -37,6 +38,7 @@ async function withServer(
     post: (body: unknown) => Promise<{ status: number; body: unknown }>,
     logs: LogCall[],
   ) => Promise<void>,
+  notifier?: ContactNotifier,
 ): Promise<void> {
   const logs: LogCall[] = [];
   const app = express();
@@ -51,7 +53,7 @@ async function withServer(
     };
     next();
   });
-  app.use("/api", createContactRouter(store));
+  app.use("/api", createContactRouter(store, notifier));
 
   const server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
@@ -94,6 +96,63 @@ test("stores a valid submission and confirms it", async () => {
       { ...VALID_SUBMISSION, phone: "(555) 123-4567" },
     ]);
   });
+});
+
+test("notifies after storing a valid submission", async () => {
+  const store = recordingStore();
+  const notified: Array<{
+    input: ContactSubmissionInput;
+    submissionId: number | undefined;
+  }> = [];
+  const notifier: ContactNotifier = {
+    async notify(input, submissionId) {
+      notified.push({ input, submissionId });
+    },
+  };
+
+  await withServer(
+    store,
+    async (post, logs) => {
+      const { status, body } = await post(VALID_SUBMISSION);
+
+      assert.equal(status, 201);
+      assert.deepEqual(body, { id: 1 });
+      assert.deepEqual(notified, [
+        {
+          input: { ...VALID_SUBMISSION, phone: "(555) 123-4567" },
+          submissionId: 1,
+        },
+      ]);
+      assert.equal(logs[1]?.message, "Contact form notification delivered");
+    },
+    notifier,
+  );
+});
+
+test("keeps the stored submission successful when notification fails", async () => {
+  const store = recordingStore();
+  const notifier: ContactNotifier = {
+    async notify() {
+      throw new Error("Monday unavailable");
+    },
+  };
+
+  await withServer(
+    store,
+    async (post, logs) => {
+      const { status, body } = await post(VALID_SUBMISSION);
+
+      assert.equal(status, 201);
+      assert.deepEqual(body, { id: 1 });
+      assert.equal(store.saved.length, 1);
+      assert.equal(logs[1]?.message, "Contact form notification failed");
+      assert.deepEqual(logs[1]?.bindings, {
+        err: new Error("Monday unavailable"),
+        submissionId: 1,
+      });
+    },
+    notifier,
+  );
 });
 
 test("treats an omitted phone number as absent", async () => {

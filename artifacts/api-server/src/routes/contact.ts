@@ -56,6 +56,14 @@ export type ContactStore = {
   save(input: ContactSubmissionInput): Promise<number | undefined>;
 };
 
+export type ContactNotifier = {
+  /** Delivers an operational alert after a submission has been stored. */
+  notify(
+    input: ContactSubmissionInput,
+    submissionId: number | undefined,
+  ): Promise<void>;
+};
+
 export type ContactValidationResult =
   | { ok: true; value: ContactSubmissionInput }
   | { ok: false; error: string };
@@ -110,7 +118,10 @@ export function validateContactSubmission(
   };
 }
 
-export function createContactRouter(store: ContactStore): IRouter {
+export function createContactRouter(
+  store: ContactStore,
+  notifier?: ContactNotifier,
+): IRouter {
   const router: IRouter = Router();
 
   router.post("/contact", async (req, res) => {
@@ -126,6 +137,23 @@ export function createContactRouter(store: ContactStore): IRouter {
 
       // Identifier only — nothing the submitter typed reaches the log stream.
       req.log.info({ submissionId: id }, "Contact form submission stored");
+
+      if (notifier) {
+        try {
+          await notifier.notify(result.value, id);
+          req.log.info(
+            { submissionId: id },
+            "Contact form notification delivered",
+          );
+        } catch (err) {
+          // The database row is the source of truth. A transient notification
+          // outage must never make a successful visitor submission look lost.
+          req.log.error(
+            { err, submissionId: id },
+            "Contact form notification failed",
+          );
+        }
+      }
 
       res.status(201).json({ id });
     } catch (err) {
