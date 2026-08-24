@@ -62,8 +62,6 @@ const WEBSITE_SCHEMA = {
   publisher: { '@id': BUSINESS_ID },
 };
 const BUSINESS_PHONE = '+16294010054';
-/** After Hours Specialty Line — published alongside the main number everywhere. */
-const AFTER_HOURS_PHONE = '+16292062360';
 const BUSINESS_EMAIL = 'info@novahavens.com';
 const BUSINESS_ADDRESS = {
   '@type': 'PostalAddress',
@@ -75,16 +73,6 @@ const BUSINESS_AREA_SERVED = {
   '@type': 'Country',
   name: 'United States',
 };
-/**
- * ContactPoint for the After Hours Specialty Line. Published on every business
- * node so the second number is discoverable wherever the main number appears.
- */
-const AFTER_HOURS_CONTACT_POINT = {
-  '@type': 'ContactPoint',
-  telephone: AFTER_HOURS_PHONE,
-  contactType: 'After Hours Specialty Line',
-  availableLanguage: 'English',
-};
 
 /**
  * Person schema for each real team member. Members without a confirmed role
@@ -93,7 +81,11 @@ const AFTER_HOURS_CONTACT_POINT = {
 const TEAM_PERSON_SCHEMAS = TEAM_MEMBERS.map((member) => ({
   '@type': 'Person',
   name: member.name,
-  ...(member.role ? { jobTitle: member.role } : {}),
+  // A bracketed placeholder role (e.g. "[Role TBC]") is shown on the page as a
+  // visible to-do, but must never be published as a verified fact.
+  ...(member.role && !/^\[.*\]$/.test(member.role.trim())
+    ? { jobTitle: member.role }
+    : {}),
   worksFor: {
     '@type': 'Organization',
     '@id': BUSINESS_ID,
@@ -145,7 +137,7 @@ const HOME_FAQS = [
   {
     question: 'How quickly can Nova Havens place a displaced family?',
     answer:
-      'Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets. Our automated claim-intake system surfaces matched properties within hours so coordinators can reach the family the same day a claim is submitted.',
+      'Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets.',
   },
   {
     question: 'Does Nova Havens work with all insurance carriers?',
@@ -155,7 +147,7 @@ const HOME_FAQS = [
   {
     question: 'Are pet-friendly furnished homes available nationwide?',
     answer:
-      'Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. When you contact Nova Havens, simply share your pet\'s species, breed, and weight and a coordinator will match your family to a compatible property. Most pet deposits are covered under ALE policies.',
+      'Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. All Nova Havens needs for placement is your pet\'s species, breed, and weight — a coordinator will match your family to a compatible property.',
   },
   {
     question: 'Which states does Nova Havens operate in?',
@@ -163,14 +155,9 @@ const HOME_FAQS = [
       'Nova Havens operates in all 48 contiguous US states, as of 2025. This includes major metros and rural areas, so families displaced in smaller communities receive the same quality of service as those in large cities.',
   },
   {
-    question: "What does a 'fully furnished' Nova Havens home include?",
-    answer:
-      'Every Nova Havens property includes beds with quality linens, a fully equipped kitchen with cookware and dishes, high-speed Wi-Fi, a streaming-ready TV, and washer/dryer access. Properties are verified by Nova Havens coordinators before being listed in the network — so what you see is what you get.',
-  },
-  {
     question: 'How do I request emergency housing through Nova Havens?',
     answer:
-      'To request emergency furnished housing through Nova Havens, call (629) 401-0054 — or the After Hours Specialty Line at (629) 206-2360 — or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly.',
+      'To request emergency furnished housing through Nova Havens, call (629) 401-0054 or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly.',
   },
   {
     question: 'How does Nova Havens coordinate with my insurance adjuster?',
@@ -180,7 +167,7 @@ const HOME_FAQS = [
   {
     question: 'Can I list my furnished property with Nova Havens?',
     answer:
-      'Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360, or visit the Contact page to get started.',
+      'Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054 or visit the Contact page to get started.',
   },
 ];
 
@@ -200,7 +187,6 @@ const STATIC_META: Record<string, RouteMeta> = {
           name: SITE_NAME,
           url: `${BASE_URL}/`,
           telephone: BUSINESS_PHONE,
-          contactPoint: AFTER_HOURS_CONTACT_POINT,
           email: BUSINESS_EMAIL,
           address: BUSINESS_ADDRESS,
           areaServed: BUSINESS_AREA_SERVED,
@@ -391,7 +377,6 @@ const STATIC_META: Record<string, RouteMeta> = {
           description: COMPANY_DEFINITION,
           address: BUSINESS_ADDRESS,
           telephone: BUSINESS_PHONE,
-          contactPoint: AFTER_HOURS_CONTACT_POINT,
           email: BUSINESS_EMAIL,
           areaServed: BUSINESS_AREA_SERVED,
           foundingLocation: {
@@ -456,7 +441,7 @@ const STATIC_META: Record<string, RouteMeta> = {
               name: 'Where is Nova Havens headquartered?',
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054, on the After Hours Specialty Line at (629) 206-2360, or at info@novahavens.com.',
+                text: 'Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054 or info@novahavens.com.',
               },
             },
           ],
@@ -467,7 +452,7 @@ const STATIC_META: Record<string, RouteMeta> = {
   '/contact': {
     title: `Contact Us | ${SITE_NAME}`,
     description:
-      'Reach Nova Havens at (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
+      'Reach Nova Havens at (629) 401-0054 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/contact`,
     jsonLd: {
@@ -503,37 +488,34 @@ const STATIC_META: Record<string, RouteMeta> = {
             opens: '00:00',
             closes: '23:59',
           },
-          contactPoint: [
-            {
-              '@type': 'ContactPoint',
-              telephone: BUSINESS_PHONE,
-              contactType: 'customer service',
-              email: BUSINESS_EMAIL,
-              availableLanguage: 'English',
-              hoursAvailable: {
-                '@type': 'OpeningHoursSpecification',
-                dayOfWeek: [
-                  'Monday',
-                  'Tuesday',
-                  'Wednesday',
-                  'Thursday',
-                  'Friday',
-                  'Saturday',
-                  'Sunday',
-                ],
-                opens: '00:00',
-                closes: '23:59',
-              },
+          contactPoint: {
+            '@type': 'ContactPoint',
+            telephone: BUSINESS_PHONE,
+            contactType: 'customer service',
+            email: BUSINESS_EMAIL,
+            availableLanguage: 'English',
+            hoursAvailable: {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday',
+              ],
+              opens: '00:00',
+              closes: '23:59',
             },
-            AFTER_HOURS_CONTACT_POINT,
-          ],
+          },
         },
         {
           '@type': 'ContactPage',
           '@id': `${BASE_URL}/contact`,
           name: `Contact ${SITE_NAME}`,
           description:
-            'Reach Nova Havens at (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
+            'Reach Nova Havens at (629) 401-0054 — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.',
           url: `${BASE_URL}/contact`,
           isPartOf: { '@id': `${BASE_URL}/#website` },
           about: { '@id': BUSINESS_ID },

@@ -11,7 +11,8 @@ const PROFILE_SECTIONS: { key: keyof TeamMemberProfile; label: string }[] = [
 ];
 
 interface TeamMemberModalProps {
-  member: TeamMember;
+  /** Only members with a submitted profile open a modal. */
+  member: TeamMember & { profile: TeamMemberProfile };
   onClose: () => void;
 }
 

@@ -52,7 +52,7 @@ const ABOUT_FAQ = [
   },
   {
     question: "Where is Nova Havens headquartered?",
-    answer: "Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054, on the After Hours Specialty Line at (629) 206-2360, or at info@novahavens.com."
+    answer: "Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054 or info@novahavens.com."
   }
 ];
 

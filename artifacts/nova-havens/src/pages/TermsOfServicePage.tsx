@@ -62,7 +62,6 @@ export default function TermsOfServicePage() {
         <p>
           <a href="mailto:info@novahavens.com" className="text-primary hover:underline">info@novahavens.com</a><br />
           <a href="tel:6294010054" className="text-primary hover:underline">(629) 401-0054</a><br />
-          After Hours Specialty Line: <a href="tel:6292062360" className="text-primary hover:underline">(629) 206-2360</a><br />
           Nashville, TN
         </p>
       </div>

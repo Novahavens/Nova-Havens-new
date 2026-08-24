@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import { Link } from 'wouter';
 import { Phone, Mail, HeartHandshake, Clock, ShieldCheck } from 'lucide-react';
 import { TEAM_MEMBERS, type TeamMember, type TeamMemberProfile } from '@/data/teamMembers';
@@ -40,14 +40,23 @@ function photoUrlFor(key: string): string {
 function toTeamMember(synced: SyncedMember): TeamMember {
   const profile = {} as TeamMemberProfile;
   for (const key of ANSWER_KEYS) profile[key] = synced[key];
+  const hasProfile = ANSWER_KEYS.some((key) => synced[key].trim().length > 0);
   return {
     name: synced.name.trim(),
     role: synced.role || undefined,
     initials: synced.initials,
-    profile,
+    profile: hasProfile ? profile : undefined,
     photoUrl: synced.photo ? photoUrlFor(synced.photo) : null,
   };
 }
+
+/** GIVE — the core values shown alongside the mission in the Our People section. */
+const GIVE_VALUES = [
+  { letter: 'G', title: 'Give a damn' },
+  { letter: 'I', title: 'Integrity' },
+  { letter: 'V', title: 'Value' },
+  { letter: 'E', title: 'Efficiency' },
+];
 
 const VALUES = [
   {
@@ -58,7 +67,7 @@ const VALUES = [
   {
     icon: Clock,
     title: 'Around the clock',
-    text: 'Disasters don\u2019t keep business hours. Nova Havens coordinates emergency placements 24/7 — the team is reachable at (629) 401-0054, or on the After Hours Specialty Line at (629) 206-2360, at any hour for urgent claims.',
+    text: 'Disasters don\u2019t keep business hours. Nova Havens coordinates emergency placements 24/7 — the team is reachable at (629) 401-0054 at any hour for urgent claims.',
   },
   {
     icon: ShieldCheck,
@@ -73,7 +82,7 @@ function memberTestId(member: TeamMember): string {
 
 export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>(TEAM_MEMBERS);
-  const [activeMember, setActiveMember] = useState<TeamMember | null>(null);
+  const [activeMember, setActiveMember] = useState<(TeamMember & { profile: TeamMemberProfile }) | null>(null);
   // Photos that failed to load fall back to the initials avatar.
   const [failedPhotos, setFailedPhotos] = useState<ReadonlySet<string>>(new Set());
   const lastTriggerRef = useRef<HTMLElement | null>(null);
@@ -128,7 +137,7 @@ export default function TeamPage() {
     return () => observer.disconnect();
   }, [members]);
 
-  const openProfile = (member: TeamMember, trigger: HTMLElement) => {
+  const openProfile = (member: TeamMember & { profile: TeamMemberProfile }, trigger: HTMLElement) => {
     lastTriggerRef.current = trigger;
     setActiveMember(member);
   };
@@ -173,6 +182,32 @@ export default function TeamPage() {
           <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
             {members.map((member, idx) => {
               const delay = { '--reveal-delay': `${(idx % 3) * 70}ms` } as CSSProperties;
+              const profile = member.profile;
+              const cardClass = `w-full h-full bg-card rounded-lg border border-white/[0.08] p-8 flex flex-col items-center text-center${profile ? ' team-card-interactive' : ''}`;
+              const cardBody = (
+                <>
+                  {member.photoUrl && !failedPhotos.has(member.photoUrl) ? (
+                    <img
+                      src={member.photoUrl}
+                      alt={`Portrait of ${member.name}`}
+                      className="w-20 h-20 rounded-full border border-primary/60 object-cover object-center mb-5"
+                      loading="lazy"
+                      onError={() => markPhotoFailed(member.photoUrl as string)}
+                    />
+                  ) : (
+                    <div
+                      className="w-20 h-20 rounded-full bg-surface-1 border border-primary/60 flex items-center justify-center mb-5"
+                      aria-hidden="true"
+                    >
+                      <span className="text-xl font-extrabold text-primary">{member.initials}</span>
+                    </div>
+                  )}
+                  <span className="text-lg font-bold text-foreground mb-1">{member.name}</span>
+                  {member.role && (
+                    <span className="text-sm font-semibold text-primary">{member.role}</span>
+                  )}
+                </>
+              );
 
               return (
                 <div
@@ -181,37 +216,48 @@ export default function TeamPage() {
                   style={delay}
                   className={`team-card-reveal lg:col-span-2${centerRowClass(idx)}`}
                 >
-                  <button
-                    type="button"
-                    className="team-card-interactive w-full h-full bg-card rounded-lg border border-white/[0.08] p-8 flex flex-col items-center text-center"
-                    onClick={(event) => openProfile(member, event.currentTarget)}
-                    aria-haspopup="dialog"
-                    data-testid={memberTestId(member)}
-                  >
-                    {member.photoUrl && !failedPhotos.has(member.photoUrl) ? (
-                      <img
-                        src={member.photoUrl}
-                        alt={`Portrait of ${member.name}`}
-                        className="w-20 h-20 rounded-full border border-primary/60 object-cover object-center mb-5"
-                        loading="lazy"
-                        onError={() => markPhotoFailed(member.photoUrl as string)}
-                      />
-                    ) : (
-                      <div
-                        className="w-20 h-20 rounded-full bg-surface-1 border border-primary/60 flex items-center justify-center mb-5"
-                        aria-hidden="true"
-                      >
-                        <span className="text-xl font-extrabold text-primary">{member.initials}</span>
-                      </div>
-                    )}
-                    <span className="text-lg font-bold text-foreground mb-1">{member.name}</span>
-                    {member.role && (
-                      <span className="text-sm font-semibold text-primary">{member.role}</span>
-                    )}
-                  </button>
+                  {profile ? (
+                    <button
+                      type="button"
+                      className={cardClass}
+                      onClick={(event: MouseEvent<HTMLButtonElement>) =>
+                        openProfile({ ...member, profile }, event.currentTarget)
+                      }
+                      aria-haspopup="dialog"
+                      data-testid={memberTestId(member)}
+                    >
+                      {cardBody}
+                    </button>
+                  ) : (
+                    <div className={cardClass} data-testid={memberTestId(member)}>
+                      {cardBody}
+                    </div>
+                  )}
                 </div>
               );
             })}
+          </div>
+
+          {/* GIVE core values */}
+          <div className="mt-16 bg-card rounded-lg border border-white/[0.08] p-8 md:p-10" data-testid="block-give-values">
+            <div className="text-center mb-8">
+              <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-3">Our Values</p>
+              <p className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground" data-testid="text-team-mission">
+                A home when you need it most.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {GIVE_VALUES.map((value) => (
+                <div
+                  key={value.title}
+                  className="bg-surface-1 rounded-lg border border-white/[0.08] p-5 text-center"
+                  data-testid={`card-give-${value.title.toLowerCase().replace(/\s+/g, '-')}`}
+                >
+                  <span className="block text-sm font-extrabold tracking-widest text-primary mb-2" aria-hidden="true">{value.letter}</span>
+                  <span className="block text-base font-bold text-foreground">{value.title}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -257,14 +303,6 @@ export default function TeamPage() {
               >
                 <Phone className="w-4 h-4" aria-hidden="true" />
                 Call (629) 401-0054
-              </a>
-              <a
-                href="tel:+16292062360"
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
-                data-testid="link-team-after-hours-call"
-              >
-                <Phone className="w-4 h-4" aria-hidden="true" />
-                After Hours: (629) 206-2360
               </a>
               <Link
                 href="/contact"

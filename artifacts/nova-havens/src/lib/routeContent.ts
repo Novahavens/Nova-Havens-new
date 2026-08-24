@@ -150,7 +150,7 @@ const HOME_HTML = `
   </section>
 
   <section>
-    <h2>The Nova Havens Experience — Everything a family needs to feel at home</h2>
+    <h2>Amenities Nova Havens families need most</h2>
     <ul>
       <li><strong>Cozy Bedding</strong> — Every home is furnished with quality linens and bedding so families can rest from the first night.</li>
       <li><strong>Entertainment</strong> — Streaming-ready TVs, high-speed internet, and fully equipped living spaces keep families connected and comfortable.</li>
@@ -168,6 +168,7 @@ const HOME_HTML = `
 
   <section>
     <h2>Where We Operate</h2>
+    <p>Nova Havens operates across the 48 contiguous United States.</p>
     <ul>
       <li>12,000+ active properties</li>
       <li>48 states covered</li>
@@ -178,11 +179,11 @@ const HOME_HTML = `
   <section>
     <h2>How It Works</h2>
 
-    <h3>For Adjusters &amp; Carriers</h3>
+    <h3>For Carriers &amp; Relocation Specialists</h3>
     <ol>
-      <li><strong>Submit a Claim</strong> — Share the claim details with our team via phone or portal.</li>
-      <li><strong>Review Placement Options</strong> — We surface verified homes within your parameters within hours.</li>
-      <li><strong>Approve &amp; Coordinate</strong> — We handle all logistics with the family directly.</li>
+      <li><strong>Submit a Claim</strong> — Send us the claim details: household size, location, and pets.</li>
+      <li><strong>Review Placement Options</strong> — We send back verified homes that match, usually within hours.</li>
+      <li><strong>Approve &amp; Coordinate</strong> — We handle move-in with the family and keep you updated.</li>
     </ol>
 
     <h3>For Displaced Families</h3>
@@ -194,15 +195,15 @@ const HOME_HTML = `
 
     <h3>For Property Owners</h3>
     <ol>
-      <li><strong>Submit Your Property</strong> — Tell us about your furnished home and availability.</li>
-      <li><strong>Get Verified</strong> — We inspect and onboard your property into our network.</li>
-      <li><strong>Start Hosting</strong> — We match you with families and handle all coordination.</li>
+      <li><strong>Submit Your Property</strong> — Tell us about your furnished home: location, size, and availability.</li>
+      <li><strong>Get Verified</strong> — We check your property against our furnishing and safety standards.</li>
+      <li><strong>Start Hosting</strong> — We match your home with displaced families and handle the coordination.</li>
     </ol>
   </section>
 
   <section>
     <h2>Trusted Partnerships</h2>
-    <p>Nova Havens works alongside the nation's leading insurance carriers, including Allstate, Travelers, Farmers Insurance, and State Farm.</p>
+    <p>Nova Havens works with leading insurance carriers nationwide, including Allstate, Travelers, Farmers Insurance, State Farm, Mercury, Lemonade, and Chubb.</p>
   </section>
 </main>
 `;
@@ -255,7 +256,6 @@ function buildBlogPostHtml(slug: string): string {
         post.cta === 'property' ? INTAKE_FORMS.property : INTAKE_FORMS.housing,
       )}">${post.cta === 'property' ? 'Submit your property' : 'Submit a housing request'}</a></p>
       <p>Call us: <a href="tel:+16294010054">(629) 401-0054</a></p>
-      <p>After Hours Specialty Line: <a href="tel:+16292062360">(629) 206-2360</a></p>
     </footer>`;
 
   return `
@@ -335,12 +335,15 @@ ${TEAM_MEMBERS.map((member) => {
     ['laugh', 'Guaranteed to make me laugh'],
     ['spareTime', 'In my spare time'],
   ];
-  const profileHtml = `\n      <dl>\n${profileLabels
-    .map(
-      ([key, label]) =>
-        `        <dt>${label}</dt>\n        <dd>${esc(member.profile[key])}</dd>`,
-    )
-    .join('\n')}\n      </dl>`;
+  const profile = member.profile;
+  const profileHtml = profile
+    ? `\n      <dl>\n${profileLabels
+        .map(
+          ([key, label]) =>
+            `        <dt>${label}</dt>\n        <dd>${esc(profile[key])}</dd>`,
+        )
+        .join('\n')}\n      </dl>`
+    : '';
   return `    <article>
       <h3>${esc(member.name)}${member.role ? ` — ${esc(member.role)}` : ''}</h3>${profileHtml}
     </article>`;
@@ -389,7 +392,7 @@ const PRIVACY_HTML = `
 <main>
   <h1>Privacy Policy</h1>
   <p>This Privacy Policy describes how Nova Havens collects, uses, and protects your personal information when you use our website and housing coordination services.</p>
-  <p>For questions about this policy, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>, or the After Hours Specialty Line at <a href="tel:+16292062360">(629) 206-2360</a>.</p>
+  <p>For questions about this policy, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>.</p>
 </main>
 `;
 
@@ -397,7 +400,7 @@ const TERMS_HTML = `
 <main>
   <h1>Terms of Service</h1>
   <p>These Terms of Service govern your use of the Nova Havens website and housing coordination services. By accessing or using our services, you agree to these terms.</p>
-  <p>For questions about these terms, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>, or the After Hours Specialty Line at <a href="tel:+16292062360">(629) 206-2360</a>.</p>
+  <p>For questions about these terms, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>.</p>
 </main>
 `;
 

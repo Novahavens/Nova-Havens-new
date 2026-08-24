@@ -47,7 +47,7 @@ export default function ContactPage() {
               Request Emergency Housing or Get in Touch
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed" data-testid="text-contact-subtitle">
-              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a>, reach the After Hours Specialty Line at <a href="tel:+16292062360" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 206-2360</a>, or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
+              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a> or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
             </p>
           </div>
         </div>
@@ -126,12 +126,12 @@ export default function ContactPage() {
           {/* Form Side */}
           <div className="lg:col-span-2 bg-card rounded-lg border border-white/10 p-8 md:p-10">
             <h2 className="text-2xl font-bold mb-2 text-foreground" data-testid="heading-form">Send a Message to Nova Havens</h2>
-            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold">(629) 401-0054</a> directly — 24/7. After hours, use the After Hours Specialty Line at <a href="tel:+16292062360" className="text-primary font-semibold">(629) 206-2360</a>.</p>
+            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold">(629) 401-0054</a> directly — 24/7.</p>
             
             {isSubmitted ? (
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 text-center" data-testid="message-success">
                 <p className="text-primary font-bold text-lg mb-2">Thank you!</p>
-                <p className="text-muted-foreground">Nova Havens has received your message and will be in touch within one business day. For urgent requests, call (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360.</p>
+                <p className="text-muted-foreground">Nova Havens has received your message and will be in touch within one business day. For urgent requests, call (629) 401-0054.</p>
               </div>
             ) : (
               <Form {...form}>

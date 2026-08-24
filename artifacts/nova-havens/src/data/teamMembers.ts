@@ -38,7 +38,8 @@ export interface TeamMember {
   /** Omit entirely when no role is confirmed — the card shows no role line. */
   role?: string;
   initials: string;
-  profile: TeamMemberProfile;
+  /** Omitted until the member submits the profile form — card stays static. */
+  profile?: TeamMemberProfile;
   /** Synced profile photo URL (served from Object Storage). Null/absent = initials avatar. */
   photoUrl?: string | null;
 }
@@ -103,5 +104,11 @@ export const TEAM_MEMBERS: TeamMember[] = [
       laugh: "Funny husky videos, and any movie with Kevin Hart.",
       spareTime: "Exploring — I recently started traveling.",
     },
+  },
+  {
+    // No profile form submission yet — card renders static, with no modal.
+    name: "Alejandra",
+    role: "[Role TBC]",
+    initials: "A",
   },
 ];

@@ -102,7 +102,7 @@ The pattern behind both is the same: they are the details people assume will be 
 
 Submit anyway. A partial request in the system beats a complete request sitting in a draft email. The team follows up on gaps directly, and the request is logged and moving in the meantime.
 
-For urgent situations — a family with nowhere to sleep tonight — call (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360, rather than submitting a form.
+For urgent situations — a family with nowhere to sleep tonight — call (629) 401-0054 rather than submitting a form.
 
 ## Frequently Asked Questions
 
@@ -220,7 +220,7 @@ Your coverage and your carrier's authorisation determine what is available to yo
 
 Once housing is authorised, Nova Havens handles finding and arranging the home itself. You do not have to search listings or call landlords. The options are brought to you.
 
-If you need to speak to someone, call (629) 401-0054 — or the After Hours Specialty Line at (629) 206-2360. Someone is available.
+If you need to speak to someone, call (629) 401-0054. Someone is available.
 
 ## Frequently Asked Questions
 

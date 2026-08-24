@@ -32,10 +32,6 @@ export const COMPANY_FACTS: { term: string; definition: string }[] = [
     definition: '(629) 401-0054',
   },
   {
-    term: 'After Hours Specialty Line',
-    definition: '(629) 206-2360',
-  },
-  {
     term: 'Email',
     definition: 'info@novahavens.com',
   },

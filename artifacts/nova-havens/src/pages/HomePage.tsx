@@ -8,11 +8,16 @@ import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-carousel';
 import AskAiAboutUs from '@/components/AskAiAboutUs';
 
-const PARTNER_LOGOS = [
+type PartnerLogo = { name: string; logo?: string; logoClass?: string; showName: boolean };
+
+const PARTNER_LOGOS: PartnerLogo[] = [
   { name: 'Allstate', logo: '/logos/allstate.png', logoClass: 'h-8', showName: true },
   { name: 'Travelers', logo: '/logos/travelers.png', logoClass: 'h-8', showName: true },
   { name: 'Farmers Insurance', logo: '/logos/farmers.svg', logoClass: 'h-9', showName: true },
   { name: 'State Farm', logo: '/logos/state-farm.svg', logoClass: 'h-6', showName: false },
+  { name: 'Mercury', showName: true },
+  { name: 'Lemonade', showName: true },
+  { name: 'Chubb', showName: true },
 ];
 
 const SHOWCASE_SLIDES: ElegantSlide[] = [
@@ -63,7 +68,7 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
 const FAQ_ITEMS = [
   {
     question: "How quickly can Nova Havens place a displaced family?",
-    answer: "Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets. Our automated claim-intake system surfaces matched properties within hours so coordinators can reach the family the same day a claim is submitted."
+    answer: "Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets."
   },
   {
     question: "Does Nova Havens work with all insurance carriers?",
@@ -71,19 +76,15 @@ const FAQ_ITEMS = [
   },
   {
     question: "Are pet-friendly furnished homes available nationwide?",
-    answer: "Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. When you contact Nova Havens, simply share your pet's species, breed, and weight and a coordinator will match your family to a compatible property. Most pet deposits are covered under ALE policies."
+    answer: "Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. All Nova Havens needs for placement is your pet's species, breed, and weight — a coordinator will match your family to a compatible property."
   },
   {
     question: "Which states does Nova Havens operate in?",
     answer: "Nova Havens operates in all 48 contiguous US states, as of 2025. This includes major metros and rural areas, so families displaced in smaller communities receive the same quality of service as those in large cities."
   },
   {
-    question: "What does a 'fully furnished' Nova Havens home include?",
-    answer: "Every Nova Havens property includes beds with quality linens, a fully equipped kitchen with cookware and dishes, high-speed Wi-Fi, a streaming-ready TV, and washer/dryer access. Properties are verified by Nova Havens coordinators before being listed in the network — so what you see is what you get."
-  },
-  {
     question: "How do I request emergency housing through Nova Havens?",
-    answer: "To request emergency furnished housing through Nova Havens, call (629) 401-0054 — or the After Hours Specialty Line at (629) 206-2360 — or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly."
+    answer: "To request emergency furnished housing through Nova Havens, call (629) 401-0054 or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly."
   },
   {
     question: "How does Nova Havens coordinate with my insurance adjuster?",
@@ -91,7 +92,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Can I list my furnished property with Nova Havens?",
-    answer: "Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360, or visit the Contact page to get started."
+    answer: "Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054 or visit the Contact page to get started."
   }
 ];
 
@@ -159,6 +160,23 @@ const STATE_CENTROIDS: Record<string, StateCentroid> = {
   DC: { name: 'Washington, DC', lat: 38.9072, lng: -77.0369 },
 };
 
+/**
+ * Tile-grid layout of the 48 contiguous states, arranged in a rough US shape.
+ * Used for the coverage map — no counts, clusters, or sized markers.
+ */
+const STATE_TILE_GRID: (string | null)[][] = [
+  [null, null, null, null, null, null, null, null, null, null, 'ME'],
+  [null, null, null, null, null, null, null, null, null, 'VT', 'NH'],
+  ['WA', 'ID', 'MT', 'ND', 'MN', 'WI', null, 'MI', 'NY', 'CT', 'MA'],
+  ['OR', 'NV', 'WY', 'SD', 'IA', 'IL', 'IN', 'OH', 'PA', 'NJ', 'RI'],
+  ['CA', 'UT', 'CO', 'NE', 'MO', 'KY', 'WV', 'VA', 'MD', 'DE', null],
+  [null, 'AZ', 'NM', 'KS', 'AR', 'TN', 'NC', 'SC', null, null, null],
+  [null, null, null, 'OK', 'LA', 'MS', 'AL', 'GA', null, null, null],
+  [null, null, null, 'TX', null, null, null, 'FL', null, null, null],
+];
+
+const CONTIGUOUS_STATE_CODES = STATE_TILE_GRID.flat().filter((code): code is string => Boolean(code));
+
 const FALLBACK_CITIES: PropertyCity[] = [
   { city: 'Nashville, TN', lat: 36.1627, lng: -86.7816, count: 1 },
   { city: 'Los Angeles, CA', lat: 34.0522, lng: -118.2437, count: 1 },
@@ -183,7 +201,12 @@ export default function HomePage() {
   byState: {},
     cities: FALLBACK_CITIES,
   });
-  const [selectedState, setSelectedState] = useState<string | null>(null);
+  // Highlight the states with live coverage; before the stats file loads (or if
+  // it has no per-state breakdown yet) show the full contiguous footprint.
+  const mappedStates = Object.entries(propertyStats.byState)
+    .filter(([, count]) => count > 0)
+    .map(([code]) => code);
+  const coveredStates = new Set(mappedStates.length > 0 ? mappedStates : CONTIGUOUS_STATE_CODES);
 
   useEffect(() => {
     fetch('/property-stats.json', { cache: 'no-cache' })
@@ -343,10 +366,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      {/* 5. The Nova Havens Experience */}
+      {/* 5. Amenities */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4" data-testid="heading-experience">What Does a Nova Havens Furnished Home Include?</h2>
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4" data-testid="heading-experience">Amenities Nova Havens families need most</h2>
           <p className="text-lg text-muted-foreground" data-testid="subtitle-experience">Every verified Nova Havens property is move-in ready from day one</p>
         </div>
         
@@ -413,61 +436,38 @@ export default function HomePage() {
       </section>
       {/* 7. Where We Operate */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12" data-testid="heading-map">Where Does Nova Havens Operate?</h2>
-        
-        <div className="w-full min-h-[var(--min-h-map-md)] bg-card rounded-lg border border-white/10 mb-12 relative overflow-hidden" data-testid="card-map">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" data-testid="heading-map">Where Does Nova Havens Operate?</h2>
+        <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto" data-testid="text-map-coverage">
+          Nova Havens operates across the 48 contiguous United States.
+        </p>
+
+        <div className="w-full bg-card rounded-lg border border-white/10 mb-12 relative overflow-hidden p-6 md:p-10" data-testid="card-map">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-          <div className="absolute inset-x-8 inset-y-6" aria-label="Property locations map">
-            {Object.entries(propertyStats.byState)
-              .filter(([stateCode, count]) => count > 0 && Boolean(STATE_CENTROIDS[stateCode]))
-              .map(([stateCode, count]) => {
-                const state = STATE_CENTROIDS[stateCode];
-                if (!state) return null;
-                const left = Math.max(2, Math.min(98, ((state.lng + 125) / 60) * 100));
-                const top = Math.max(5, Math.min(95, ((50 - state.lat) / 28) * 100));
-                const size = Math.min(54, 12 + Math.sqrt(count / 20) * 5);
-                const isSelected = selectedState === stateCode;
-                return (
-                  <button
-                    key={stateCode}
-                    type="button"
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/70 border-2 border-primary shadow-[var(--shadow-glow-lg)] transition-all hover:bg-primary hover:z-20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-2 ${isSelected ? 'z-30 ring-2 ring-primary ring-offset-2 ring-offset-surface-2' : 'z-10'}`}
-                    style={{ left: `${left}%`, top: `${top}%`, width: size, height: size }}
-                    onClick={() => setSelectedState(isSelected ? null : stateCode)}
-                    aria-label={`${state.name} (${stateCode}): ${count.toLocaleString()} properties`}
-                    title={`${state.name} (${stateCode}): ${count.toLocaleString()} properties`}
-                  />
-                );
-              })}
-            {propertyStats.cities.map((city) => {
-              const left = Math.max(3, Math.min(97, ((city.lng + 125) / 60) * 100));
-              const top = Math.max(5, Math.min(95, ((50 - city.lat) / 28) * 100));
-              const size = Math.min(26, 10 + Math.log10(city.count + 1) * 5);
-              return (
-                <div key={city.city} className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${left}%`, top: `${top}%` }}>
-                  <span
-                    className="block rounded-full bg-primary border-2 border-primary/70 shadow-[var(--shadow-glow-md)]"
-                    style={{ width: size, height: size }}
-                    title={`${city.city}: ${city.count.toLocaleString()} properties`}
-                  />
-                  <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                    {city.city}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          {selectedState && STATE_CENTROIDS[selectedState] && (
-            <div className="absolute top-4 right-4 z-40 rounded-lg border border-primary/50 bg-background/90 px-4 py-3 shadow-xl">
-              <div className="text-xs uppercase tracking-wider text-primary">{selectedState}</div>
-              <div className="font-semibold text-foreground">{STATE_CENTROIDS[selectedState].name}</div>
-              <div className="text-sm text-muted-foreground">
-                {(propertyStats.byState[selectedState] ?? 0).toLocaleString()} properties
+          <div className="relative flex flex-col gap-1.5 md:gap-2" role="img" aria-label="Map of the 48 contiguous United States with the states Nova Havens serves highlighted">
+            {STATE_TILE_GRID.map((row, rowIdx) => (
+              <div key={rowIdx} className="grid grid-cols-11 gap-1.5 md:gap-2">
+                {row.map((stateCode, colIdx) => {
+                  if (!stateCode) return <div key={`empty-${rowIdx}-${colIdx}`} aria-hidden="true" />;
+                  const covered = coveredStates.has(stateCode);
+                  return (
+                    <div
+                      key={stateCode}
+                      className={`aspect-square rounded-sm flex items-center justify-center text-xs font-bold tracking-tight transition-colors ${
+                        covered
+                          ? 'bg-primary/20 border border-primary/40 text-primary'
+                          : 'bg-surface-3 border border-white/5 text-muted-foreground/40'
+                      }`}
+                      title={`${STATE_CENTROIDS[stateCode]?.name ?? stateCode}${covered ? ' — served by Nova Havens' : ''}`}
+                    >
+                      {stateCode}
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          )}
-          <div className="absolute bottom-4 left-5 flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-primary" aria-hidden="true" /> Live mapped property markets
+            ))}
+          </div>
+          <div className="relative mt-6 flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="w-3 h-3 rounded-sm bg-primary/20 border border-primary/40" aria-hidden="true" /> States served by Nova Havens
           </div>
         </div>
 
@@ -503,7 +503,7 @@ export default function HomePage() {
         <div className="max-w-site mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold mb-3 text-left" data-testid="heading-partners">Our trusted industry partners.</h2>
-            <p className="text-muted-foreground" data-testid="subtitle-partners">Nova Havens coordinates placements alongside the nation's leading insurance carriers, including:</p>
+            <p className="text-muted-foreground" data-testid="subtitle-partners">Nova Havens works with leading insurance carriers nationwide.</p>
           </div>
           
           <div className="relative overflow-hidden" data-testid="marquee-partners">
@@ -515,7 +515,9 @@ export default function HomePage() {
                 <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
                   {PARTNER_LOGOS.map((partner, idx) => (
                     <div key={partner.name} className="flex items-center gap-4 bg-card border border-white/5 rounded-sm px-8 py-6 mx-3 shrink-0" data-testid={copy === 0 ? `card-partner-${idx}` : undefined}>
-                      <img src={partner.logo} alt={copy === 0 ? `${partner.name} logo` : ''} className={`w-auto object-contain ${partner.logoClass}`} loading="lazy" />
+                      {partner.logo && (
+                        <img src={partner.logo} alt={copy === 0 ? `${partner.name} logo` : ''} className={`w-auto object-contain ${partner.logoClass ?? 'h-8'}`} loading="lazy" />
+                      )}
                       {partner.showName && (
                         <span className="font-extrabold text-lg md:text-xl text-foreground tracking-tight whitespace-nowrap">{partner.name}</span>
                       )}
@@ -533,7 +535,7 @@ export default function HomePage() {
         
         <Tabs defaultValue="adjusters" className="w-full flex flex-col items-center">
           <TabsList className="bg-card border border-white/10 p-1 rounded-full h-auto flex flex-col sm:flex-row w-full sm:w-auto mb-12" data-testid="tabs-how-it-works">
-            <TabsTrigger value="adjusters" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-adjusters">Adjusters & Carriers</TabsTrigger>
+            <TabsTrigger value="adjusters" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-adjusters">Carriers & Relocation Specialists</TabsTrigger>
             <TabsTrigger value="families" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-families">Displaced Families</TabsTrigger>
             <TabsTrigger value="owners" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-owners">Property Owners</TabsTrigger>
           </TabsList>
@@ -545,17 +547,17 @@ export default function HomePage() {
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-1">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Submit a Claim</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Share the claim details with Nova Havens via phone or portal — household size, location, pets, and accessibility needs</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Send Nova Havens the claim details — household size, location, and pets</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-2">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Review Placement Options</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens surfaces verified homes within your parameters within hours — scored by suitability, proximity, and availability</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens sends back verified homes that match, usually within hours</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-3">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Approve & Coordinate</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens handles all logistics with the family directly and keeps you updated with proactive status notifications</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens handles move-in with the family and keeps carriers and relocation specialists updated</p>
               </div>
             </div>
           </TabsContent>
@@ -589,27 +591,33 @@ export default function HomePage() {
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-1">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Submit Your Property</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Tell Nova Havens about your furnished home — location, size, amenities, pet policy, and availability</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Tell Nova Havens about your furnished home — location, size, and availability</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-2">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Get Verified</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">A Nova Havens coordinator inspects and onboards your property into the network, verifying it meets our furnishing and safety standards</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">A coordinator checks your property against Nova Havens furnishing and safety standards</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-3">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Start Hosting</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens matches your property with displaced families and handles all coordination — you deal with us, not the family directly</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens matches your home with displaced families and handles the coordination</p>
               </div>
             </div>
           </TabsContent>
         </Tabs>
+
+        <div className="flex justify-center mt-12">
+          <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-how-it-works-submit-claim">
+            Submit a Claim
+          </a>
+        </div>
       </section>
       {/* 11. Reviews Carousel */}
       <section className="py-20 md:py-24 w-full bg-surface-1 border-y border-white/5 overflow-hidden">
         <div className="max-w-site mx-auto px-4 md:px-8">
           <div className="flex justify-between items-end mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold" data-testid="heading-reviews">What Our Clients Say</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold" data-testid="heading-reviews">What displaced families say</h2>
             <div className="hidden md:flex gap-3">
               <Button aria-label="Previous review" variant="outline" size="icon" onClick={scrollPrev} className="rounded-full border-white/20 hover:bg-white/5 text-foreground hover:text-primary border bg-transparent" data-testid="btn-carousel-prev">
                 <MoveRight className="w-4 h-4 rotate-180" aria-hidden="true" />
@@ -707,14 +715,20 @@ export default function HomePage() {
       <section className="w-full py-12 px-4 bg-surface-1 border-y border-white/5">
         <div className="max-w-prose-wide mx-auto text-center flex flex-col items-center gap-4 text-foreground">
           <Phone className="w-8 h-8 text-primary" />
-          <a href="tel:6294010054" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-phone">
-            (629) 401-0054
+          <a href="tel:6292062360" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-after-hours-phone">
+            (629) 206-2360
           </a>
-          <a href="tel:6292062360" className="text-base md:text-lg font-bold text-primary hover:opacity-80 transition-opacity" data-testid="link-emergency-after-hours-phone">
-            After Hours Specialty Line: (629) 206-2360
-          </a>
+          <p className="text-sm md:text-base font-semibold uppercase tracking-widest text-primary" data-testid="text-emergency-after-hours-label">
+            After Hours Specialty Line
+          </p>
           <p className="text-base md:text-lg font-medium text-muted-foreground" data-testid="text-emergency-desc">
-            Nova Havens is available 24/7 for emergency housing claims and placement inquiries
+            Displaced and need somewhere to stay tonight? Call Nova Havens — someone answers 24/7.
+          </p>
+          <p className="text-sm md:text-base text-muted-foreground" data-testid="text-emergency-main-line">
+            Main line:{' '}
+            <a href="tel:6294010054" className="font-bold text-foreground hover:text-primary transition-colors" data-testid="link-emergency-phone">
+              (629) 401-0054
+            </a>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-request-housing">
@@ -723,23 +737,6 @@ export default function HomePage() {
             <Link href="/contact" className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors border border-primary text-primary hover:bg-primary/10 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-contact-page">
               Contact Page
             </Link>
-          </div>
-        </div>
-      </section>
-      {/* 13. Closing CTA Band */}
-      <section className="py-24 px-4 md:px-8 w-full bg-card">
-        <div className="max-w-prose-wide mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-foreground" data-testid="heading-cta">Ready to get started with Nova Havens?</h2>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed" data-testid="subtitle-cta">
-            Request emergency furnished housing for a displaced family, or join our network as a property owner — Nova Havens responds to both 24/7.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-cta-primary">
-              Start a Housing Request
-            </a>
-            <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors border border-primary text-primary hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-cta-secondary">
-              Submit Property Details
-            </a>
           </div>
         </div>
       </section>
