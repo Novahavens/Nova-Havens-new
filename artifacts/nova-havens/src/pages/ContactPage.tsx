@@ -29,6 +29,11 @@ export default function ContactPage() {
     defaultValues: CONTACT_FORM_DEFAULT_VALUES
   });
 
+  // Honeypot: hidden from people and assistive technology, but present in the
+  // DOM for scripts that blindly fill every input. The API rejects any
+  // submission that arrives with it filled in.
+  const honeypotRef = React.useRef<HTMLInputElement>(null);
+
   const onSubmit = async (data: FormValues) => {
     setSubmitError(null);
 
@@ -36,7 +41,7 @@ export default function ContactPage() {
       const response = await fetch(`${import.meta.env.BASE_URL}api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, company: honeypotRef.current?.value ?? '' }),
       });
 
       if (!response.ok) {
@@ -150,6 +155,20 @@ export default function ContactPage() {
             ) : (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  {/* Bot trap — never shown, never focusable, never announced. */}
+                  <div aria-hidden="true" className="hidden">
+                    <label htmlFor="contact-company">Company (leave blank)</label>
+                    <input
+                      id="contact-company"
+                      name="company"
+                      type="text"
+                      ref={honeypotRef}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      defaultValue=""
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}

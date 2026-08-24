@@ -601,6 +601,10 @@ test.describe('Contact form', () => {
       name: 'Jane Doe',
       email: 'jane@example.com',
       subject: 'Housing Request',
+      // The honeypot the API uses to spot bots: a person never sees this field,
+      // so a real submission must always carry it empty. Sending anything else
+      // would get genuine visitors rejected as spam.
+      company: '',
     });
 
     expect(

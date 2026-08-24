@@ -1,9 +1,10 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type Request } from "express";
 
 /**
  * Receives messages from the Nova Havens contact page:
  *
- *   POST /api/contact — validates the submission, hands it to the store and
+ *   POST /api/contact — throttles the sender, screens out obvious bots,
+ *                       validates the submission, hands it to the store and
  *                       logs only that it arrived.
  *
  * The frontend only shows its confirmation panel once this responds 2xx, so
@@ -118,13 +119,163 @@ export function validateContactSubmission(
   };
 }
 
+/**
+ * A tiny in-process fixed-window rate limiter.
+ *
+ * A public, unauthenticated write endpoint needs a cheap way to stop a scripted
+ * client from inserting rows in a loop. This deliberately avoids a dependency
+ * and a shared store: a single API process serves the site, so an approximate
+ * per-process limit is enough to keep the inbox usable. Counters live in memory
+ * and expired windows are pruned on every check, so the map cannot grow beyond
+ * the set of senders seen within one window.
+ */
+export type RateLimitDecision =
+  | { allowed: true; remaining: number }
+  | { allowed: false; retryAfterSeconds: number };
+
+export type RateLimiter = {
+  /** Records a hit for `key` and reports whether it is within the limit. */
+  check(key: string): RateLimitDecision;
+};
+
+export type RateLimiterOptions = {
+  /** Maximum number of requests allowed per key within one window. */
+  limit: number;
+  /** Window length in milliseconds. */
+  windowMs: number;
+  /** Injectable clock, so tests do not have to wait out a real window. */
+  now?: () => number;
+};
+
+export function createRateLimiter({
+  limit,
+  windowMs,
+  now = Date.now,
+}: RateLimiterOptions): RateLimiter {
+  const windows = new Map<string, { count: number; resetAt: number }>();
+
+  return {
+    check(key) {
+      const timestamp = now();
+
+      for (const [existingKey, window] of windows) {
+        if (window.resetAt <= timestamp) {
+          windows.delete(existingKey);
+        }
+      }
+
+      const window = windows.get(key);
+
+      if (!window) {
+        windows.set(key, { count: 1, resetAt: timestamp + windowMs });
+        return { allowed: true, remaining: limit - 1 };
+      }
+
+      if (window.count >= limit) {
+        return {
+          allowed: false,
+          retryAfterSeconds: Math.max(
+            1,
+            Math.ceil((window.resetAt - timestamp) / 1000),
+          ),
+        };
+      }
+
+      window.count += 1;
+      return { allowed: true, remaining: limit - window.count };
+    },
+  };
+}
+
+/**
+ * A field the real form keeps hidden from people but leaves in the DOM. A
+ * visitor never sees it, so anything filled in came from a script that submits
+ * every input it finds. Kept in sync with the hidden input rendered by
+ * artifacts/nova-havens/src/pages/ContactPage.tsx.
+ */
+export const CONTACT_HONEYPOT_FIELD = "company";
+
+/**
+ * Returns true when the submission carries the tell-tale signs of a bot. Only
+ * signals that a person filling the form normally can never trigger belong
+ * here — a false positive silently loses a real housing request.
+ */
+export function looksLikeSpam(body: unknown): boolean {
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return false;
+  }
+
+  const honeypot = (body as Record<string, unknown>)[CONTACT_HONEYPOT_FIELD];
+
+  return typeof honeypot === "string" && honeypot.trim() !== "";
+}
+
+/**
+ * Generous enough that a visitor who resends after a typo or a failed attempt
+ * is never blocked, tight enough that a script cannot fill the table.
+ */
+const RATE_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 } as const;
+
+/**
+ * How many proxy hops sit in front of this server: exactly one, the Replit
+ * edge proxy that terminates the visitor's connection.
+ *
+ * Express counts X-Forwarded-For from the right, so trusting one hop resolves
+ * `req.ip` to the address that trusted proxy actually observed. Anything a
+ * caller injects into the header themselves ends up further left and is
+ * ignored — which is what keeps a script from minting a fresh throttling
+ * bucket (or burning someone else's) per request. Trusting every hop
+ * (`true`) would hand that control straight to the caller.
+ */
+export const TRUSTED_PROXY_HOPS = 1;
+
+/**
+ * Identifies the sender for throttling. `req.ip` honours X-Forwarded-For only
+ * as far as TRUSTED_PROXY_HOPS allows (configured in app.ts); the socket
+ * address is the fallback so a missing header can never collapse every visitor
+ * into one shared bucket key silently.
+ */
+function senderKey(req: Request): string {
+  return req.ip ?? req.socket.remoteAddress ?? "unknown";
+}
+
+export type ContactRouterOptions = {
+  /** Overridable so tests can drive the window without waiting on the clock. */
+  rateLimiter?: RateLimiter;
+};
+
 export function createContactRouter(
   store: ContactStore,
   notifier?: ContactNotifier,
+  options: ContactRouterOptions = {},
 ): IRouter {
   const router: IRouter = Router();
+  const rateLimiter = options.rateLimiter ?? createRateLimiter(RATE_LIMIT);
 
   router.post("/contact", async (req, res) => {
+    const decision = rateLimiter.check(senderKey(req));
+
+    if (!decision.allowed) {
+      req.log.warn(
+        { retryAfterSeconds: decision.retryAfterSeconds },
+        "Contact form submission throttled",
+      );
+      res.setHeader("Retry-After", String(decision.retryAfterSeconds));
+      res.status(429).json({
+        error:
+          "Too many messages sent from this connection. Please wait a few minutes and try again, or call (629) 401-0054.",
+      });
+      return;
+    }
+
+    if (looksLikeSpam(req.body)) {
+      // Nothing is stored and nothing is notified: the response deliberately
+      // says no more than any other rejection so a bot learns nothing.
+      req.log.warn("Contact form submission rejected as spam");
+      res.status(400).json({ error: "Submission rejected" });
+      return;
+    }
+
     const result = validateContactSubmission(req.body);
 
     if (!result.ok) {

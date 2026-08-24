@@ -17,6 +17,10 @@ import express from "express";
 import type { AddressInfo } from "node:net";
 import {
   createContactRouter,
+  CONTACT_HONEYPOT_FIELD,
+  createRateLimiter,
+  TRUSTED_PROXY_HOPS,
+  type ContactRouterOptions,
   type ContactStore,
   type ContactNotifier,
   type ContactSubmissionInput,
@@ -35,38 +39,56 @@ const VALID_SUBMISSION = {
 async function withServer(
   store: ContactStore,
   run: (
-    post: (body: unknown) => Promise<{ status: number; body: unknown }>,
+    post: (
+      body: unknown,
+      forwardedFor?: string,
+    ) => Promise<{ status: number; body: unknown; headers: Headers }>,
     logs: LogCall[],
   ) => Promise<void>,
   notifier?: ContactNotifier,
+  options?: ContactRouterOptions,
 ): Promise<void> {
   const logs: LogCall[] = [];
   const app = express();
+  // Mirrors the production configuration in src/app.ts so these tests exercise
+  // the same X-Forwarded-For handling the deployed server uses.
+  app.set("trust proxy", TRUSTED_PROXY_HOPS);
   app.use(express.json());
   app.use((req, _res, next) => {
     // Stands in for pino-http's per-request logger.
     (req as unknown as { log: unknown }).log = {
       info: (bindings: unknown, message: string) =>
         logs.push({ bindings, message }),
+      warn: (bindings: unknown, message?: string) =>
+        typeof bindings === "string"
+          ? logs.push({ bindings: undefined, message: bindings })
+          : logs.push({ bindings, message: message ?? "" }),
       error: (bindings: unknown, message: string) =>
         logs.push({ bindings, message }),
     };
     next();
   });
-  app.use("/api", createContactRouter(store, notifier));
+  app.use("/api", createContactRouter(store, notifier, options));
 
   const server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
   const { port } = server.address() as AddressInfo;
 
   try {
-    await run(async (body) => {
+    await run(async (body, forwardedFor) => {
       const response = await fetch(`http://127.0.0.1:${port}/api/contact`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(forwardedFor ? { "X-Forwarded-For": forwardedFor } : {}),
+        },
         body: JSON.stringify(body),
       });
-      return { status: response.status, body: await response.json() };
+      return {
+        status: response.status,
+        body: await response.json(),
+        headers: response.headers,
+      };
     }, logs);
   } finally {
     await new Promise((resolve) => server.close(resolve));
@@ -233,4 +255,138 @@ test("never writes submitted values to the log stream", async () => {
       );
     }
   });
+});
+
+test("rejects a submission that filled the honeypot field", async () => {
+  const store = recordingStore();
+
+  await withServer(store, async (post) => {
+    const { status, body } = await post({
+      ...VALID_SUBMISSION,
+      [CONTACT_HONEYPOT_FIELD]: "Acme Corp",
+    });
+
+    assert.equal(status, 400);
+    assert.deepEqual(body, { error: "Submission rejected" });
+    assert.deepEqual(store.saved, []);
+  });
+});
+
+test("stores a submission whose honeypot field is present but empty", async () => {
+  const store = recordingStore();
+
+  await withServer(store, async (post) => {
+    const { status } = await post({
+      ...VALID_SUBMISSION,
+      [CONTACT_HONEYPOT_FIELD]: "",
+    });
+
+    assert.equal(status, 201);
+    assert.equal(store.saved.length, 1);
+  });
+});
+
+test("throttles repeated submissions from the same sender", async () => {
+  const store = recordingStore();
+  let clock = 0;
+  const rateLimiter = createRateLimiter({
+    limit: 3,
+    windowMs: 60_000,
+    now: () => clock,
+  });
+
+  await withServer(
+    store,
+    async (post) => {
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        const { status } = await post(VALID_SUBMISSION);
+        assert.equal(status, 201);
+      }
+
+      const { status, body } = await post(VALID_SUBMISSION);
+      assert.equal(status, 429);
+      assert.match((body as { error: string }).error, /Too many messages/);
+      assert.equal(store.saved.length, 3);
+
+      // Once the window rolls over, the same visitor is served again.
+      clock += 60_001;
+      const after = await post(VALID_SUBMISSION);
+      assert.equal(after.status, 201);
+      assert.equal(store.saved.length, 4);
+    },
+    undefined,
+    { rateLimiter },
+  );
+});
+
+test("lets a visitor resend after a validation error without being throttled", async () => {
+  const store = recordingStore();
+  const rateLimiter = createRateLimiter({ limit: 5, windowMs: 60_000 });
+
+  await withServer(
+    store,
+    async (post) => {
+      for (const message of ["short", "tiny", "nope"]) {
+        const { status } = await post({ ...VALID_SUBMISSION, message });
+        assert.equal(status, 400);
+      }
+
+      const { status } = await post(VALID_SUBMISSION);
+      assert.equal(status, 201);
+      assert.equal(store.saved.length, 1);
+    },
+    undefined,
+    { rateLimiter },
+  );
+});
+
+test("returns Retry-After when a sender is throttled", async () => {
+  const store = recordingStore();
+  const rateLimiter = createRateLimiter({
+    limit: 1,
+    windowMs: 60_000,
+    now: () => 0,
+  });
+
+  await withServer(
+    store,
+    async (post) => {
+      await post(VALID_SUBMISSION);
+      const { status, headers } = await post(VALID_SUBMISSION);
+
+      assert.equal(status, 429);
+      assert.equal(headers.get("retry-after"), "60");
+    },
+    undefined,
+    { rateLimiter },
+  );
+});
+
+test("ignores a caller-supplied forwarded address when throttling", async () => {
+  const store = recordingStore();
+  const rateLimiter = createRateLimiter({ limit: 2, windowMs: 60_000 });
+
+  await withServer(
+    store,
+    async (post) => {
+      // The trusted proxy appends the address it observed, so the real sender
+      // is always the right-most entry. Everything to its left is whatever the
+      // caller injected — a bot rotating those values must not win a fresh
+      // bucket each time.
+      const spoofed = (fake: string) => `${fake}, 203.0.113.7`;
+
+      assert.equal((await post(VALID_SUBMISSION, spoofed("1.1.1.1"))).status, 201);
+      assert.equal((await post(VALID_SUBMISSION, spoofed("2.2.2.2"))).status, 201);
+
+      const blocked = await post(VALID_SUBMISSION, spoofed("3.3.3.3"));
+      assert.equal(blocked.status, 429);
+      assert.equal(store.saved.length, 2);
+
+      // A different real sender behind the same proxy is unaffected.
+      const other = await post(VALID_SUBMISSION, "3.3.3.3, 198.51.100.4");
+      assert.equal(other.status, 201);
+    },
+    undefined,
+    { rateLimiter },
+  );
 });
