@@ -22,7 +22,7 @@ export const ENTRY_BUDGET_BYTES = 500_000;
  * while a new heavy dependency on a page trips the check.
  */
 export const ROUTE_BUDGET_BYTES: Record<string, number> = {
-  'src/pages/ContactPage.tsx': 125_000,
+  'src/pages/ContactPage.tsx': 62_000,
   'src/pages/HomePage.tsx': 105_000,
   'src/pages/LlmsTxtPage.tsx': 30_000,
   'src/pages/AboutPage.tsx': 30_000,

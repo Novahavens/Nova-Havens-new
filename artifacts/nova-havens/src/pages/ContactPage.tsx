@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { NativeSelect } from '@/components/ui/native-select';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import {
   CONTACT_FORM_DEFAULT_VALUES,
@@ -199,20 +199,20 @@ export default function ContactPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Subject *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="bg-background border-white/10 text-foreground" data-testid="select-subject">
-                                <SelectValue placeholder="Select a subject" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-card border-white/10 text-foreground">
-                              <SelectItem value="General Inquiry">General Inquiry</SelectItem>
-                              <SelectItem value="Housing Request">Housing Request — Displaced Family or Adjuster</SelectItem>
-                              <SelectItem value="Property Submission">Property Submission — Join the Network</SelectItem>
-                              <SelectItem value="Partnership">Carrier or Partner Inquiry</SelectItem>
-                              <SelectItem value="Press">Press</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <NativeSelect
+                              placeholder="Select a subject"
+                              className="bg-background border-white/10 text-foreground"
+                              data-testid="select-subject"
+                              {...field}
+                            >
+                              <option value="General Inquiry">General Inquiry</option>
+                              <option value="Housing Request">Housing Request — Displaced Family or Adjuster</option>
+                              <option value="Property Submission">Property Submission — Join the Network</option>
+                              <option value="Partnership">Carrier or Partner Inquiry</option>
+                              <option value="Press">Press</option>
+                            </NativeSelect>
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
