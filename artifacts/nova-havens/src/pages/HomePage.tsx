@@ -609,7 +609,7 @@ export default function HomePage() {
 
         <div className="flex justify-center mt-12">
           <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-how-it-works-submit-claim">
-            Submit a Claim
+            Request Housing
           </a>
         </div>
       </section>
