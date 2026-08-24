@@ -4,7 +4,15 @@
  */
 
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+  utimesSync,
+  writeFileSync,
+} from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -12,8 +20,10 @@ import test from 'node:test';
 
 import {
   DEFAULT_ROUTE_BUDGET_BYTES,
+  DEFAULT_SOURCE_ROOT,
   ENTRY_BUDGET_BYTES,
   ROUTE_BUDGET_BYTES,
+  SOURCE_PATHS,
   validateBundleBudget,
 } from '../scripts/validate-bundle-budget.ts';
 
@@ -42,6 +52,31 @@ test.after(() => {
 function writeSizedFile(path: string, bytes: number): void {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, 'x'.repeat(bytes));
+}
+
+/** Sets the modification time of every file under a directory tree. */
+function setMtimes(dir: string, when: Date): void {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) setMtimes(path, when);
+    else utimesSync(path, when, when);
+  }
+}
+
+/**
+ * A throwaway source tree the validator dates the build output against. Its
+ * files are backdated by default so a freshly written dist looks current.
+ */
+function makeSourceRoot({ ageMs = 60_000 }: { ageMs?: number } = {}): string {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'bundle-budget-src-'));
+  createdDirs.push(sourceRoot);
+
+  writeFileSync(join(sourceRoot, 'index.html'), '<!doctype html>');
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+  writeFileSync(join(sourceRoot, 'src', 'App.tsx'), 'export default null;\n');
+  setMtimes(sourceRoot, new Date(Date.now() - ageMs));
+
+  return sourceRoot;
 }
 
 /** Builds a throwaway dist/public tree that looks like a real Vite build. */
@@ -85,7 +120,13 @@ function makeDist(fixture: Fixture = {}): string {
 }
 
 function run(fixture: Fixture = {}) {
-  return validateBundleBudget({ distDir: makeDist(fixture), log: () => {} });
+  const sourceRoot = makeSourceRoot();
+
+  return validateBundleBudget({
+    distDir: makeDist(fixture),
+    sourceRoot,
+    log: () => {},
+  });
 }
 
 test('a healthy build passes and reports what it measured', () => {
@@ -215,6 +256,87 @@ test('an index.html without a module entry fails', () => {
     () => run({ indexHtml: '<!doctype html><p>no script here</p>' }),
     /could not find a <script type="module"/,
   );
+});
+
+test('output older than the source is reported as stale, not over budget', () => {
+  // An old build that would blow the entry budget: the message must talk about
+  // staleness so nobody chases a size regression that no longer exists.
+  const distDir = makeDist({ entryBytes: ENTRY_BUDGET_BYTES + 152_000 });
+  const sourceRoot = makeSourceRoot({ ageMs: -60_000 });
+
+  assert.throws(
+    () => validateBundleBudget({ distDir, sourceRoot, log: () => {} }),
+    (error: Error) => {
+      assert.match(error.message, /stale build output/);
+      assert.match(error.message, /index\.html|src\/App\.tsx/);
+      assert.doesNotMatch(error.message, /exceeding/);
+      return true;
+    },
+  );
+});
+
+test('a freshly rewritten index.html does not hide stale assets', () => {
+  // Prerendering rewrites index.html after the build, so index.html alone is
+  // not evidence that the assets beside it are current.
+  const distDir = makeDist();
+  const sourceRoot = makeSourceRoot({ ageMs: -60_000 });
+
+  writeFileSync(
+    join(distDir, 'index.html'),
+    '<!doctype html><script type="module" crossorigin src="/assets/index-abc123.js"></script>',
+  );
+
+  assert.throws(
+    () => validateBundleBudget({ distDir, sourceRoot, log: () => {} }),
+    /stale build output/,
+  );
+});
+
+test('an old route chunk beside fresh output is reported as stale', () => {
+  // A rebuilt entry can sit next to a route chunk left over from an earlier
+  // build; measuring that chunk's size would be meaningless.
+  const distDir = makeDist({
+    chunkBytes: {
+      'assets/HomePage-abc123.js': ROUTE_BUDGET_BYTES['src/pages/HomePage.tsx'] + 1,
+    },
+  });
+  const sourceRoot = makeSourceRoot({ ageMs: -60_000 });
+  const old = new Date(Date.now() - 120_000);
+
+  utimesSync(join(distDir, 'assets', 'HomePage-abc123.js'), old, old);
+
+  assert.throws(
+    () => validateBundleBudget({ distDir, sourceRoot, log: () => {} }),
+    (error: Error) => {
+      assert.match(error.message, /stale build output/);
+      assert.doesNotMatch(error.message, /route chunk budgets exceeded/);
+      return true;
+    },
+  );
+});
+
+test('the stale check can be skipped for output the caller just built', () => {
+  const distDir = makeDist({ entryBytes: 200_000 });
+  const sourceRoot = makeSourceRoot({ ageMs: -60_000 });
+
+  assert.equal(
+    validateBundleBudget({
+      distDir,
+      sourceRoot,
+      skipStaleCheck: true,
+      log: () => {},
+    }).entry.size,
+    200_000,
+  );
+});
+
+test('the tracked source paths exist in the artifact', () => {
+  for (const entry of SOURCE_PATHS) {
+    assert.ok(
+      existsSync(join(DEFAULT_SOURCE_ROOT, entry)),
+      `${entry} is listed as a build input but does not exist`,
+    );
+  }
 });
 
 test('the validator runs as part of the release and test scripts', async () => {
