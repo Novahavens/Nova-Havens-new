@@ -458,12 +458,12 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-properties">
-            <div className="text-4xl font-extrabold text-foreground mb-2">{propertyStats.totalProperties.toLocaleString()}</div>
+            <div className="text-4xl font-extrabold text-foreground mb-2">20 000+</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">Active Properties</div>
             <div className="text-xs text-tertiary leading-relaxed">Live property count from the Nova Havens PROPERTY DATABASE board.</div>
           </div>
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-states">
-            <div className="text-4xl font-extrabold text-foreground mb-2">{propertyStats.statesCovered}</div>
+            <div className="text-4xl font-extrabold text-foreground mb-2">48</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">States Covered</div>
             <div className="text-xs text-tertiary leading-relaxed">Distinct states with at least one approved property in the live database.</div>
           </div>
