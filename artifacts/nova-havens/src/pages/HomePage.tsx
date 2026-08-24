@@ -31,9 +31,9 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
   {
     title: 'Walk in showers',
     subtitle: 'Rest, Restored',
-    description: 'Spacious bedrooms with quality linens and ample closet space, so displaced families can settle in immediately.',
-    imageUrl: '/property-2.webp',
-    imageAlt: 'Spacious master bedroom with quality linens and ample closet space — Nova Havens furnished home',
+    description: 'Spacious walk-in showers with easy, low-threshold entry — a practical comfort detail for families settling into a temporary home.',
+    imageUrl: '/walk-in-shower.webp',
+    imageAlt: 'Modern walk-in shower with frameless glass and tiled walls — Nova Havens furnished home',
   },
   {
     title: 'Full Kitchens',
