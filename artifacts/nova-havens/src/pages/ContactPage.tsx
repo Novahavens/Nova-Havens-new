@@ -18,6 +18,7 @@ type FormValues = ContactFormValues;
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   useEffect(() => {
     // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
@@ -28,12 +29,25 @@ export default function ContactPage() {
     defaultValues: CONTACT_FORM_DEFAULT_VALUES
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Form data:", data);
-    // Simulate API call
-    setTimeout(() => {
+  const onSubmit = async (data: FormValues) => {
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Contact endpoint responded ${response.status}`);
+      }
+
+      // Only now has the message actually reached Nova Havens.
       setIsSubmitted(true);
-    }, 500);
+    } catch {
+      setSubmitError('Your message could not be sent to Nova Havens.');
+    }
   };
 
   return (
@@ -224,8 +238,18 @@ export default function ContactPage() {
                     )}
                   />
 
-                  <Button type="submit" className="rounded-full bg-primary text-primary-foreground hover:brightness-105 font-bold px-8 py-6 h-auto" data-testid="btn-submit-contact">
-                    Send Message
+                  {submitError && (
+                    <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4" role="alert" data-testid="message-submit-error">
+                      <p className="text-sm text-foreground">
+                        {submitError}{' '}Please try again, or call{' '}
+                        <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a>
+                        {' '}— Nova Havens answers 24/7.
+                      </p>
+                    </div>
+                  )}
+
+                  <Button type="submit" disabled={form.formState.isSubmitting} className="rounded-full bg-primary text-primary-foreground hover:brightness-105 font-bold px-8 py-6 h-auto" data-testid="btn-submit-contact">
+                    {form.formState.isSubmitting ? 'Sending…' : 'Send Message'}
                   </Button>
                 </form>
               </Form>
