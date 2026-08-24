@@ -295,6 +295,13 @@ export default function BlogPostPage() {
                   >
                     (629) 401-0054
                   </a>
+                  <a
+                    href="tel:+16292062360"
+                    className="px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
+                    data-testid="link-after-hours-call-cta"
+                  >
+                    After Hours: (629) 206-2360
+                  </a>
                 </div>
               </div>
             </div>

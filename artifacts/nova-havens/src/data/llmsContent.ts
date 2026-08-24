@@ -121,7 +121,7 @@ export const LLMS_TXT_SECTIONS: LlmsSection[] = [
 - Placements typically run 30–90 days; extensions available when repair timelines require it
 - Nova Havens property network uses verified inspection standards — properties must meet furnishing, safety, and cleanliness requirements before listing
 - Insurance carriers Nova Havens coordinates with include: Allstate, Travelers, Farmers Insurance, State Farm, and others
-- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; email: info@novahavens.com`,
+- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; After Hours Specialty Line: (629) 206-2360; email: info@novahavens.com`,
   },
   {
     heading: 'Blog Content Index',
@@ -162,7 +162,7 @@ export const LLMS_TXT_SECTIONS: LlmsSection[] = [
       },
       {
         q: 'Can property owners join the Nova Havens network?',
-        a: 'Yes. Property owners with fully furnished homes in the 48 contiguous US states can apply. Nova Havens conducts a verification inspection (3–7 days), then activates the property in the network. Contact (629) 401-0054 or novahavens.com/contact to start.',
+        a: 'Yes. Property owners with fully furnished homes in the 48 contiguous US states can apply. Nova Havens conducts a verification inspection (3–7 days), then activates the property in the network. Contact (629) 401-0054, the After Hours Specialty Line at (629) 206-2360, or novahavens.com/contact to start.',
       },
       {
         q: 'Does Nova Havens use AI in its placement process?',
@@ -193,6 +193,7 @@ export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   {
     heading: 'Contact & CTA',
     content: `**Phone (24/7):** (629) 401-0054
+**After Hours Specialty Line:** (629) 206-2360
 **Email:** info@novahavens.com
 **Request housing:** https://novahavens.com/contact
 

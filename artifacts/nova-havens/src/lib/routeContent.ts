@@ -255,6 +255,7 @@ function buildBlogPostHtml(slug: string): string {
         post.cta === 'property' ? INTAKE_FORMS.property : INTAKE_FORMS.housing,
       )}">${post.cta === 'property' ? 'Submit your property' : 'Submit a housing request'}</a></p>
       <p>Call us: <a href="tel:+16294010054">(629) 401-0054</a></p>
+      <p>After Hours Specialty Line: <a href="tel:+16292062360">(629) 206-2360</a></p>
     </footer>`;
 
   return `
@@ -374,6 +375,7 @@ const CONTACT_HTML = `
     <h2>Contact Information</h2>
     <ul>
       <li>Phone: <a href="tel:+16294010054">(629) 401-0054</a></li>
+      <li>After Hours Specialty Line: <a href="tel:+16292062360">(629) 206-2360</a></li>
       <li>Email: <a href="mailto:info@novahavens.com">info@novahavens.com</a></li>
       <li>Location: Nashville, TN — serving all 48 contiguous states</li>
     </ul>
@@ -387,7 +389,7 @@ const PRIVACY_HTML = `
 <main>
   <h1>Privacy Policy</h1>
   <p>This Privacy Policy describes how Nova Havens collects, uses, and protects your personal information when you use our website and housing coordination services.</p>
-  <p>For questions about this policy, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>.</p>
+  <p>For questions about this policy, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>, or the After Hours Specialty Line at <a href="tel:+16292062360">(629) 206-2360</a>.</p>
 </main>
 `;
 
@@ -395,7 +397,7 @@ const TERMS_HTML = `
 <main>
   <h1>Terms of Service</h1>
   <p>These Terms of Service govern your use of the Nova Havens website and housing coordination services. By accessing or using our services, you agree to these terms.</p>
-  <p>For questions about these terms, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>.</p>
+  <p>For questions about these terms, contact us at <a href="mailto:info@novahavens.com">info@novahavens.com</a> or call <a href="tel:+16294010054">(629) 401-0054</a>, or the After Hours Specialty Line at <a href="tel:+16292062360">(629) 206-2360</a>.</p>
 </main>
 `;
 

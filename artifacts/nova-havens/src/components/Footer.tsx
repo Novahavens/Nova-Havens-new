@@ -31,6 +31,7 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold text-foreground mb-2">Contact</h3>
             <a href="tel:6294010054" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-phone">(629) 401-0054</a>
+            <a href="tel:6292062360" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-after-hours-phone">After Hours Specialty Line: (629) 206-2360</a>
             <a href="mailto:info@novahavens.com" className="text-muted-foreground hover:text-primary transition-colors text-sm w-fit" data-testid="link-footer-email">info@novahavens.com</a>
             <span className="text-muted-foreground text-sm" data-testid="text-footer-location">Nashville, TN</span>
           </div>

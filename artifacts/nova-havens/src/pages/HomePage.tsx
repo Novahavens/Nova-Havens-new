@@ -83,7 +83,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "How do I request emergency housing through Nova Havens?",
-    answer: "To request emergency furnished housing through Nova Havens, call (629) 401-0054 or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly."
+    answer: "To request emergency furnished housing through Nova Havens, call (629) 401-0054 — or the After Hours Specialty Line at (629) 206-2360 — or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly."
   },
   {
     question: "How does Nova Havens coordinate with my insurance adjuster?",
@@ -91,7 +91,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Can I list my furnished property with Nova Havens?",
-    answer: "Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054 or visit the Contact page to get started."
+    answer: "Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054, or the After Hours Specialty Line at (629) 206-2360, or visit the Contact page to get started."
   }
 ];
 
@@ -709,6 +709,9 @@ export default function HomePage() {
           <Phone className="w-8 h-8 text-primary" />
           <a href="tel:6294010054" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-phone">
             (629) 401-0054
+          </a>
+          <a href="tel:6292062360" className="text-base md:text-lg font-bold text-primary hover:opacity-80 transition-opacity" data-testid="link-emergency-after-hours-phone">
+            After Hours Specialty Line: (629) 206-2360
           </a>
           <p className="text-base md:text-lg font-medium text-muted-foreground" data-testid="text-emergency-desc">
             Nova Havens is available 24/7 for emergency housing claims and placement inquiries

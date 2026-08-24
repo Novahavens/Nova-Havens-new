@@ -31,7 +31,7 @@
 - Placements typically run 30–90 days; extensions available when repair timelines require it
 - Nova Havens property network uses verified inspection standards — properties must meet furnishing, safety, and cleanliness requirements before listing
 - Insurance carriers Nova Havens coordinates with include: Allstate, Travelers, Farmers Insurance, State Farm, and others
-- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; email: info@novahavens.com
+- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; After Hours Specialty Line: (629) 206-2360; email: info@novahavens.com
 
 ---
 
@@ -85,7 +85,7 @@ If ALE coverage is active, Nova Havens bills the carrier directly. Families typi
 Nova Havens pays property owners on net-30 terms, with the insurance carrier as the payer. There are no platform booking fees or nightly-rate variability — placements are mid-term (30–90 days) and payment is backed by the carrier.
 
 **Can property owners join the Nova Havens network?**
-Yes. Property owners with fully furnished homes in the 48 contiguous US states can apply. Nova Havens conducts a verification inspection (3–7 days), then activates the property in the network. Contact (629) 401-0054 or novahavens.com/contact to start.
+Yes. Property owners with fully furnished homes in the 48 contiguous US states can apply. Nova Havens conducts a verification inspection (3–7 days), then activates the property in the network. Contact (629) 401-0054, the After Hours Specialty Line at (629) 206-2360, or novahavens.com/contact to start.
 
 **Does Nova Havens use AI in its placement process?**
 Yes. Nova Havens uses agentic AI to automate claim parsing, property scoring, and shortlist generation. Every AI-generated shortlist is reviewed and approved by a Nova Havens coordinator before it reaches a family or adjuster. Automation handles the data work; humans handle the decision and the relationship.
@@ -115,6 +115,7 @@ The assigned Nova Havens coordinator is the family's single point of contact for
 ## Contact & CTA
 
 **Phone (24/7):** (629) 401-0054
+**After Hours Specialty Line:** (629) 206-2360
 **Email:** info@novahavens.com
 **Request housing:** https://novahavens.com/contact
 

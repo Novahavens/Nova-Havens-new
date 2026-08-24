@@ -58,7 +58,7 @@ const VALUES = [
   {
     icon: Clock,
     title: 'Around the clock',
-    text: 'Disasters don\u2019t keep business hours. Nova Havens coordinates emergency placements 24/7 — the team is reachable at (629) 401-0054 at any hour for urgent claims.',
+    text: 'Disasters don\u2019t keep business hours. Nova Havens coordinates emergency placements 24/7 — the team is reachable at (629) 401-0054, or on the After Hours Specialty Line at (629) 206-2360, at any hour for urgent claims.',
   },
   {
     icon: ShieldCheck,
@@ -257,6 +257,14 @@ export default function TeamPage() {
               >
                 <Phone className="w-4 h-4" aria-hidden="true" />
                 Call (629) 401-0054
+              </a>
+              <a
+                href="tel:+16292062360"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
+                data-testid="link-team-after-hours-call"
+              >
+                <Phone className="w-4 h-4" aria-hidden="true" />
+                After Hours: (629) 206-2360
               </a>
               <Link
                 href="/contact"
