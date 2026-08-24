@@ -50,6 +50,26 @@ function toTeamMember(synced: SyncedMember): TeamMember {
   };
 }
 
+function rosterKey(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Prefer the synced record for people it knows about, while retaining newly
+ * added fallback entries until the next successful roster sync publishes them.
+ */
+function mergeRoster(synced: TeamMember[]): TeamMember[] {
+  const syncedNames = new Set(synced.map((member) => rosterKey(member.name)));
+  return [
+    ...synced,
+    ...TEAM_MEMBERS.filter((member) => !syncedNames.has(rosterKey(member.name))),
+  ];
+}
+
 /** GIVE — the core values shown alongside the mission in the Our People section. */
 const GIVE_VALUES = [
   { letter: 'G', title: 'Give a damn' },
@@ -93,8 +113,9 @@ export default function TeamPage() {
   };
 
   // The live roster is synced daily into Object Storage (scripts/sync-team.js)
-  // and served at /api/team/team.json. On any failure the hardcoded fallback
-  // list stays in place — the page never renders empty.
+  // and served at /api/team/team.json. Synced people replace their fallback
+  // records, while newly added fallback entries remain visible until the next
+  // successful sync publishes them.
   useEffect(() => {
     let cancelled = false;
     fetch(`${import.meta.env.BASE_URL}api/team/team.json`)
@@ -102,7 +123,7 @@ export default function TeamPage() {
       .then((data: { members?: unknown }) => {
         if (cancelled || !Array.isArray(data?.members)) return;
         const synced = data.members.filter(isSyncedMember).map(toTeamMember);
-        if (synced.length > 0) setMembers(synced);
+        if (synced.length > 0) setMembers(mergeRoster(synced));
       })
       .catch(() => {
         /* fallback list already rendered */
@@ -146,16 +167,6 @@ export default function TeamPage() {
     setActiveMember(null);
     lastTriggerRef.current?.focus();
     lastTriggerRef.current = null;
-  };
-
-  // On desktop the grid is 6 columns with each card spanning 2. Center a
-  // partial last row: two cards shift right one column (start at col 2), a
-  // lone card shifts two (start at col 3).
-  const lastRowCount = members.length % 3;
-  const centerRowClass = (idx: number) => {
-    if (lastRowCount === 2 && idx === members.length - 2) return ' lg:col-start-2';
-    if (lastRowCount === 1 && idx === members.length - 1) return ' lg:col-start-3';
-    return '';
   };
 
   return (
@@ -214,7 +225,7 @@ export default function TeamPage() {
                   key={member.name}
                   data-reveal
                   style={delay}
-                  className={`team-card-reveal lg:col-span-2${centerRowClass(idx)}`}
+                  className="team-card-reveal lg:col-span-2"
                 >
                   {profile ? (
                     <button

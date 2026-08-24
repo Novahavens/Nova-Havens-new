@@ -49,6 +49,7 @@ const ROLE_BY_FIRST_NAME = {
   sydney: 'Leasing & Move-In Coordination',
   chane: 'Client Coordination', // Chané
   brenda: 'Client Support',
+  fazal: 'AI Engineer',
 };
 
 /** Sheet column headers, matched by name (not position). */

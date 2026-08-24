@@ -111,4 +111,16 @@ export const TEAM_MEMBERS: TeamMember[] = [
     role: "[Role TBC]",
     initials: "A",
   },
+  {
+    name: "Fazal Abed",
+    role: "AI Engineer",
+    initials: "FA",
+    profile: {
+      help: "I engineer the systems that help the team move faster. I place the latest technologies in the hands of our team so that they can serve our clients in the best way possible.",
+      favouritePart: "The density of talent and character.",
+      foods: "Sushi and lasagna. Not at the same time, though.",
+      laugh: "Anything Theo Von says.",
+      spareTime: "Reading, racing my Mini Cooper JCW, and writing code.",
+    },
+  },
 ];
