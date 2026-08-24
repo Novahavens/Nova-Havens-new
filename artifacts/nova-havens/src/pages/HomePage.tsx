@@ -6,6 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-carousel';
+import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 
 type PartnerLogo = { name: string; logo?: string; logoClass?: string; showName: boolean };
 
@@ -83,37 +84,6 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
     imageUrl: '/pet-friendly-family.webp',
     imageAlt: 'Family relaxing with their dog in a bright Nova Havens furnished home',
   },
-];
-
-const FAQ_ITEMS = [
-  {
-    question: "How quickly can Nova Havens place a displaced family?",
-    answer: "Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets."
-  },
-  {
-    question: "Does Nova Havens work with all insurance carriers?",
-    answer: "Nova Havens coordinates with a wide range of insurance carriers and independent adjusters nationwide, including Allstate, Travelers, Farmers Insurance, and State Farm. If your carrier uses Additional Living Expenses (ALE) coverage, Nova Havens can typically bill them directly — so families pay nothing out of pocket for housing."
-  },
-  {
-    question: "Are pet-friendly furnished homes available nationwide?",
-    answer: "Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. All Nova Havens needs for placement is your pet's species, breed, and weight — a coordinator will match your family to a compatible property."
-  },
-  {
-    question: "Which states does Nova Havens operate in?",
-    answer: "Nova Havens operates in all 48 contiguous US states, as of 2025. This includes major metros and rural areas, so families displaced in smaller communities receive the same quality of service as those in large cities."
-  },
-  {
-    question: "How do I request emergency housing through Nova Havens?",
-    answer: "To request emergency furnished housing through Nova Havens, call (629) 401-0054 or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly."
-  },
-  {
-    question: "How does Nova Havens coordinate with my insurance adjuster?",
-    answer: "Nova Havens assigns one dedicated coordinator to each placement. That coordinator communicates directly with your adjuster and carrier — handling documentation, extensions, and status updates — so you don't have to relay messages between parties. Adjusters receive proactive updates throughout the placement."
-  },
-  {
-    question: "Can I list my furnished property with Nova Havens?",
-    answer: "Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054 or visit the Contact page to get started."
-  }
 ];
 
 type PropertyCity = { city: string; lat: number; lng: number; count: number };
@@ -699,31 +669,47 @@ export default function HomePage() {
           <span className="text-xs font-bold tracking-widest uppercase mb-4 block text-primary">COMMON QUESTIONS</span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-foreground">Frequently Asked Questions</h2>
         </div>
-        <div className="space-y-3">
-          {FAQ_ITEMS.map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-card rounded-lg border border-white/10 overflow-hidden"
-              data-testid={`faq-item-${idx + 1}`}
-            >
-              <button
-                className="w-full flex items-center justify-between p-6 text-left gap-4 hover:bg-white/[0.02] transition-colors"
-                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                aria-expanded={openFaq === idx}
-              >
-                <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`}
-                  aria-hidden="true"
-                />
-              </button>
-              {openFaq === idx && (
-                <div className="px-6 pb-6 text-muted-foreground leading-relaxed text-sm md:text-base">
-                  {item.answer}
+        <div className="space-y-10">
+          {HOME_FAQ_GROUPS.map((group, groupIdx) => {
+            const itemOffset = HOME_FAQ_GROUPS
+              .slice(0, groupIdx)
+              .reduce((total, previousGroup) => total + previousGroup.items.length, 0);
+
+            return (
+              <div key={group.id} className="space-y-4" data-testid={`faq-group-${group.id}`}>
+                <h3 className="text-xl md:text-2xl font-bold text-foreground">{group.heading}</h3>
+                <div className="space-y-3">
+                  {group.items.map((item, itemIdx) => {
+                    const faqIdx = itemOffset + itemIdx;
+                    return (
+                      <div
+                        key={item.question}
+                        className="bg-card rounded-lg border border-white/10 overflow-hidden"
+                        data-testid={`faq-item-${faqIdx + 1}`}
+                      >
+                        <button
+                          className="w-full flex items-center justify-between p-6 text-left gap-4 hover:bg-white/[0.02] transition-colors"
+                          onClick={() => setOpenFaq(openFaq === faqIdx ? null : faqIdx)}
+                          aria-expanded={openFaq === faqIdx}
+                        >
+                          <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>
+                          <ChevronDown
+                            className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-200 ${openFaq === faqIdx ? 'rotate-180' : ''}`}
+                            aria-hidden="true"
+                          />
+                        </button>
+                        {openFaq === faqIdx && (
+                          <div className="px-6 pb-6 text-muted-foreground leading-relaxed text-sm md:text-base">
+                            {item.answer}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </section>
       {/* 12. Emergency Contact Band */}

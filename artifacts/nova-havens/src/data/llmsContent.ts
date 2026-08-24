@@ -1,4 +1,5 @@
 import { BLOG_POSTS, type BlogPost } from './blogPosts.ts';
+import { HOME_FAQS } from './homeFaqs.ts';
 
 export interface LlmsFaq {
   q: string;
@@ -131,48 +132,10 @@ export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   {
     heading: 'Frequently Asked Questions',
     rawDividerAfter: true,
-    faqs: [
-      {
-        q: 'How quickly can Nova Havens place a displaced family?',
-        a: 'Nova Havens places most families into a verified furnished home within 24–48 hours of first contact in most markets — and same day in many. Automated matching surfaces property options within hours of claim intake.',
-      },
-      {
-        q: 'Does Nova Havens work with all insurance carriers?',
-        a: 'Nova Havens coordinates with a wide range of carriers and independent adjusters, including Allstate, Travelers, Farmers Insurance, and State Farm. If ALE coverage is active, Nova Havens can typically bill the carrier directly so families pay nothing out of pocket.',
-      },
-      {
-        q: 'Which states does Nova Havens operate in?',
-        a: 'All 48 contiguous US states as of March 2025 — including major metros, suburban markets, secondary cities, and rural areas. Alaska and Hawaii are not currently covered.',
-      },
-      {
-        q: 'What does a "fully furnished" Nova Havens home include?',
-        a: 'Every property includes beds with quality linens, a fully equipped kitchen (cookware, dishes, utensils, small appliances), high-speed Wi-Fi, a TV, and washer/dryer access. Properties are verified before listing — families receive what is described.',
-      },
-      {
-        q: 'How does Nova Havens handle pet-owning families?',
-        a: 'Nova Havens discloses pets at first intake and filters inventory to pet-friendly properties. Over 40% of network properties are pet-designated as of 2025. Breed/weight restrictions vary by property. Pet deposits are typically covered under ALE.',
-      },
-      {
-        q: 'Does the family pay out of pocket for Nova Havens housing?',
-        a: 'If ALE coverage is active, Nova Havens bills the carrier directly. Families typically pay nothing for housing itself. Some policies have limits or waiting periods — the adjuster clarifies coverage. Nova Havens can assist if gaps arise.',
-      },
-      {
-        q: 'How do property owners get paid for Nova Havens placements?',
-        a: 'Nova Havens pays property owners on net-30 terms, with the insurance carrier as the payer. There are no platform booking fees or nightly-rate variability — placements are mid-term (30–90 days) and payment is backed by the carrier.',
-      },
-      {
-        q: 'Can property owners join the Nova Havens network?',
-        a: 'Yes. Property owners with fully furnished homes in the 48 contiguous US states can apply. Nova Havens conducts a verification inspection (3–7 days), then activates the property in the network. Contact (629) 401-0054 or novahavens.com/contact to start.',
-      },
-      {
-        q: 'Does Nova Havens use AI in its placement process?',
-        a: 'Yes. Nova Havens uses agentic AI to automate claim parsing, property scoring, and shortlist generation. Every AI-generated shortlist is reviewed and approved by a Nova Havens coordinator before it reaches a family or adjuster. Automation handles the data work; humans handle the decision and the relationship.',
-      },
-      {
-        q: "What happens if the temporary housing placement doesn't work out?",
-        a: "The assigned Nova Havens coordinator is the family's single point of contact for any issue — maintenance, property conflicts, extension needs. Nova Havens handles it and keeps the adjuster informed. Alternative placement is arranged if the current property is not working as described.",
-      },
-    ],
+    faqs: HOME_FAQS.map((faq) => ({
+      q: faq.question,
+      a: faq.answer,
+    })),
   },
   {
     heading: 'Intake Paths',

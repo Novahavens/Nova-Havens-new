@@ -5,3 +5,4 @@
 - [Targeted Playwright runs](targeted-playwright-runs.md) — invoke Nova Havens Playwright through its Nix wrapper and package-local binary when filtering tests.
 - [Nova Havens build env vars](nova-havens-build-env.md) — the Vite config hard-fails unless PORT and BASE_PATH are set, so ad-hoc builds must pass both.
 - [Prerender idempotence](prerender-idempotence.md) — post-build route generation must tolerate existing prerendered bodies because validation may rerun it without rebuilding Vite.
+- [FAQ content source of truth](faq-content-source-of-truth.md) — keep rendered FAQs, llms.txt, and FAQPage schemas on the shared audience question set.

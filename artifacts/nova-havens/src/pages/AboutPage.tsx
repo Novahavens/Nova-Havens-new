@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight, CheckCircle2, ChevronDown, Heart, Home, ShieldCheck, Users } from 'lucide-react';
 import { COMPANY_DEFINITION, COMPANY_FACTS } from '@/lib/companyFacts';
+import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 
 const PRINCIPLES = [
   {
@@ -31,29 +32,6 @@ const DIFFERENTIATORS = [
   'A single dedicated point of contact for every placement',
   'Proactive status updates for adjusters and families throughout the stay',
   'Pet-friendly, accessible, and family-ready options in the network',
-];
-
-const ABOUT_FAQ = [
-  {
-    question: "Who does Nova Havens serve?",
-    answer: "Nova Havens serves three groups: displaced families who need furnished housing after a covered property loss; insurance carriers and independent adjusters who need a reliable, carrier-aligned housing coordinator; and property owners who want to list their furnished homes in a vetted network. All three are served through one coordinated team based in Nashville, TN."
-  },
-  {
-    question: "What makes Nova Havens different from other relocation companies?",
-    answer: "Nova Havens is purpose-built for the insurance housing workflow. Unlike general relocation companies, Nova Havens assigns a single coordinator to each claim, bills carriers directly under ALE coverage, provides proactive documentation updates adjusters need, and operates a verified property network — not a third-party listing marketplace. As of 2025, Nova Havens operates across all 48 contiguous US states."
-  },
-  {
-    question: "How does Nova Havens verify its properties?",
-    answer: "Every property in the Nova Havens network is inspected by a Nova Havens coordinator before being listed. The inspection covers furnishing standards (beds with linens, stocked kitchen, Wi-Fi, washer/dryer), safety conditions, and overall livability. Properties that don't meet the standard are not added to the network. Nova Havens maintains 20,000+ verified homes as of 2025."
-  },
-  {
-    question: "Does Nova Havens handle billing with insurance carriers directly?",
-    answer: "Yes. When a family's Additional Living Expenses (ALE) coverage is active, Nova Havens bills the insurance carrier or adjuster directly — so the displaced family typically pays nothing out of pocket for housing. Nova Havens works with carriers including Allstate, Travelers, Farmers Insurance, State Farm, and others."
-  },
-  {
-    question: "Where is Nova Havens headquartered?",
-    answer: "Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054 or info@novahavens.com."
-  }
 ];
 
 export default function AboutPage() {
@@ -164,31 +142,47 @@ export default function AboutPage() {
             <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Common Questions</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">Questions About Nova Havens</h2>
           </div>
-          <div className="space-y-3">
-            {ABOUT_FAQ.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-card rounded-lg border border-white/[0.08] overflow-hidden"
-                data-testid={`about-faq-item-${idx + 1}`}
-              >
-                <button
-                  className="w-full flex items-center justify-between p-6 text-left gap-4 hover:bg-white/[0.02] transition-colors"
-                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  aria-expanded={openFaq === idx}
-                >
-                  <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`}
-                    aria-hidden="true"
-                  />
-                </button>
-                {openFaq === idx && (
-                  <div className="px-6 pb-6 text-muted-foreground leading-relaxed text-sm md:text-base">
-                    {item.answer}
+          <div className="space-y-10">
+            {HOME_FAQ_GROUPS.map((group, groupIdx) => {
+              const itemOffset = HOME_FAQ_GROUPS
+                .slice(0, groupIdx)
+                .reduce((total, previousGroup) => total + previousGroup.items.length, 0);
+
+              return (
+                <div key={group.id} className="space-y-4" data-testid={`about-faq-group-${group.id}`}>
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground">{group.heading}</h3>
+                  <div className="space-y-3">
+                    {group.items.map((item, itemIdx) => {
+                      const faqIdx = itemOffset + itemIdx;
+                      return (
+                        <div
+                          key={item.question}
+                          className="bg-card rounded-lg border border-white/[0.08] overflow-hidden"
+                          data-testid={`about-faq-item-${faqIdx + 1}`}
+                        >
+                          <button
+                            className="w-full flex items-center justify-between p-6 text-left gap-4 hover:bg-white/[0.02] transition-colors"
+                            onClick={() => setOpenFaq(openFaq === faqIdx ? null : faqIdx)}
+                            aria-expanded={openFaq === faqIdx}
+                          >
+                            <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>
+                            <ChevronDown
+                              className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-200 ${openFaq === faqIdx ? 'rotate-180' : ''}`}
+                              aria-hidden="true"
+                            />
+                          </button>
+                          {openFaq === faqIdx && (
+                            <div className="px-6 pb-6 text-muted-foreground leading-relaxed text-sm md:text-base">
+                              {item.answer}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -10,6 +10,7 @@
  */
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
+import { HOME_FAQS } from '../data/homeFaqs.ts';
 import { COMPANY_DEFINITION } from './companyFacts.ts';
 import { TEAM_MEMBERS } from '../data/teamMembers.ts';
 
@@ -132,44 +133,6 @@ export function parseFaqsFromContent(
 }
 
 // ── Static route metadata ──────────────────────────────────────────────────
-
-const HOME_FAQS = [
-  {
-    question: 'How quickly can Nova Havens place a displaced family?',
-    answer:
-      'Nova Havens places most families into a verified furnished home within 5 days of the first contact — and often within 24–48 hours in major markets.',
-  },
-  {
-    question: 'Does Nova Havens work with all insurance carriers?',
-    answer:
-      'Nova Havens coordinates with a wide range of insurance carriers and independent adjusters nationwide, including Allstate, Travelers, Farmers Insurance, and State Farm. If your carrier uses Additional Living Expenses (ALE) coverage, Nova Havens can typically bill them directly — so families pay nothing out of pocket for housing.',
-  },
-  {
-    question: 'Are pet-friendly furnished homes available nationwide?',
-    answer:
-      'Yes. Nova Havens maintains a dedicated segment of pet-friendly properties across its network of 20,000+ verified homes. All Nova Havens needs for placement is your pet\'s species, breed, and weight — a coordinator will match your family to a compatible property.',
-  },
-  {
-    question: 'Which states does Nova Havens operate in?',
-    answer:
-      'Nova Havens operates in all 48 contiguous US states, as of 2025. This includes major metros and rural areas, so families displaced in smaller communities receive the same quality of service as those in large cities.',
-  },
-  {
-    question: 'How do I request emergency housing through Nova Havens?',
-    answer:
-      'To request emergency furnished housing through Nova Havens, call (629) 401-0054 or submit a request through the Contact page. Nova Havens responds to urgent housing requests 24/7. Your insurance carrier or adjuster can also initiate a placement on your behalf by contacting our team directly.',
-  },
-  {
-    question: 'How does Nova Havens coordinate with my insurance adjuster?',
-    answer:
-      "Nova Havens assigns one dedicated coordinator to each placement. That coordinator communicates directly with your adjuster and carrier — handling documentation, extensions, and status updates — so you don't have to relay messages between parties. Adjusters receive proactive updates throughout the placement.",
-  },
-  {
-    question: 'Can I list my furnished property with Nova Havens?',
-    answer:
-      'Yes. Property owners with fully furnished homes anywhere in the 48 contiguous US states can apply to join the Nova Havens network. Nova Havens conducts an inspection, verifies the property meets its standards, and then matches it with displaced families whose needs align. Contact (629) 401-0054 or visit the Contact page to get started.',
-  },
-];
 
 const STATIC_META: Record<string, RouteMeta> = {
   '/': {
@@ -403,48 +366,14 @@ const STATIC_META: Record<string, RouteMeta> = {
         },
         {
           '@type': 'FAQPage',
-          mainEntity: [
-            {
-              '@type': 'Question',
-              name: 'Who does Nova Havens serve?',
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: 'Nova Havens serves three groups: displaced families who need furnished housing after a covered property loss; insurance carriers and independent adjusters who need a reliable, carrier-aligned housing coordinator; and property owners who want to list their furnished homes in a vetted network. All three are served through one coordinated team based in Nashville, TN.',
-              },
+          mainEntity: HOME_FAQS.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer,
             },
-            {
-              '@type': 'Question',
-              name: 'What makes Nova Havens different from other relocation companies?',
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: 'Nova Havens is purpose-built for the insurance housing workflow. Unlike general relocation companies, Nova Havens assigns a single coordinator to each claim, bills carriers directly under ALE coverage, provides proactive documentation updates adjusters need, and operates a verified property network — not a third-party listing marketplace. As of 2025, Nova Havens operates across all 48 contiguous US states.',
-              },
-            },
-            {
-              '@type': 'Question',
-              name: 'How does Nova Havens verify its properties?',
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: "Every property in the Nova Havens network is inspected by a Nova Havens coordinator before being listed. The inspection covers furnishing standards (beds with linens, stocked kitchen, Wi-Fi, washer/dryer), safety conditions, and overall livability. Properties that don't meet the standard are not added to the network. Nova Havens maintains 20,000+ verified homes as of 2025.",
-              },
-            },
-            {
-              '@type': 'Question',
-              name: 'Does Nova Havens handle billing with insurance carriers directly?',
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: "Yes. When a family's Additional Living Expenses (ALE) coverage is active, Nova Havens bills the insurance carrier or adjuster directly — so the displaced family typically pays nothing out of pocket for housing. Nova Havens works with carriers including Allstate, Travelers, Farmers Insurance, State Farm, and others.",
-              },
-            },
-            {
-              '@type': 'Question',
-              name: 'Where is Nova Havens headquartered?',
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: 'Nova Havens is headquartered in Nashville, Tennessee, and operates nationwide across all 48 contiguous US states. The company can be reached at (629) 401-0054 or info@novahavens.com.',
-              },
-            },
-          ],
+          })),
         },
       ],
     },
