@@ -61,7 +61,7 @@ export default function PrivacyPolicyPage() {
           If you have any questions or concerns about this Privacy Policy, please contact us at:
         </p>
         <p>
-          <a href="mailto:info@novahavens.com" className="text-primary hover:underline">info@novahavens.com</a><br />
+          <a href="mailto:william@novahavens.com" className="text-primary hover:underline">william@novahavens.com</a><br />
           <a href="tel:6294010054" className="text-primary hover:underline">(629) 401-0054</a><br />
           Nashville, TN
         </p>
