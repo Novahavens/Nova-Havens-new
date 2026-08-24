@@ -3,6 +3,11 @@ import type { ContactSubmissionInput, ContactNotifier } from "../routes/contact"
 const MONDAY_API_URL = "https://api.monday.com/v2";
 const DEFAULT_NOTIFICATION_BOARD_ID = "18415735059";
 
+function notificationBoardId(): string {
+  const configuredBoardId = process.env["MONDAY_NOTIFICATION_BOARD_ID"]?.trim();
+  return configuredBoardId || DEFAULT_NOTIFICATION_BOARD_ID;
+}
+
 type MondayResponse<T> = {
   data?: T;
   errors?: Array<{ message: string }>;
@@ -77,9 +82,7 @@ function notificationText(
  */
 export const mondayContactNotifier: ContactNotifier = {
   async notify(input, submissionId) {
-    const boardId =
-      process.env["MONDAY_NOTIFICATION_BOARD_ID"] ??
-      DEFAULT_NOTIFICATION_BOARD_ID;
+    const boardId = notificationBoardId();
     const owners = await mondayRequest<BoardOwnersResponse>(
       `query ($boardId: ID!) {
         boards(ids: [$boardId]) {
