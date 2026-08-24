@@ -7,3 +7,4 @@
 - [Prerender idempotence](prerender-idempotence.md) — post-build route generation must tolerate existing prerendered bodies because validation may rerun it without rebuilding Vite.
 - [FAQ content source of truth](faq-content-source-of-truth.md) — keep rendered FAQs, llms.txt, and FAQPage schemas on the shared audience question set.
 - [Team roster sync lag](team-roster-sync-lag.md) — a valid but stale Object Storage roster can hide newly added fallback members until the next successful sync.
+- [llms.txt article selection](llms-blog-selection.md) — list the three confirmed housing and family articles; omit the property-owner article.

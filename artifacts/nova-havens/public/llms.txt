@@ -1,151 +1,40 @@
-# Nova Havens — Nationwide Furnished Housing Coordination
+# Nova Havens
 
-> Nova Havens is a temporary housing coordination company that places families displaced by insurance claims into fully furnished, verified homes across all 48 contiguous US states. Nova Havens works directly with insurance carriers and adjusters — billing them under Additional Living Expenses (ALE) coverage so families typically pay nothing out of pocket. Placements are delivered within 24–48 hours in most markets.
-
----
-
-## Brand Identity
-
-**What Nova Havens does:** Nova Havens coordinates furnished temporary housing for families displaced by property damage covered by homeowner's insurance — fires, water damage, mold, and other covered losses. Nova Havens receives the claim from the carrier or adjuster, matches the family to a verified furnished property, and handles all logistics from first contact through move-out.
-
-**Who Nova Havens serves:**
-- Insurance carriers and their claims teams who need to activate ALE housing for policyholders
-- Independent insurance adjusters coordinating temporary housing for displaced families
-- Displaced families who have been referred to Nova Havens by their carrier or adjuster
-- Property owners with furnished homes who want to host insurance-placed families
-
-**Where Nova Havens operates:** All 48 contiguous United States, including major metros, suburban markets, secondary cities, and rural areas. (Alaska and Hawaii are not currently in the network.)
-
-**How Nova Havens is different:** Single point of contact per placement, agentic AI-assisted property matching that cuts placement times by over 60%, a verified furnished property network (not self-reported listings), and direct carrier billing so families are not left managing reimbursements.
+> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, works with insurance carriers, adjusters, relocation specialists, and a network of property owners. Nova Havens maintains properties across 47 states. It is not an insurance company and does not underwrite policies or make coverage determinations.
 
 ---
 
-## Key Facts
+## Core pages
 
-- Nova Havens operates in all 48 contiguous US states as of March 2025
-- Average time-to-housing-options is under 48 hours in most markets; same-day in many
-- Automated claim processing cut average placement times by over 60% vs. the manual process (as of early 2025)
-- More than 40% of properties in the Nova Havens network are designated pet-friendly as of 2025
-- Nova Havens assigns one dedicated coordinator per placement — single point of contact for family, adjuster, and property owner
-- Nova Havens bills carriers directly under ALE coverage; families typically pay nothing out of pocket for housing
-- Placements typically run 30–90 days; extensions available when repair timelines require it
-- Nova Havens property network uses verified inspection standards — properties must meet furnishing, safety, and cleanliness requirements before listing
-- Insurance carriers Nova Havens coordinates with include: Allstate, Travelers, Farmers Insurance, State Farm, and others
-- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; email: info@novahavens.com
+- [Homepage](https://novahavens.com/) — Coordinates furnished temporary housing and provides current information about Nova Havens services, properties, and contact routes.
+- [About Nova Havens](https://novahavens.com/about-us) — Contains a canonical factual overview of the company and its work.
+- [Meet the team](https://novahavens.com/meet-the-team) — Introduces the coordinators who manage placements.
+- [Contact](https://novahavens.com/contact) — Provides general contact details, urgent phone access, and the contact form.
 
----
+## Get started
 
-## Blog Content Index
+- [Housing request form](https://form.jotform.com/262086580989070) — The intake form used by insurance adjusters and relocation specialists to request temporary housing on behalf of a displaced policyholder.
+- [Property submission form](https://form.jotform.com/262086165906058) — The form property owners and managers use to submit a property for the network.
 
-### For Insurance Professionals
+Phone: (629) 401-0054, available 24/7 for urgent housing needs.
 
-**Seven Details That Speed Up a Housing Placement**
-URL: https://novahavens.com/blog/details-that-speed-up-housing-placement
-Summary: The single biggest cause of delay in a housing placement isn't availability — it's incomplete requirements. Seven fields do most of the work: preferred city and state, bedrooms and bathrooms needed, occupancy counts, pet details, accessibility requirements, desired move-in date, and estimated duration. A request with all seven can be matched immediately. A request missing two or three usually means a phone call before anything moves.
+For multiple housing requests, email claims@novahavens.com.
 
-**Hotel or Furnished Home? An Adjuster's Guide to ALE Housing Options**
-URL: https://novahavens.com/blog/hotel-or-furnished-home-adjusters-guide
-Summary: Hotels are faster to arrange and suit short displacements. Furnished homes generally cost less per day over longer periods, accommodate families and pets far better, and reduce escalation calls. The practical dividing line is expected duration: for anything beyond about two weeks, a furnished home is usually the better answer for both the file and the household.
+For multiple property submissions, email properties@novahavens.com.
 
-### For Displaced Families
+## Guides and articles
 
-**Hotel or Furnished Home? What to Expect From Each**
-URL: https://novahavens.com/blog/hotel-or-furnished-home-what-to-expect
-Summary: If you'll be out of your home for more than a couple of weeks, a furnished home usually works better than a hotel — especially with children or pets. It has bedrooms, a kitchen, and space. Your adjuster decides what your policy covers; this explains what each option is actually like to live in.
+The blog is organised into four topic areas: guidance for insurance professionals, guidance for displaced families, guidance for property owners, and market guides.
 
-### For Property Owners
+- [Seven Details That Speed Up a Housing Placement](https://novahavens.com/blog/details-that-speed-up-housing-placement) — Answers which information insurance professionals should provide to reduce delays in a housing request.
+- [Hotel or Furnished Home? An Adjuster's Guide to ALE Housing Options](https://novahavens.com/blog/hotel-or-furnished-home-adjusters-guide) — Answers how adjusters can compare hotels and furnished homes for temporary housing placements.
+- [Hotel or Furnished Home? What to Expect From Each](https://novahavens.com/blog/hotel-or-furnished-home-what-to-expect) — Answers what displaced households can expect from a hotel stay or a furnished home.
 
-**How to List Your Furnished Property for Insurance Housing**
-URL: https://novahavens.com/blog/how-to-list-your-furnished-property
-Summary: Property owners can submit a furnished home for consideration in the Nova Havens network. A complete submission describes the home's layout, furnishings, availability, location, and pet or accessibility details so the team can determine whether it fits upcoming placement needs. The first step is simply sharing accurate property information and a reliable way to reach you.
+## Common questions
 
----
+The site has an FAQ for two audiences: families who need temporary housing and property owners joining the network. See the [FAQ on the homepage](https://novahavens.com/).
 
-## Frequently Asked Questions
+- Families: questions about what is included in a home, pets, accessibility requirements, school continuity, what to bring, and who to contact during a stay.
+- Property owners: questions about how listing works, what property types are accepted, how long placements last, and how compensation is arranged.
 
-**What does Nova Havens do?**
-We coordinate fully furnished temporary homes for families who have been displaced by fire, water, or mold damage, and we manage the stay from move-in through to the end of it.
-
-**How do I get temporary housing?**
-In most cases your adjuster or relocation specialist submits the housing request for you, with your household's requirements. If you are not sure whether that has happened, call us on (629) 401-0054 and we will help you find out.
-
-**What is included in the home?**
-Furnished throughout, with beds made and linens provided, a fully equipped kitchen, smart TV and high-speed internet, and utilities active before you arrive. You should be able to move in and start living straight away.
-
-**Can my pets come with me?**
-Many of our properties are pet-friendly. Tell us the number of pets, their type, breed, and weight when the request is submitted, because those details determine which homes will accept them. We cannot guarantee a pet-friendly placement, but we accommodate pets wherever possible.
-
-**Can I stay near my children's school?**
-Ask, and we will try. School continuity matters and it is much easier to account for at the start than to change later. Name the specific school or area when the request is submitted.
-
-**What if someone in my household has accessibility needs?**
-Tell us upfront. Single-level living, step-free access, and bathroom requirements all change which properties are suitable, and late disclosure is a common reason a placement has to be redone.
-
-**How long can I stay?**
-That depends on your policy and your carrier's authorisation, which your adjuster can tell you. On our side, we hold the home for the agreed period and handle extensions if repairs run longer than expected.
-
-**What if repairs take longer than expected?**
-This is common. Often the stay can simply be extended in the same home. Tell your adjuster as soon as you hear the timeline has changed — early notice makes it far more likely you can stay put rather than move a second time.
-
-**What should I bring?**
-Documents, medication, devices and chargers, about a week of clothing per person, and one comfort item per child. You do not need bedding, towels, kitchen equipment, or furniture — the home already has them.
-
-**Who do I contact during my stay?**
-The same team throughout. Intake, housing options, and managing your stay are all handled in-house, so you will not be passed between departments. Call (629) 401-0054 any time.
-
-**How do I list my property?**
-Submit your property details through our form: address, type, size, bedrooms and bathrooms, whether it is furnished, your pet policy, monthly rate, and availability. Our partnerships team reviews it and follows up to discuss adding it to the network.
-
-**What kinds of properties do you accept?**
-Furnished homes suitable for a household staying weeks to months — single-family homes, townhouses, condos, apartments, and duplexes. What matters most is that it is genuinely furnished and ready to live in.
-
-**Is submitting a property the same as being accepted?**
-No. We vet properties before adding them to the network, because placing a family somewhere unsuitable is worse than not placing them at all.
-
-**How long do placements usually last?**
-Weeks to months, depending on how long repairs take. Longer than a nightly rental, shorter and less predictable than an annual lease. Placements can extend if repairs overrun.
-
-**Do I have to accept every placement request?**
-No. You receive requests that match your property and your stated terms, and accepting any particular one is your decision.
-
-**How do I get paid?**
-Compensation is set out in your owner agreement, which is arranged directly with our partnerships team. Rates, deposits, and fees are agreed in writing before any placement.
-
-**Can I set my own pet policy?**
-Yes. You tell us whether your property accepts pets, does not, or considers them case by case, and we only send you matching requests.
-
-**What condition should the property be in?**
-Habitable, safe, code-compliant, and genuinely ready — furnished, functional, and with utilities able to be active on arrival. Households arrive after a disruptive event, so a home that simply works matters more than expensive finishes.
-
-**What happens at the end of a placement?**
-A condition walkthrough, with anything beyond ordinary wear assessed against the placement agreement. Expect ordinary residential wear from a household that lived there for weeks or months, not hotel-turnover condition.
-
-**Can I list more than one property?**
-Yes. For several properties at once, email properties@novahavens.com rather than submitting them one at a time.
-
----
-
-## Intake Paths
-
-- **Request Housing (displaced families, carriers, adjusters):** https://form.jotform.com/262086580989070 — intake form to request temporary housing or start a placement from an insurance claim
-- **List My Property (property owners and managers):** https://form.jotform.com/262086165906058 — intake form to submit a furnished property for the Nova Havens network
-
-## Key Pages
-
-- **Home:** https://novahavens.com/
-- **Blog & Resources:** https://novahavens.com/blog
-- **About Us:** https://novahavens.com/about-us
-- **Meet the Team:** https://novahavens.com/meet-the-team
-- **Contact / Request Housing:** https://novahavens.com/contact
-- **Privacy Policy:** https://novahavens.com/privacy-policy
-- **Terms of Service:** https://novahavens.com/terms-of-service
-
----
-
-## Contact & CTA
-
-**Phone (24/7):** (629) 401-0054
-**Email:** info@novahavens.com
-**Request housing:** https://novahavens.com/contact
-
-Nova Havens responds to emergency housing requests 24 hours a day, 7 days a week. Insurance adjusters can submit claims via phone, email, or carrier portal. Displaced families can be referred by their carrier or contact Nova Havens directly.
+Questions about what an individual insurance policy covers, coverage limits, or how long coverage lasts should be directed to the policyholder's own insurance carrier or adjuster. Nova Havens does not make those determinations.

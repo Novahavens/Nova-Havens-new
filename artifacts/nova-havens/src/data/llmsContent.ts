@@ -1,5 +1,4 @@
-import { BLOG_POSTS, type BlogPost } from './blogPosts.ts';
-import { HOME_FAQS } from './homeFaqs.ts';
+import { BLOG_POSTS } from './blogPosts.ts';
 
 export interface LlmsFaq {
   q: string;
@@ -19,10 +18,10 @@ export interface LlmsSection {
   rawDividerAfter?: boolean;
 }
 
-const LLMS_TXT_TITLE = '# Nova Havens — Nationwide Furnished Housing Coordination';
+const LLMS_TXT_TITLE = '# Nova Havens';
 
 const LLMS_TXT_DESCRIPTION =
-  '> Nova Havens is a temporary housing coordination company that places families displaced by insurance claims into fully furnished, verified homes across all 48 contiguous US states. Nova Havens works directly with insurance carriers and adjusters — billing them under Additional Living Expenses (ALE) coverage so families typically pay nothing out of pocket. Placements are delivered within 24–48 hours in most markets.';
+  '> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, works with insurance carriers, adjusters, relocation specialists, and a network of property owners. Nova Havens maintains properties across 47 states. It is not an insurance company and does not underwrite policies or make coverage determinations.';
 
 export const LLMS_TXT_PAGE_TITLE = 'llms.txt — AI & Machine-Readable Site Index';
 
@@ -32,134 +31,73 @@ export const LLMS_TXT_PAGE_INTRO =
 export const BLOG_INDEX_URL_PREFIX = 'https://novahavens.com/blog/';
 
 /**
- * Machine-readable summary for a published post. Every post body opens with a
- * "> " quick-summary blockquote (see the body conventions in blogPosts.ts);
- * that blockquote is the canonical article summary, so it is what AI tools
- * receive. Posts without one fall back to the catalogue excerpt, and
- * scripts/validate-llms.ts fails the build so the omission is caught at
- * authoring time rather than shipping a shorter summary to AI tools.
+ * The AI index intentionally lists the three currently selected live articles.
+ * The property-owner article remains a separate site record but is not part of
+ * this file because the current index requirements specify these three posts.
  */
-export function getBlogPostSummary(post: BlogPost): string {
-  const quickSummary = getQuickSummaryBlockquote(post);
+const LLMS_BLOG_POST_SLUGS = [
+  'details-that-speed-up-housing-placement',
+  'hotel-or-furnished-home-adjusters-guide',
+  'hotel-or-furnished-home-what-to-expect',
+] as const;
 
-  return quickSummary ?? post.excerpt.trim();
-}
+export const LLMS_BLOG_POSTS = LLMS_BLOG_POST_SLUGS.map((slug) => {
+  const post = BLOG_POSTS.find((candidate) => candidate.slug === slug);
 
-/**
- * Returns the post's opening "> " quick-summary blockquote as plain text, or
- * null when the body does not open with one.
- */
-export function getQuickSummaryBlockquote(post: BlogPost): string | null {
-  const firstBlock = post.content.split(/\n\n+/, 1)[0] ?? '';
-
-  if (!firstBlock.startsWith('> ')) {
-    return null;
+  if (!post) {
+    throw new Error(`The llms.txt blog index references an unpublished slug: ${slug}`);
   }
 
-  const text = firstBlock
-    .split('\n')
-    .map((line) => line.replace(/^>\s?/, ''))
-    .join(' ')
-    .trim();
+  return post;
+});
 
-  return text === '' ? null : text;
-}
+const BLOG_ARTICLE_DESCRIPTIONS: Record<string, string> = {
+  'details-that-speed-up-housing-placement':
+    'Answers which information insurance professionals should provide to reduce delays in a housing request.',
+  'hotel-or-furnished-home-adjusters-guide':
+    'Answers how adjusters can compare hotels and furnished homes for temporary housing placements.',
+  'hotel-or-furnished-home-what-to-expect':
+    'Answers what displaced households can expect from a hotel stay or a furnished home.',
+};
 
-/**
- * Renders the Blog Content Index straight from the published blog catalogue so
- * titles and summaries can never drift from what the site publishes. Posts are
- * grouped by category in catalogue order.
- */
-export function buildBlogIndexSubsections(posts: BlogPost[]): LlmsSubsection[] {
-  const grouped = new Map<string, BlogPost[]>();
-
-  for (const post of posts) {
-    const bucket = grouped.get(post.category);
-
-    if (bucket) {
-      bucket.push(post);
-    } else {
-      grouped.set(post.category, [post]);
-    }
-  }
-
-  return [...grouped.entries()].map(([category, categoryPosts]) => ({
-    subheading: category,
-    content: categoryPosts
-      .map(
-        (post) =>
-          `**${post.title}**\nURL: ${BLOG_INDEX_URL_PREFIX}${post.slug}\nSummary: ${getBlogPostSummary(post)}`,
-      )
-      .join('\n\n'),
-  }));
-}
+const BLOG_ARTICLE_LINKS = LLMS_BLOG_POSTS.map(
+  (post) =>
+    `- [${post.title}](${BLOG_INDEX_URL_PREFIX}${post.slug}) — ${BLOG_ARTICLE_DESCRIPTIONS[post.slug]}`,
+).join('\n');
 
 export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   {
-    heading: 'Brand Identity',
-    rawDividerAfter: true,
-    content: `**What Nova Havens does:** Nova Havens coordinates furnished temporary housing for families displaced by property damage covered by homeowner's insurance — fires, water damage, mold, and other covered losses. Nova Havens receives the claim from the carrier or adjuster, matches the family to a verified furnished property, and handles all logistics from first contact through move-out.
+    heading: 'Core pages',
+    content: `- [Homepage](https://novahavens.com/) — Coordinates furnished temporary housing and provides current information about Nova Havens services, properties, and contact routes.
+- [About Nova Havens](https://novahavens.com/about-us) — Contains a canonical factual overview of the company and its work.
+- [Meet the team](https://novahavens.com/meet-the-team) — Introduces the coordinators who manage placements.
+- [Contact](https://novahavens.com/contact) — Provides general contact details, urgent phone access, and the contact form.`,
+  },
+  {
+    heading: 'Get started',
+    content: `- [Housing request form](https://form.jotform.com/262086580989070) — The intake form used by insurance adjusters and relocation specialists to request temporary housing on behalf of a displaced policyholder.
+- [Property submission form](https://form.jotform.com/262086165906058) — The form property owners and managers use to submit a property for the network.
 
-**Who Nova Havens serves:**
-- Insurance carriers and their claims teams who need to activate ALE housing for policyholders
-- Independent insurance adjusters coordinating temporary housing for displaced families
-- Displaced families who have been referred to Nova Havens by their carrier or adjuster
-- Property owners with furnished homes who want to host insurance-placed families
+Phone: (629) 401-0054, available 24/7 for urgent housing needs.
 
-**Where Nova Havens operates:** All 48 contiguous United States, including major metros, suburban markets, secondary cities, and rural areas. (Alaska and Hawaii are not currently in the network.)
+For multiple housing requests, email claims@novahavens.com.
 
-**How Nova Havens is different:** Single point of contact per placement, agentic AI-assisted property matching that cuts placement times by over 60%, a verified furnished property network (not self-reported listings), and direct carrier billing so families are not left managing reimbursements.`,
+For multiple property submissions, email properties@novahavens.com.`,
   },
   {
-    heading: 'Key Facts',
-    rawDividerAfter: true,
-    content: `- Nova Havens operates in all 48 contiguous US states as of March 2025
-- Average time-to-housing-options is under 48 hours in most markets; same-day in many
-- Automated claim processing cut average placement times by over 60% vs. the manual process (as of early 2025)
-- More than 40% of properties in the Nova Havens network are designated pet-friendly as of 2025
-- Nova Havens assigns one dedicated coordinator per placement — single point of contact for family, adjuster, and property owner
-- Nova Havens bills carriers directly under ALE coverage; families typically pay nothing out of pocket for housing
-- Placements typically run 30–90 days; extensions available when repair timelines require it
-- Nova Havens property network uses verified inspection standards — properties must meet furnishing, safety, and cleanliness requirements before listing
-- Insurance carriers Nova Havens coordinates with include: Allstate, Travelers, Farmers Insurance, State Farm, and others
-- Nova Havens is headquartered in Nashville, TN; phone: (629) 401-0054; email: info@novahavens.com`,
-  },
-  {
-    heading: 'Blog Content Index',
-    rawDividerAfter: true,
-    subsections: buildBlogIndexSubsections(BLOG_POSTS),
-  },
-  {
-    heading: 'Frequently Asked Questions',
-    rawDividerAfter: true,
-    faqs: HOME_FAQS.map((faq) => ({
-      q: faq.question,
-      a: faq.answer,
-    })),
-  },
-  {
-    heading: 'Intake Paths',
-    content: `- **Request Housing (displaced families, carriers, adjusters):** https://form.jotform.com/262086580989070 — intake form to request temporary housing or start a placement from an insurance claim
-- **List My Property (property owners and managers):** https://form.jotform.com/262086165906058 — intake form to submit a furnished property for the Nova Havens network`,
-  },
-  {
-    heading: 'Key Pages',
-    rawDividerAfter: true,
-    content: `- **Home:** https://novahavens.com/
-- **Blog & Resources:** https://novahavens.com/blog
-- **About Us:** https://novahavens.com/about-us
-- **Meet the Team:** https://novahavens.com/meet-the-team
-- **Contact / Request Housing:** https://novahavens.com/contact
-- **Privacy Policy:** https://novahavens.com/privacy-policy
-- **Terms of Service:** https://novahavens.com/terms-of-service`,
-  },
-  {
-    heading: 'Contact & CTA',
-    content: `**Phone (24/7):** (629) 401-0054
-**Email:** info@novahavens.com
-**Request housing:** https://novahavens.com/contact
+    heading: 'Guides and articles',
+    content: `The blog is organised into four topic areas: guidance for insurance professionals, guidance for displaced families, guidance for property owners, and market guides.
 
-Nova Havens responds to emergency housing requests 24 hours a day, 7 days a week. Insurance adjusters can submit claims via phone, email, or carrier portal. Displaced families can be referred by their carrier or contact Nova Havens directly.`,
+${BLOG_ARTICLE_LINKS}`,
+  },
+  {
+    heading: 'Common questions',
+    content: `The site has an FAQ for two audiences: families who need temporary housing and property owners joining the network. See the [FAQ on the homepage](https://novahavens.com/).
+
+- Families: questions about what is included in a home, pets, accessibility requirements, school continuity, what to bring, and who to contact during a stay.
+- Property owners: questions about how listing works, what property types are accepted, how long placements last, and how compensation is arranged.
+
+Questions about what an individual insurance policy covers, coverage limits, or how long coverage lasts should be directed to the policyholder's own insurance carrier or adjuster. Nova Havens does not make those determinations.`,
   },
 ];
 
