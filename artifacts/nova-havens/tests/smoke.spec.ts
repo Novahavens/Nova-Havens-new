@@ -616,6 +616,88 @@ test.describe('Contact form', () => {
       `Console errors:\n${errors.consoleErrors.join('\n')}`,
     ).toHaveLength(0);
   });
+
+  /**
+   * The success and error branches are mutually exclusive, so a broken error
+   * branch is invisible until a real send fails.  These checks force both
+   * kinds of failure a visitor can hit — the API answering 5xx, and the
+   * request never reaching it at all — and prove the page says so, keeps the
+   * thank-you panel hidden, and leaves the typed message in place to retry.
+   *
+   * Runtime collectors are deliberately NOT attached here: the failing
+   * request is the point of the test, and Chromium reports it as a network
+   * error the generic collectors would flag.
+   */
+  const SEND_FAILURES = [
+    {
+      name: 'the API answers 500',
+      fulfil: async (route: import('@playwright/test').Route) => {
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Internal Server Error' }),
+        });
+      },
+    },
+    {
+      name: 'the request never reaches the API',
+      fulfil: async (route: import('@playwright/test').Route) => {
+        await route.abort('connectionrefused');
+      },
+    },
+  ] as const;
+
+  for (const failure of SEND_FAILURES) {
+    test(`tells the visitor the message was not sent when ${failure.name}`, async ({ page }) => {
+      test.skip(
+        test.info().project.name !== 'chromium',
+        'Behavioural check — one viewport is enough; the other projects cover layout.',
+      );
+
+      await page.route('**/api/contact', failure.fulfil);
+
+      await page.goto('/contact');
+      await waitForStable(page);
+
+      const message =
+        'We need furnished housing for a displaced family in Nashville.';
+
+      await page.getByTestId('input-name').fill('Jane Doe');
+      await page.getByTestId('input-email').fill('jane@example.com');
+      await page.getByTestId('input-phone').fill('(555) 123-4567');
+      await page.getByTestId('select-subject').selectOption('Housing Request');
+      await page.getByTestId('input-message').fill(message);
+
+      await page.getByTestId('btn-submit-contact').click();
+
+      // ── The failure is surfaced, with the 24/7 phone number to fall back on ─
+      const errorPanel = page.getByTestId('message-submit-error');
+      await expect(
+        errorPanel,
+        'A failed send left the visitor with no error panel',
+      ).toBeVisible();
+      await expect(errorPanel).toContainText('could not be sent');
+      await expect(
+        errorPanel.getByRole('link', { name: '(629) 401-0054' }),
+        'The error panel must offer the 24/7 phone number as a fallback',
+      ).toHaveAttribute('href', 'tel:+16294010054');
+
+      // ── Nothing may claim the message was delivered ────────────────────────
+      await expect(
+        page.getByTestId('message-success'),
+        'A failed send still showed the thank-you panel',
+      ).toBeHidden();
+
+      // ── The visitor can retry without retyping anything ────────────────────
+      await expect(page.getByTestId('btn-submit-contact')).toBeVisible();
+      await expect(page.getByTestId('btn-submit-contact')).toBeEnabled();
+      await expect(page.getByTestId('input-name')).toHaveValue('Jane Doe');
+      await expect(page.getByTestId('input-email')).toHaveValue('jane@example.com');
+      await expect(page.getByTestId('input-phone')).toHaveValue('(555) 123-4567');
+      await expect(page.getByTestId('select-subject')).toHaveValue('Housing Request');
+      await expect(page.getByTestId('input-message')).toHaveValue(message);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------
