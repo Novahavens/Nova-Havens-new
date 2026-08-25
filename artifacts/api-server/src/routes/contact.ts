@@ -120,14 +120,13 @@ export function validateContactSubmission(
 }
 
 /**
- * A tiny in-process fixed-window rate limiter.
+ * A tiny fixed-window rate limiter.
  *
  * A public, unauthenticated write endpoint needs a cheap way to stop a scripted
- * client from inserting rows in a loop. This deliberately avoids a dependency
- * and a shared store: a single API process serves the site, so an approximate
- * per-process limit is enough to keep the inbox usable. Counters live in memory
- * and expired windows are pruned on every check, so the maps cannot grow beyond
- * the set of sender identities seen within one window.
+ * client from inserting rows in a loop. The default implementation below is
+ * deliberately small and in-process so route tests need no database; production
+ * injects the database-backed implementation from contactStore.ts. Both expose
+ * the same contract, so the route does not care where counters are kept.
  */
 export type RateLimitDecision =
   | { allowed: true; remaining: number }
@@ -135,7 +134,7 @@ export type RateLimitDecision =
 
 export type RateLimiter = {
   /** Records a hit for `key` and reports whether it is within the limit. */
-  check(key: string): RateLimitDecision;
+  check(key: string): RateLimitDecision | Promise<RateLimitDecision>;
 };
 
 export type RateLimiterOptions = {
@@ -211,12 +210,12 @@ export function looksLikeSpam(body: unknown): boolean {
 }
 
 /**
- * Generous enough that a visitor who resends after a typo or a failed attempt
- * is never blocked, tight enough that a script cannot fill the table. This is
- * scoped to a normalized email below, so people sharing one address do not
- * consume one another's allowance.
+ * Generous enough that a visitor who resends after a validation typo is never
+ * blocked, tight enough that a script cannot fill the table. This is scoped to
+ * a normalized email below, so people sharing one address do not consume one
+ * another's allowance.
  */
-const RATE_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 } as const;
+export const RATE_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 } as const;
 
 /**
  * The per-email limit above prevents one person from repeatedly submitting.
@@ -224,7 +223,10 @@ const RATE_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 } as const;
  * rotating email addresses, while still leaving room for a shared office,
  * hotel, or mobile carrier connection to submit several legitimate requests.
  */
-const SENDER_RATE_LIMIT = { limit: 20, windowMs: 10 * 60 * 1000 } as const;
+export const SENDER_RATE_LIMIT = {
+  limit: 20,
+  windowMs: 10 * 60 * 1000,
+} as const;
 
 /**
  * How many proxy hops sit in front of this server: exactly one, the Replit
@@ -308,7 +310,7 @@ export function createContactRouter(
       return;
     }
 
-    const decision = rateLimiter.check(
+    const decision = await rateLimiter.check(
       contactRateLimitKey(req, result.value.email),
     );
 
@@ -317,7 +319,7 @@ export function createContactRouter(
       return;
     }
 
-    const senderDecision = senderRateLimiter.check(senderKey(req));
+    const senderDecision = await senderRateLimiter.check(senderKey(req));
 
     if (!senderDecision.allowed) {
       sendRateLimitedResponse(req, res, senderDecision);

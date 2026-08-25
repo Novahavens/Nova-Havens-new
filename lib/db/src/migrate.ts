@@ -32,6 +32,17 @@ const MIGRATIONS: readonly Migration[] = [
       )`,
     ],
   },
+  {
+    name: "0002_contact_rate_limits",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS "contact_rate_limits" (
+        "key" text PRIMARY KEY,
+        "window_started_at" timestamp with time zone NOT NULL,
+        "count" integer DEFAULT 0 NOT NULL,
+        "updated_at" timestamp with time zone DEFAULT now() NOT NULL
+      )`,
+    ],
+  },
 ];
 
 // Arbitrary but fixed: two instances booting at once must pick the same lock.
