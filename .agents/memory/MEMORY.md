@@ -9,3 +9,4 @@
 - [Team roster sync lag](team-roster-sync-lag.md) — a valid but stale Object Storage roster can hide newly added fallback members until the next successful sync.
 - [llms.txt article selection](llms-blog-selection.md) — list the three confirmed housing and family articles; omit the property-owner article.
 - [Vite lazy-route cache recovery](nova-havens-vite-cache.md) — stale optimized modules can mimic duplicate React after dependency cleanup; clear the cache and restart before editing hooks.
+- [Node source integration tests](node-source-integration-tests.md) — direct Node type-strip workers need explicit TS module specifiers throughout imported workspace packages.

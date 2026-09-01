@@ -5,7 +5,7 @@ import {
   type ContactStore,
   type RateLimiter,
   type RateLimiterOptions,
-} from "../routes/contact";
+} from "../routes/contact.ts";
 
 /** Stores contact page submissions in the contact_submissions table. */
 export const dbContactStore: ContactStore = {

@@ -9,7 +9,8 @@
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "test:contact-contract": "node --experimental-strip-types --test tests/contactContract.test.ts"
+    "test:contact-contract": "node --experimental-strip-types --test tests/contactContract.test.ts",
+    "test:contact-database": "node --experimental-strip-types --test tests/contactDatabase.test.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.22.0",

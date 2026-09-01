@@ -1,4 +1,4 @@
-import { pool } from "./index";
+import { pool } from "./index.ts";
 
 /**
  * Schema migrations applied at API server startup.
