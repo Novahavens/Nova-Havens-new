@@ -737,6 +737,7 @@ test.describe('Contact form', () => {
 
     const errorPanel = page.getByTestId('message-submit-error');
     await expect(errorPanel, 'A throttled send left the visitor with no error panel').toBeVisible();
+    await expect(errorPanel).toContainText('Please wait 60 seconds before trying again.');
     await expect(
       errorPanel.getByRole('link', { name: '(629) 401-0054' }),
       'The throttled response must leave the 24/7 phone fallback usable',
@@ -745,6 +746,41 @@ test.describe('Contact form', () => {
       page.getByTestId('message-success'),
       'A throttled send still showed the thank-you panel',
     ).toBeHidden();
+  });
+
+  test('uses a safe retry message when a throttled response omits Retry-After', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioural check — one viewport is enough; the other projects cover layout.',
+    );
+
+    await page.route('**/api/contact', async (route) => {
+      await route.fulfill({
+        status: 429,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Too many messages sent from this connection.' }),
+      });
+    });
+
+    await page.goto('/contact');
+    await waitForStable(page);
+
+    await page.getByTestId('input-name').fill('Jane Doe');
+    await page.getByTestId('input-email').fill('jane@example.com');
+    await page.getByTestId('select-subject').selectOption('Housing Request');
+    await page
+      .getByTestId('input-message')
+      .fill('We need furnished housing for a displaced family in Nashville.');
+
+    await page.getByTestId('btn-submit-contact').click();
+
+    const errorPanel = page.getByTestId('message-submit-error');
+    await expect(errorPanel).toContainText(
+      'Please wait a few minutes before trying again.',
+    );
+    await expect(
+      errorPanel.getByRole('link', { name: '(629) 401-0054' }),
+    ).toHaveAttribute('href', 'tel:+16294010054');
   });
 });
 

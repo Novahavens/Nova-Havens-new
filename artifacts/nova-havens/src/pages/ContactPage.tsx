@@ -16,9 +16,31 @@ import {
 
 type FormValues = ContactFormValues;
 
+function getThrottleMessage(retryAfter: string | null): string {
+  const retryAfterValue = retryAfter?.trim() ?? '';
+  const retryAfterSeconds = Number(retryAfterValue);
+
+  if (Number.isInteger(retryAfterSeconds) && retryAfterSeconds > 0) {
+    const unit = retryAfterSeconds === 1 ? 'second' : 'seconds';
+    return `Messages are temporarily limited. Please wait ${retryAfterSeconds} ${unit} before trying again.`;
+  }
+
+  const retryAt = Date.parse(retryAfterValue);
+  if (!Number.isNaN(retryAt)) {
+    const remainingSeconds = Math.ceil((retryAt - Date.now()) / 1000);
+    if (remainingSeconds > 0) {
+      const unit = remainingSeconds === 1 ? 'second' : 'seconds';
+      return `Messages are temporarily limited. Please wait ${remainingSeconds} ${unit} before trying again.`;
+    }
+  }
+
+  return 'Messages are temporarily limited. Please wait a few minutes before trying again.';
+}
+
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const [isThrottled, setIsThrottled] = React.useState(false);
 
   useEffect(() => {
     // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
@@ -36,6 +58,7 @@ export default function ContactPage() {
 
   const onSubmit = async (data: FormValues) => {
     setSubmitError(null);
+    setIsThrottled(false);
 
     try {
       const response = await fetch(`${import.meta.env.BASE_URL}api/contact`, {
@@ -45,6 +68,12 @@ export default function ContactPage() {
       });
 
       if (!response.ok) {
+        if (response.status === 429) {
+          setIsThrottled(true);
+          setSubmitError(getThrottleMessage(response.headers.get('Retry-After')));
+          return;
+        }
+
         throw new Error(`Contact endpoint responded ${response.status}`);
       }
 
@@ -260,7 +289,7 @@ export default function ContactPage() {
                   {submitError && (
                     <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4" role="alert" data-testid="message-submit-error">
                       <p className="text-sm text-foreground">
-                        {submitError}{' '}Please try again, or call{' '}
+                        {submitError}{' '}{isThrottled ? 'For immediate assistance, call' : 'Please try again, or call'}{' '}
                         <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a>
                         {' '}— Nova Havens answers 24/7.
                       </p>
