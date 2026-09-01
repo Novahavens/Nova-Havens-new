@@ -322,6 +322,11 @@ async function smokeTest(page: Page, path: string): Promise<void> {
   }
 
   // ── Visual snapshot ───────────────────────────────────────────────────────
+  // Pause autoplaying carousels before the screenshot so a slide transition
+  // cannot change the document height between Playwright's stability samples.
+  const carousel = page.getByTestId('carousel-showcase');
+  if (await carousel.count()) await carousel.hover();
+
   const imgLocators = page.locator('img');
 
   await expect(page).toHaveScreenshot({
