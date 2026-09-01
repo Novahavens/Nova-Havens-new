@@ -1,0 +1,19 @@
+kind = "design-system"
+previewPath = "/nova-havens-design-system/"
+title = "Nova Havens Design System"
+description = "A reusable design system extracted from Nova Havens: a calm, high-trust emergency housing platform for displaced families, adjusters, and furnished-property partners."
+version = "1.0.0"
+id = "artifacts/nova-havens-design-system"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/nova-havens-design-system/" ]
+localPort = 22514
+
+[services.development]
+run = "pnpm --filter @workspace/nova-havens-design-system run dev"
+
+[services.env]
+PORT = "22514"
+BASE_PATH = "/nova-havens-design-system/"
