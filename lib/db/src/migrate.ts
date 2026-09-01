@@ -43,6 +43,13 @@ const MIGRATIONS: readonly Migration[] = [
       )`,
     ],
   },
+  {
+    name: "0003_contact_rate_limits_window_index",
+    statements: [
+      `CREATE INDEX IF NOT EXISTS "contact_rate_limits_window_started_at_idx"
+         ON "contact_rate_limits" ("window_started_at")`,
+    ],
+  },
 ];
 
 // Arbitrary but fixed: two instances booting at once must pick the same lock.

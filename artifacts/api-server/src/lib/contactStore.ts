@@ -26,6 +26,48 @@ type DatabaseRateLimiterOptions = Pick<
   namespace: "email" | "sender";
 };
 
+const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+
+function getWindowSeconds(windowMs: number): number {
+  if (!Number.isInteger(windowMs) || windowMs < 1000) {
+    throw new Error("Rate-limit window must be at least one second");
+  }
+
+  const windowSeconds = windowMs / 1000;
+  if (!Number.isInteger(windowSeconds)) {
+    throw new Error("Rate-limit window must be a whole number of seconds");
+  }
+
+  return windowSeconds;
+}
+
+/**
+ * Deletes buckets whose fixed window has ended.
+ *
+ * The namespace predicate is important because different limiter namespaces
+ * may use different window lengths. The database clock keeps this decision
+ * consistent across API workers, and PostgreSQL's row locking makes a
+ * concurrent cleanup safe with the limiter upsert.
+ */
+export async function cleanupExpiredContactRateLimits({
+  namespace,
+  windowMs,
+}: Pick<
+  DatabaseRateLimiterOptions,
+  "namespace" | "windowMs"
+>): Promise<number> {
+  const windowSeconds = getWindowSeconds(windowMs);
+  const { rowCount } = await pool.query(
+    `DELETE FROM "contact_rate_limits"
+      WHERE "key" LIKE $1
+        AND "window_started_at" +
+            ($2 * INTERVAL '1 second') <= CURRENT_TIMESTAMP`,
+    [`${namespace}:%`, windowSeconds],
+  );
+
+  return rowCount ?? 0;
+}
+
 /**
  * Creates an atomic, Postgres-backed fixed-window limiter.
  *
@@ -41,17 +83,35 @@ export function createDatabaseRateLimiter({
   if (!Number.isInteger(limit) || limit < 1) {
     throw new Error("Rate limit must be a positive integer");
   }
-  if (!Number.isInteger(windowMs) || windowMs < 1000) {
-    throw new Error("Rate-limit window must be at least one second");
-  }
+  const windowSeconds = getWindowSeconds(windowMs);
+  let cleanupDueAt = 0;
+  let cleanupInFlight: Promise<void> | undefined;
 
-  const windowSeconds = windowMs / 1000;
-  if (!Number.isInteger(windowSeconds)) {
-    throw new Error("Rate-limit window must be a whole number of seconds");
+  async function runCleanupIfDue(): Promise<void> {
+    const now = Date.now();
+    if (now < cleanupDueAt) {
+      return;
+    }
+
+    if (!cleanupInFlight) {
+      cleanupDueAt = now + CLEANUP_INTERVAL_MS;
+      cleanupInFlight = cleanupExpiredContactRateLimits({
+        namespace,
+        windowMs,
+      })
+        .then(() => undefined)
+        .catch(() => undefined)
+        .finally(() => {
+          cleanupInFlight = undefined;
+        });
+    }
+
+    await cleanupInFlight;
   }
 
   return {
     async check(key) {
+      await runCleanupIfDue();
       const bucketKey = `${namespace}:${key}`;
       const { rows } = await pool.query<{
         count: number;

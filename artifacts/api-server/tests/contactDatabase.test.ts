@@ -42,6 +42,12 @@ type SubmissionResponse = {
   body: unknown;
 };
 
+let databasePool: { end(): Promise<void> } | undefined;
+
+test.after(async () => {
+  await databasePool?.end();
+});
+
 async function findFreePort(): Promise<number> {
   const server = createServer();
   await new Promise<void>((resolve, reject) => {
@@ -174,6 +180,7 @@ test(
   },
   async () => {
     const { pool } = await import("@workspace/db");
+    databasePool = pool;
     const firstWorker = await findFreePort();
     const secondWorker = await findFreePort();
     const thirdWorker = await findFreePort();
@@ -286,7 +293,63 @@ test(
         `DELETE FROM "contact_submissions" WHERE "email" = ANY($1::text[])`,
         [submittedEmails],
       );
-      await pool.end();
+    }
+  },
+);
+
+test(
+  "removes expired buckets without deleting active windows",
+  {
+    skip: !process.env["DATABASE_URL"]
+      ? "Requires DATABASE_URL for a development PostgreSQL database"
+      : false,
+  },
+  async () => {
+    const { pool } = await import("@workspace/db");
+    databasePool = pool;
+    const { cleanupExpiredContactRateLimits } =
+      await import("../src/lib/contactStore.ts");
+    const suffix = randomUUID();
+    const expiredKey = `email:cleanup-expired-${suffix}`;
+    const activeKey = `email:cleanup-active-${suffix}`;
+
+    try {
+      await pool.query(
+        `INSERT INTO "contact_rate_limits"
+          ("key", "window_started_at", "count", "updated_at")
+         VALUES
+          ($1, CURRENT_TIMESTAMP - ($3 * INTERVAL '1 second'), 2, CURRENT_TIMESTAMP),
+          ($2, CURRENT_TIMESTAMP - ($4 * INTERVAL '1 second'), 2, CURRENT_TIMESTAMP)`,
+        [
+          expiredKey,
+          activeKey,
+          RATE_LIMIT.windowMs / 1000 + 1,
+          RATE_LIMIT.windowMs / 1000 - 1,
+        ],
+      );
+
+      const deleted = await cleanupExpiredContactRateLimits({
+        namespace: "email",
+        windowMs: RATE_LIMIT.windowMs,
+      });
+
+      assert.equal(deleted, 1);
+      const { rows } = await pool.query<{ key: string }>(
+        `SELECT "key"
+           FROM "contact_rate_limits"
+          WHERE "key" = ANY($1::text[])
+          ORDER BY "key"`,
+        [[expiredKey, activeKey]],
+      );
+      assert.deepEqual(
+        rows.map((row) => row.key),
+        [activeKey],
+      );
+    } finally {
+      await pool.query(
+        `DELETE FROM "contact_rate_limits" WHERE "key" = ANY($1::text[])`,
+        [[expiredKey, activeKey]],
+      );
     }
   },
 );

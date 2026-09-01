@@ -10,3 +10,4 @@
 - [llms.txt article selection](llms-blog-selection.md) — list the three confirmed housing and family articles; omit the property-owner article.
 - [Vite lazy-route cache recovery](nova-havens-vite-cache.md) — stale optimized modules can mimic duplicate React after dependency cleanup; clear the cache and restart before editing hooks.
 - [Node source integration tests](node-source-integration-tests.md) — direct Node type-strip workers need explicit TS module specifiers throughout imported workspace packages.
+- [Contact rate-limit retention](contact-rate-limit-retention.md) — cleanup must use each namespace’s window length and the database clock so active buckets survive.

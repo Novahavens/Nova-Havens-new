@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /**
  * Fixed-window counters used by the public contact form.
@@ -8,17 +8,24 @@ import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
  * counter is capped at limit + 1 by the database-backed limiter, so repeated
  * rejected requests cannot make this table grow or overflow an integer.
  */
-export const contactRateLimitsTable = pgTable("contact_rate_limits", {
-  key: text("key").primaryKey(),
-  windowStartedAt: timestamp("window_started_at", {
-    withTimezone: true,
-  }).notNull(),
-  count: integer("count").notNull().default(0),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const contactRateLimitsTable = pgTable(
+  "contact_rate_limits",
+  {
+    key: text("key").primaryKey(),
+    windowStartedAt: timestamp("window_started_at", {
+      withTimezone: true,
+    }).notNull(),
+    count: integer("count").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    windowStartedAtIndex: index("contact_rate_limits_window_started_at_idx").on(
+      table.windowStartedAt,
+    ),
+  }),
+);
 
 export type ContactRateLimit = typeof contactRateLimitsTable.$inferSelect;
-export type InsertContactRateLimit =
-  typeof contactRateLimitsTable.$inferInsert;
+export type InsertContactRateLimit = typeof contactRateLimitsTable.$inferInsert;
