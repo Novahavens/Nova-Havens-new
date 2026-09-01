@@ -748,6 +748,52 @@ test.describe('Contact form', () => {
     ).toBeHidden();
   });
 
+  test('calculates the retry wait when a throttled response sends an HTTP-date', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioural check — one viewport is enough; the other projects cover layout.',
+    );
+
+    await page.route('**/api/contact', async (route) => {
+      await route.fulfill({
+        status: 429,
+        headers: {
+          // Retry-After supports an HTTP-date as well as a number of seconds.
+          'Retry-After': new Date(Date.now() + 120_000).toUTCString(),
+        },
+        contentType: 'application/json',
+        body: JSON.stringify({
+          error:
+            'Too many messages sent from this connection. Please wait a few minutes and try again, or call (629) 401-0054.',
+        }),
+      });
+    });
+
+    await page.goto('/contact');
+    await waitForStable(page);
+
+    await page.getByTestId('input-name').fill('Jane Doe');
+    await page.getByTestId('input-email').fill('jane@example.com');
+    await page.getByTestId('select-subject').selectOption('Housing Request');
+    await page
+      .getByTestId('input-message')
+      .fill('We need furnished housing for a displaced family in Nashville.');
+
+    await page.getByTestId('btn-submit-contact').click();
+
+    const errorPanel = page.getByTestId('message-submit-error');
+    await expect(errorPanel, 'A date-based throttle left the visitor with no error panel').toBeVisible();
+    await expect(errorPanel).toContainText(/Please wait (?:119|120) seconds before trying again\./);
+    await expect(
+      errorPanel.getByRole('link', { name: '(629) 401-0054' }),
+      'The date-based throttle must leave the 24/7 phone fallback usable',
+    ).toHaveAttribute('href', 'tel:+16294010054');
+    await expect(
+      page.getByTestId('message-success'),
+      'A date-based throttled send still showed the thank-you panel',
+    ).toBeHidden();
+  });
+
   test('uses a safe retry message when a throttled response omits Retry-After', async ({ page }) => {
     test.skip(
       test.info().project.name !== 'chromium',
