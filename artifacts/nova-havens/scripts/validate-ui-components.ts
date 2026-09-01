@@ -1,11 +1,12 @@
 /**
- * Reports UI primitives that are not reachable from the application's entry
+ * Reports source files that are not reachable from the application's entry
  * point.
  *
  * The UI directory is intentionally kept small: every component stored there
  * is a candidate for use in a route and can bring a runtime dependency with
- * it.  Following the source import graph catches both directly unused files
- * and files referenced only by another unused UI primitive.
+ * it. Following the source import graph catches both directly unused files
+ * and files referenced only by another unused UI primitive. The same graph is
+ * also used by the informational application-source report.
  *
  * Run with: node --experimental-strip-types scripts/validate-ui-components.ts
  */
@@ -21,6 +22,16 @@ const UI_DIR = join('src', 'components', 'ui');
 
 export const DEFAULT_SOURCE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 export const APPLICATION_ENTRY_POINTS = ['src/main.tsx'] as const;
+
+/**
+ * Source modules used by build-time entry points rather than the browser
+ * entry point. Keep this list explicit: adding a source file here should be a
+ * deliberate decision, not an accidental way to silence the report.
+ */
+export const DEFAULT_APPLICATION_SOURCE_EXCLUSIONS = [
+  'src/lib/routeContent.ts',
+  'src/lib/validateRules.ts',
+] as const;
 
 function collectSourceFiles(directory: string, files: string[] = []): string[] {
   for (const entry of readdirSync(directory)) {
@@ -43,6 +54,26 @@ function collectSourceFiles(directory: string, files: string[] = []): string[] {
 function isWithin(filePath: string, directory: string): boolean {
   const relativePath = relative(directory, filePath);
   return relativePath !== '' && !relativePath.startsWith(`..${sep}`) && relativePath !== '..';
+}
+
+function normalizedSourcePath(filePath: string): string {
+  return filePath.split(sep).join('/');
+}
+
+function isExcludedSourceFile(
+  filePath: string,
+  sourceRoot: string,
+  exclusions: readonly string[],
+): boolean {
+  const relativePath = normalizedSourcePath(relative(sourceRoot, filePath));
+
+  return exclusions.some((exclusion) => {
+    const normalizedExclusion = normalizedSourcePath(exclusion).replace(/\/+$/, '');
+    return (
+      relativePath === normalizedExclusion ||
+      relativePath.startsWith(`${normalizedExclusion}/`)
+    );
+  });
 }
 
 function resolveImport(importer: string, specifier: string, sourceRoot: string): string | null {
@@ -163,8 +194,15 @@ function unreachableSourceFiles(
 export function findUnreachableSourceFiles(
   sourceRoot = DEFAULT_SOURCE_ROOT,
   entryPoints: readonly string[] = APPLICATION_ENTRY_POINTS,
+  exclusions: readonly string[] = [],
 ): string[] {
-  return unreachableSourceFiles(sourceRoot, entryPoints);
+  const unreachableFiles = unreachableSourceFiles(sourceRoot, entryPoints);
+  const absoluteSourceRoot = resolve(sourceRoot);
+
+  return unreachableFiles.filter((sourceFile) => {
+    const absoluteSourceFile = resolve(absoluteSourceRoot, sourceFile);
+    return !isExcludedSourceFile(absoluteSourceFile, absoluteSourceRoot, exclusions);
+  });
 }
 
 export function findUnusedUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): string[] {
@@ -174,6 +212,26 @@ export function findUnusedUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): string
   return findUnreachableSourceFiles(sourceRoot)
     .map((sourceFile) => resolve(absoluteSourceRoot, sourceFile))
     .filter((sourceFile) => isWithin(sourceFile, uiDirectory))
+    .map((sourceFile) => relative(absoluteSourceRoot, sourceFile))
+    .sort();
+}
+
+/**
+ * Finds unreachable application files while leaving the shared UI directory
+ * to its stricter, blocking validator. Exclusions are relative to sourceRoot
+ * and can name either a file or a directory.
+ */
+export function findUnusedApplicationFiles(
+  sourceRoot = DEFAULT_SOURCE_ROOT,
+  entryPoints: readonly string[] = APPLICATION_ENTRY_POINTS,
+  exclusions: readonly string[] = DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
+): string[] {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const uiDirectory = join(absoluteSourceRoot, UI_DIR);
+
+  return findUnreachableSourceFiles(sourceRoot, entryPoints, exclusions)
+    .map((sourceFile) => resolve(absoluteSourceRoot, sourceFile))
+    .filter((sourceFile) => !isWithin(sourceFile, uiDirectory))
     .map((sourceFile) => relative(absoluteSourceRoot, sourceFile))
     .sort();
 }

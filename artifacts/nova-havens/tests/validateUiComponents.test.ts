@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { test } from 'node:test';
 
 import {
+  DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
+  findUnusedApplicationFiles,
   findUnreachableSourceFiles,
   findUnusedUiComponents,
 } from '../scripts/validate-ui-components.ts';
@@ -75,6 +77,63 @@ export default Used;
     'src/components/ui/string-only.tsx',
     'src/components/ui/unused.tsx',
   ]);
+});
+
+test('reports unreachable application files outside UI and honors exclusions', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-source-reachability-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src', 'components', 'ui'), { recursive: true });
+  mkdirSync(join(sourceRoot, 'src', 'lib', 'routes'), { recursive: true });
+  mkdirSync(join(sourceRoot, 'src', 'standalone'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    "import Live from './components/Live';\nexport default Live;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'components', 'Live.tsx'),
+    'export default function Live() { return null; }\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'components', 'ui', 'unused.tsx'),
+    'export default function Unused() { return null; }\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'lib', 'routeContent.ts'),
+    "import './routes/home';\nexport const routeContent = true;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'lib', 'routes', 'home.ts'),
+    'export const homeRoute = true;\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'standalone', 'report.ts'),
+    'export const report = true;\n',
+  );
+
+  deepEqual(findUnusedApplicationFiles(sourceRoot), [
+    'src/lib/routes/home.ts',
+    'src/standalone/report.ts',
+  ]);
+  deepEqual(
+    findUnusedApplicationFiles(sourceRoot, ['src/main.tsx'], [
+      ...DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
+      'src/standalone',
+    ]),
+    ['src/lib/routes/home.ts'],
+  );
+  deepEqual(
+    findUnusedApplicationFiles(sourceRoot, ['src/main.tsx'], [
+      ...DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
+      'src/standalone',
+      'src/lib/routes',
+    ]),
+    [],
+  );
 });
 
 test('the checked-in UI directory has no unreachable components', () => {
