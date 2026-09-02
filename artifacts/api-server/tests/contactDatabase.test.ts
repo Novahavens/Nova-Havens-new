@@ -353,3 +353,70 @@ test(
     }
   },
 );
+
+test(
+  "logs cleanup failures without blocking the next rate-limit check",
+  {
+    skip: !process.env["DATABASE_URL"]
+      ? "Requires DATABASE_URL for a development PostgreSQL database"
+      : false,
+  },
+  async () => {
+    const { pool } = await import("@workspace/db");
+    databasePool = pool;
+    const { createDatabaseRateLimiter } =
+      await import("../src/lib/contactStore.ts");
+    const { logger } = await import("../src/lib/logger.ts");
+    const key = `cleanup-failure-${randomUUID()}`;
+    const storedKey = `email:${key}`;
+    const cleanupError = new Error("cleanup database unavailable");
+    const warnings: Array<{ bindings: unknown; message: string }> = [];
+    const originalQuery = pool.query.bind(pool);
+    const originalWarn = logger.warn;
+    let queryCount = 0;
+
+    pool.query = async (...args: any[]) => {
+      if (queryCount === 0) {
+        queryCount += 1;
+        throw cleanupError;
+      }
+      queryCount += 1;
+      return originalQuery(...args);
+    };
+    logger.warn = ((bindings: unknown, message: string) => {
+      warnings.push({ bindings, message });
+    }) as typeof logger.warn;
+
+    try {
+      const limiter = createDatabaseRateLimiter({
+        limit: RATE_LIMIT.limit,
+        windowMs: RATE_LIMIT.windowMs,
+        namespace: "email",
+      });
+
+      const decision = await limiter.check(key);
+
+      assert.deepEqual(decision, {
+        allowed: true,
+        remaining: RATE_LIMIT.limit - 1,
+      });
+      assert.deepEqual(warnings, [
+        {
+          bindings: {
+            err: cleanupError,
+            namespace: "email",
+            windowMs: RATE_LIMIT.windowMs,
+          },
+          message: "Contact rate-limit cleanup failed",
+        },
+      ]);
+    } finally {
+      logger.warn = originalWarn;
+      pool.query = originalQuery;
+      await originalQuery(
+        `DELETE FROM "contact_rate_limits" WHERE "key" = $1`,
+        [storedKey],
+      );
+    }
+  },
+);

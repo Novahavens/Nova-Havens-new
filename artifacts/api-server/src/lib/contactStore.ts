@@ -6,6 +6,7 @@ import {
   type RateLimiter,
   type RateLimiterOptions,
 } from "../routes/contact.ts";
+import { logger } from "./logger.ts";
 
 /** Stores contact page submissions in the contact_submissions table. */
 export const dbContactStore: ContactStore = {
@@ -100,7 +101,12 @@ export function createDatabaseRateLimiter({
         windowMs,
       })
         .then(() => undefined)
-        .catch(() => undefined)
+        .catch((err) => {
+          logger.warn(
+            { err, namespace, windowMs },
+            "Contact rate-limit cleanup failed",
+          );
+        })
         .finally(() => {
           cleanupInFlight = undefined;
         });
