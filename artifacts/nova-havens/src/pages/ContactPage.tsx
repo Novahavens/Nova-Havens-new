@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'wouter';
 import { Phone, Mail, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { NativeSelect } from '@/components/ui/native-select';
+import { Button } from '@workspace/nova-havens-design-system/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/nova-havens-design-system/components/ui/form';
+import { Input } from '@workspace/nova-havens-design-system/components/ui/input';
+import { Textarea } from '@workspace/nova-havens-design-system/components/ui/textarea';
+import { NativeSelect } from '@workspace/nova-havens-design-system/components/ui/native-select';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import {
   CONTACT_FORM_DEFAULT_VALUES,

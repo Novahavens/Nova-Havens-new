@@ -1,8 +1,8 @@
 import { Link } from 'wouter';
 import { Menu } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@workspace/nova-havens-design-system/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@workspace/nova-havens-design-system/components/ui/sheet';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 
 export function Logo() {

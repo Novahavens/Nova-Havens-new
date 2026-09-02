@@ -1,151 +1,39 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@plugin "@tailwindcss/typography";
-
-@custom-variant dark (&:is(.dark *));
+@import "@workspace/nova-havens-design-system/styles.css";
 
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  /* Section surface scale: closest-to-background → most raised */
-  --color-surface-1: #0d0f14;
-  --color-surface-2: #151820;
-  --color-surface-3: #1a1d24;
-  /* Tertiary (most de-emphasized) text — 5.05:1 on background, passes AA */
-  --color-tertiary: #7a828f;
-  --font-sans: var(--app-font-sans);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  /*
-   * ── Content-width scale ───────────────────────────────────────────────────
-   *
-   * These tokens generate Tailwind max-w-* utilities automatically.
-   * Always use the named class — never write a raw max-w-[Xpx] / max-w-[Xrem]
-   * whose value matches one of these; validate-tokens.ts will flag it.
-   *
-   *   max-w-site        75rem  / 1200px — full site container
-   *   max-w-section   68.75rem / 1100px — section content container
-   *   max-w-content   56.25rem /  900px — hero / mid content block
-   *   max-w-prose-wide  50rem  /  800px — wide prose / mission sections
-   *   max-w-prose      47.5rem /  760px — article / FAQ / narrow sections
-   *   max-w-cta       26.25rem /  420px — small CTA callout
-   *
-   * To add a new width stop: define --width-<name> here, then use max-w-<name>
-   * in components.  Do NOT introduce a one-off max-w-[Npx] in a component.
-   * ─────────────────────────────────────────────────────────────────────────
-   */
-  --width-site: 75rem;         /* 1200px — full site container */
-  --width-section: 68.75rem;   /* 1100px — section content container */
-  --width-content: 56.25rem;   /* 900px  — hero / mid content block */
-  --width-prose-wide: 50rem;   /* 800px  — wide prose / mission sections */
-  --width-prose: 47.5rem;      /* 760px  — article / FAQ / narrow sections */
-  --width-cta: 26.25rem;       /* 420px  — small CTA callout */
+  /* App-specific surfaces and type hierarchy layered over shared tokens. */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-tertiary: var(--tertiary);
+  --width-site: 75rem;
+  --width-section: 68.75rem;
+  --width-content: 56.25rem;
+  --width-prose-wide: 50rem;
+  --width-prose: 47.5rem;
+  --width-cta: 26.25rem;
 }
 
-/*
- * ============================================================================
- * COLOR SYSTEM RULES — do not add new color values without updating these.
- *
- * There is exactly ONE gold in this system: #D4A24C (--primary). Never
- * introduce a second gold/yellow/amber hex. Never hardcode hex colors in
- * components — always use the tokens below (Tailwind: bg-primary, text-card,
- * bg-surface-1, text-tertiary, etc.).
- *
- * GOLD IS PERMITTED on (accent-scale only):
- *   - icons up to 32px
- *   - small uppercase labels / eyebrows
- *   - pill borders and tinted pill backgrounds (bg-primary/10)
- *   - button fills
- *   - active tab and carousel-dot/progress states
- *   - link text and hover states
- *   - focus rings
- *   - thin dividers / connector lines
- *   - small map markers
- *
- * GOLD IS NOT PERMITTED on:
- *   - type larger than 24px (large numbers/headlines use --foreground;
- *     size and weight carry the emphasis, not color)
- *   - section background fills
- *   - large shape fills over 48px (use a dark surface + thin gold border)
- *   - body copy
- *
- * TEXT ON A GOLD FILL must always be the near-black --primary-foreground,
- * NEVER off-white: off-white on gold = 2.12:1 (fails WCAG AA 4.5:1);
- * dark on gold = 8.46:1 (passes).
- *
- * TEXT COLORS — exactly three, no opacity variants:
- *   primary   --foreground        #F5F5F2
- *   secondary --muted-foreground  #9BA3AF
- *   tertiary  --color-tertiary    #7A828F
- * ============================================================================
- */
 :root {
-  --app-font-sans: 'Plus Jakarta Sans', sans-serif;
-  --radius: 1rem; /* 16px for cards */
-  /* Architectural heights — use as min-h-[var(--min-h-*)] */
-  --min-h-textarea: 9.375rem;    /* 150px — contact form message field */
-  --min-h-map: 18.75rem;         /* 300px — mobile map container */
-  --min-h-map-md: 21.875rem;     /* 350px — tablet map container */
-  --min-h-map-lg: 31.25rem;      /* 500px — desktop map container */
-  /* Hero heading fluid size — use as fontSize: 'var(--text-hero)' */
-  --text-hero: clamp(3rem, 6vw, 5rem);   /* clamp(48px, 6vw, 80px) in rem */
-  /* Modal max-height — use as max-h-[var(--max-h-modal)] */
-  --max-h-modal: 85vh;
-  /* Glow shadows — reference primary token, use as shadow-[var(--shadow-glow-*)] */
+  /* These values are compositions unique to Nova Havens, not theme tokens. */
+  --surface-1: #0d0f14;
+  --surface-2: #151820;
+  --surface-3: #1a1d24;
+  --tertiary: #7a828f;
+
+  /* Architectural heights — use as min-h-[var(--min-h-*)]. */
+  --min-h-textarea: 9.375rem;
+  --min-h-map: 18.75rem;
+  --min-h-map-md: 21.875rem;
+  --min-h-map-lg: 31.25rem;
+
+  /* Hero heading fluid size — use as fontSize: 'var(--text-hero)'. */
+  --text-hero: clamp(3rem, 6vw, 5rem);
+
+  /* Glow shadows — reference the shared primary token. */
   --shadow-glow-lg: 0 0 22px hsl(var(--primary) / 0.42);
   --shadow-glow-md: 0 0 18px hsl(var(--primary) / 0.45);
   --shadow-glow-sm: 0 0 15px hsl(var(--primary) / 0.15);
-
-  /* #0A0C10 as HSL: 224 28% 6% */
-  --background: 220 23% 5%;
-  /* #F5F5F2 as HSL: 60 7% 96% */
-  --foreground: 60 7% 96%;
-  /* #111318 as HSL: 228 20% 8% */
-  --card: 228 20% 8%;
-  --card-foreground: 60 7% 96%;
-  /* popover */
-  --popover: 228 20% 8%;
-  --popover-foreground: 60 7% 96%;
-  /* #D4A24C as HSL: 38 58% 56% */
-  --primary: 38 58% 56%;
-  /* dark text on gold */
-  --primary-foreground: 224 28% 6%;
-  --secondary: 228 20% 12%;
-  --secondary-foreground: 60 7% 96%;
-  --muted: 228 20% 12%;
-  /* #9BA3AF as HSL: 216 13% 65% */
-  --muted-foreground: 216 13% 65%;
-  --accent: 228 20% 14%;
-  --accent-foreground: 60 7% 96%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 60 7% 96%;
-  --border: 228 20% 14%;
-  --input: 228 20% 14%;
-  --ring: 38 58% 56%;
-}
-
-@layer base {
-  * { @apply border-border; box-sizing: border-box; }
-  body { @apply font-sans antialiased bg-background text-foreground; }
 }
 
 @keyframes marquee {
@@ -163,28 +51,30 @@
   .animate-marquee {
     animation: marquee 30s linear infinite;
   }
+
   @media (prefers-reduced-motion: reduce) {
     .animate-marquee { animation: none; }
   }
 }
-/* ── Meet the Team: staggered reveal + interactive card hover ─────────────
-   Reveal runs once per card as it scrolls into view (JS adds .is-visible).
-   Hover lift/glow lives on a nested element so reveal delays never affect
-   hover timing. Both are fully disabled under prefers-reduced-motion. */
+
+/* Meet the Team: staggered reveal and interactive card hover. */
 .team-card-reveal {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s ease var(--reveal-delay, 0ms),
     transform 0.5s ease var(--reveal-delay, 0ms);
 }
+
 .team-card-reveal.is-visible {
   opacity: 1;
   transform: none;
 }
+
 .team-card-interactive {
   transition: transform 0.25s ease, border-color 0.25s ease,
     box-shadow 0.25s ease;
 }
+
 .team-card-interactive:hover,
 .team-card-interactive:focus-visible {
   transform: translateY(-4px);
@@ -192,12 +82,14 @@
   box-shadow: 0 12px 36px -10px hsl(var(--primary) / 0.3);
   cursor: pointer;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .team-card-reveal {
     opacity: 1;
     transform: none;
     transition: none;
   }
+
   .team-card-interactive,
   .team-card-interactive:hover,
   .team-card-interactive:focus-visible {

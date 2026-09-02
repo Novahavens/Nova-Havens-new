@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@workspace/nova-havens-design-system/components/ui/toaster';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import Layout from '@/components/Layout';
 import { useRouteMeta } from '@/lib/useRouteMeta';

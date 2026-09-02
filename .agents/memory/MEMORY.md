@@ -11,4 +11,4 @@
 - [Vite lazy-route cache recovery](nova-havens-vite-cache.md) — stale optimized modules can mimic duplicate React after dependency cleanup; clear the cache and restart before editing hooks.
 - [Node source integration tests](node-source-integration-tests.md) — direct Node type-strip workers need explicit TS module specifiers throughout imported workspace packages.
 - [Contact rate-limit retention](contact-rate-limit-retention.md) — cleanup must use each namespace’s window length and the database clock so active buckets survive.
-- [Nova Havens design-system extraction](nova-havens-design-system.md) — dark-first source fidelity, text wordmark only, and screen migration stays approval-gated.
+- [Nova Havens design-system migration](nova-havens-design-system.md) — live screens consume the approved package; preserve dark-first fidelity and keep app-only compositions local.

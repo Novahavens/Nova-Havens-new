@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown, Building2, HeartHandshake, Clock } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/nova-havens-design-system/components/ui/tabs';
 import useEmblaCarousel from 'embla-carousel-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/nova-havens-design-system/components/ui/button';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
-import ElegantCarousel, { type ElegantSlide } from '@/components/ui/elegant-carousel';
+import ElegantCarousel, { type ElegantSlide } from '@workspace/nova-havens-design-system/components/ui/elegant-carousel';
 import GoogleRating from '@/components/GoogleRating';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 
