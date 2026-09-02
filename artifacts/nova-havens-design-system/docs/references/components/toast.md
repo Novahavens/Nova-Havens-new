@@ -4,9 +4,17 @@
   in `artifacts/nova-havens/src/`.
 - **Public exports:** Toast primitives plus `Toaster`; provider-backed
   notifications are grouped as one family.
-- **Behavior:** transient feedback, action/close controls, viewport placement,
-  and provider state.
+- **Behavior:** transient feedback, one-visible-toast limit, action/close
+  controls, viewport placement, swipe dismissal, and provider-backed shared
+  state.
 - **Consumers:** shared app infrastructure; no current user-facing call site
   was found during extraction.
-- **Dependencies:** Radix Toast, React context/state, and `cn`.
-- **Chunk:** 2, pending until the pilot is approved.
+- **Dependencies:** Radix Toast, React state, CVA, Lucide X, and `cn`.
+- **Implementation:** primitives in `src/components/ui/toast.tsx`, provider
+  renderer in `src/components/ui/toaster.tsx`, and shared API in
+  `src/hooks/use-toast.tsx`; preview story:
+  `src/preview/demos/toast.tsx`.
+- **Usage:** mount one `Toaster` at the app shell and call `toast(...)` or
+  `useToast()` from consumers. Use `ToastAction` for a short recovery action;
+  Toast's built-in close control remains available for dismissal.
+- **Chunk:** 2.

@@ -26,6 +26,12 @@ const CardDemo = lazyPage(() =>
 const TabsDemo = lazyPage(() =>
   import('./demos/tabs').then(({ TabsDemo }) => TabsDemo),
 );
+const ElegantCarouselDemo = lazyPage(() =>
+  import('./demos/elegant-carousel').then(({ ElegantCarouselDemo }) => ElegantCarouselDemo),
+);
+const ToastDemo = lazyPage(() =>
+  import('./demos/toast').then(({ ToastDemo }) => ToastDemo),
+);
 
 export type PreviewEntry = {
   id: string;
@@ -149,6 +155,23 @@ export const NAV_GROUPS: NavGroup[] = [
         name: 'Tabs',
         description: 'Audience or workflow views within a shared content region.',
         Page: TabsDemo,
+      },
+    ],
+  },
+  {
+    name: 'Feedback & motion',
+    entries: [
+      {
+        id: 'elegant-carousel',
+        name: 'Elegant carousel',
+        description: 'Timed property and testimonial storytelling with direct controls and touch support.',
+        Page: ElegantCarouselDemo,
+      },
+      {
+        id: 'toast',
+        name: 'Toast',
+        description: 'Transient provider-backed feedback with close and recovery actions.',
+        Page: ToastDemo,
       },
     ],
   },

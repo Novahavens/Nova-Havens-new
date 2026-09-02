@@ -14,8 +14,8 @@ not copied into the design-system package.
 | Sheet | `components/sheet.md` | Radix Dialog, CVA, Lucide X, `cn` | Responsive Navbar mobile menu | 1 · pilot | implemented |
 | Card | `components/card.md` | `cn` | Not-found card plus repeated site card treatment | 1 · pilot | implemented |
 | Tabs | `components/tabs.md` | Radix Tabs, `cn` | Homepage audience switcher for family, adjuster, and owner paths | 1 · pilot | implemented |
-| ElegantCarousel | `components/elegant-carousel.md` | React state/effects, Lucide controls | Homepage property showcase and testimonials | 2 | pending |
-| Toast | `components/toast.md` | Radix Toast, `use-toast` | Shared feedback infrastructure; no current user-facing call site | 2 | pending |
+| ElegantCarousel | `components/elegant-carousel.md` | React state/effects, Lucide controls | Homepage property showcase and testimonials | 2 | implemented |
+| Toast | `components/toast.md` | Radix Toast, `use-toast` | Shared feedback infrastructure; no current user-facing call site | 2 | implemented |
 
 ## Source runtime and composition notes
 

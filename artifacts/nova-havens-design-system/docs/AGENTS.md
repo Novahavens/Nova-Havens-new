@@ -51,8 +51,7 @@ accessible counterpart because the source ships a dark presentation only. The
 source has no standalone Nova Havens wordmark asset: the preview therefore uses
 the source's text treatment (“Nova” in foreground plus “Havens” in primary) and
 does not invent or retain a logo file. The pilot currently implements Button,
-the Form field kit, Sheet, Card, and Tabs. ElegantCarousel and Toast remain
-pending for the next approved chunk.
+the Form field kit, Sheet, Card, Tabs, ElegantCarousel, and Toast.
 
 Source-derived visual guidance:
 
