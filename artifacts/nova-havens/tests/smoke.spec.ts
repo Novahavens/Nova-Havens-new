@@ -828,6 +828,62 @@ test.describe('Contact form', () => {
       errorPanel.getByRole('link', { name: '(629) 401-0054' }),
     ).toHaveAttribute('href', 'tel:+16294010054');
   });
+
+  const INVALID_RETRY_AFTER_VALUES = [
+    { label: 'a malformed value', value: 'not-a-retry-window' },
+    { label: 'a date-like but invalid value', value: '2099-12-31' },
+    { label: 'an impossible April date', value: 'Wed, 31 Apr 2099 00:00:00 GMT' },
+    { label: 'an impossible non-leap-year February date', value: 'Thu, 29 Feb 2099 00:00:00 GMT' },
+    { label: 'an expired HTTP-date', value: new Date(Date.now() - 60_000).toUTCString() },
+    { label: 'zero seconds', value: '0' },
+    { label: 'a negative number of seconds', value: '-30' },
+  ] as const;
+
+  for (const retryAfter of INVALID_RETRY_AFTER_VALUES) {
+    test(`uses safe guidance for ${retryAfter.label} and keeps the phone fallback usable`, async ({
+      page,
+    }) => {
+      test.skip(
+        test.info().project.name !== 'chromium',
+        'Behavioural check — one viewport is enough; the other projects cover layout.',
+      );
+
+      await page.route('**/api/contact', async (route) => {
+        await route.fulfill({
+          status: 429,
+          headers: { 'Retry-After': retryAfter.value },
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Too many messages sent from this connection.' }),
+        });
+      });
+
+      await page.goto('/contact');
+      await waitForStable(page);
+
+      await page.getByTestId('input-name').fill('Jane Doe');
+      await page.getByTestId('input-email').fill('jane@example.com');
+      await page.getByTestId('select-subject').selectOption('Housing Request');
+      await page
+        .getByTestId('input-message')
+        .fill('We need furnished housing for a displaced family in Nashville.');
+
+      await page.getByTestId('btn-submit-contact').click();
+
+      const errorPanel = page.getByTestId('message-submit-error');
+      await expect(errorPanel, `A throttled ${retryAfter.label} had no error panel`).toBeVisible();
+      await expect(errorPanel).toContainText(
+        'Please wait a few minutes before trying again.',
+      );
+      await expect(
+        errorPanel.getByRole('link', { name: '(629) 401-0054' }),
+        `The ${retryAfter.label} response must keep the 24/7 phone fallback usable`,
+      ).toHaveAttribute('href', 'tel:+16294010054');
+      await expect(
+        page.getByTestId('message-success'),
+        `A throttled ${retryAfter.label} still showed the thank-you panel`,
+      ).toBeHidden();
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------

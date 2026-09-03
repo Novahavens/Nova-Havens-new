@@ -16,16 +16,97 @@ import {
 
 type FormValues = ContactFormValues;
 
+const HTTP_DATE_PATTERN =
+  /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT|((?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)), (\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{2}) (\d{2}):(\d{2}):(\d{2}) GMT|(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) {1,2}(\d{1,2}) (\d{2}):(\d{2}):(\d{2}) (\d{4}))$/;
+
+const HTTP_WEEKDAYS = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+] as const;
+
+const HTTP_MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+] as const;
+
+function parseHttpDate(value: string): number {
+  const match = value.match(HTTP_DATE_PATTERN);
+  if (!match) return Number.NaN;
+
+  const isImfFixdate = match[1] !== undefined;
+  const isRfc850 = match[8] !== undefined;
+  const weekday = isImfFixdate ? match[1] : isRfc850 ? match[8] : match[15];
+  const month = isImfFixdate ? match[3] : isRfc850 ? match[10] : match[16];
+  const day = Number(isImfFixdate ? match[2] : isRfc850 ? match[9] : match[17]);
+  const hour = Number(isImfFixdate ? match[5] : isRfc850 ? match[12] : match[18]);
+  const minute = Number(isImfFixdate ? match[6] : isRfc850 ? match[13] : match[19]);
+  const second = Number(isImfFixdate ? match[7] : isRfc850 ? match[14] : match[20]);
+  const year = Number(isImfFixdate ? match[4] : isRfc850 ? match[11] : match[21]);
+  const dateValue = isRfc850 || isImfFixdate ? value : `${value} GMT`;
+  const parsedAt = Date.parse(dateValue);
+
+  if (
+    Number.isNaN(parsedAt) ||
+    !weekday ||
+    !month ||
+    !HTTP_MONTHS.includes(month as (typeof HTTP_MONTHS)[number]) ||
+    hour > 23 ||
+    minute > 59 ||
+    second > 59
+  ) {
+    return Number.NaN;
+  }
+
+  const parsedDate = new Date(parsedAt);
+  const expectedWeekday = weekday.length === 3
+    ? HTTP_WEEKDAYS.findIndex((name) => name.startsWith(weekday))
+    : HTTP_WEEKDAYS.indexOf(weekday as (typeof HTTP_WEEKDAYS)[number]);
+  const expectedYear = isRfc850 ? parsedDate.getUTCFullYear() % 100 : year;
+
+  if (
+    parsedDate.getUTCFullYear() !== (isRfc850 ? parsedDate.getUTCFullYear() : year) ||
+    parsedDate.getUTCMonth() !== HTTP_MONTHS.indexOf(month as (typeof HTTP_MONTHS)[number]) ||
+    parsedDate.getUTCDate() !== day ||
+    parsedDate.getUTCHours() !== hour ||
+    parsedDate.getUTCMinutes() !== minute ||
+    parsedDate.getUTCSeconds() !== second ||
+    parsedDate.getUTCDay() !== expectedWeekday ||
+    expectedYear !== year
+  ) {
+    return Number.NaN;
+  }
+
+  return parsedAt;
+}
+
 function getThrottleMessage(retryAfter: string | null): string {
   const retryAfterValue = retryAfter?.trim() ?? '';
-  const retryAfterSeconds = Number(retryAfterValue);
+  const isNumericRetryAfter = /^[+-]?\d+$/.test(retryAfterValue);
+  const retryAfterSeconds = /^\d+$/.test(retryAfterValue)
+    ? Number(retryAfterValue)
+    : Number.NaN;
 
-  if (Number.isInteger(retryAfterSeconds) && retryAfterSeconds > 0) {
+  if (Number.isSafeInteger(retryAfterSeconds) && retryAfterSeconds > 0) {
     const unit = retryAfterSeconds === 1 ? 'second' : 'seconds';
     return `Messages are temporarily limited. Please wait ${retryAfterSeconds} ${unit} before trying again.`;
   }
 
-  const retryAt = Date.parse(retryAfterValue);
+  const retryAt = isNumericRetryAfter ? Number.NaN : parseHttpDate(retryAfterValue);
   if (!Number.isNaN(retryAt)) {
     const remainingSeconds = Math.ceil((retryAt - Date.now()) / 1000);
     if (remainingSeconds > 0) {
