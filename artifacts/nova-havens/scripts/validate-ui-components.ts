@@ -11,7 +11,7 @@
  * Run with: node --experimental-strip-types scripts/validate-ui-components.ts
  */
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,6 +19,36 @@ import * as ts from 'typescript';
 
 const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
 const UI_DIR = join('src', 'components', 'ui');
+const DESIGN_SYSTEM_PACKAGE = '@workspace/nova-havens-design-system';
+const DESIGN_SYSTEM_STYLE_IMPORT_RE = new RegExp(
+  `@import\\s+["']${DESIGN_SYSTEM_PACKAGE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\/styles\\.css["']\\s*;`,
+);
+const DESIGN_SYSTEM_UI_DIR = join('src', 'components', 'ui');
+const DESIGN_SYSTEM_HELPER_PATHS = new Set([
+  'src/lib/utils',
+  'src/hooks/use-toast',
+]);
+
+/**
+ * The fallback inventory keeps this validator useful in isolated fixture
+ * directories. In the real app, the inventory is augmented from the design
+ * system package so adding a new package primitive does not silently weaken
+ * the migration guard.
+ */
+export const FALLBACK_DESIGN_SYSTEM_UI_COMPONENTS = [
+  'button',
+  'card',
+  'elegant-carousel',
+  'form',
+  'input',
+  'label',
+  'native-select',
+  'sheet',
+  'tabs',
+  'textarea',
+  'toaster',
+  'toast',
+] as const;
 
 export const DEFAULT_SOURCE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 export const APPLICATION_ENTRY_POINTS = ['src/main.tsx'] as const;
@@ -115,7 +145,7 @@ function scriptKind(filePath: string): ts.ScriptKind {
   }
 }
 
-function importedFiles(filePath: string, sourceRoot: string): string[] {
+function moduleSpecifiers(filePath: string): string[] {
   const sourceFile = ts.createSourceFile(
     filePath,
     readFileSync(filePath, 'utf8'),
@@ -159,9 +189,202 @@ function importedFiles(filePath: string, sourceRoot: string): string[] {
 
   visit(sourceFile);
 
-  return [...imports]
+  return [...imports];
+}
+
+function importedFiles(filePath: string, sourceRoot: string): string[] {
+  return moduleSpecifiers(filePath)
     .map((specifier) => resolveImport(filePath, specifier, sourceRoot))
     .filter((imported): imported is string => imported !== null);
+}
+
+function designSystemUiComponents(sourceRoot: string): Set<string> {
+  const componentNames = new Set<string>(FALLBACK_DESIGN_SYSTEM_UI_COMPONENTS);
+  const packageUiDirectory = resolve(sourceRoot, '..', 'nova-havens-design-system', DESIGN_SYSTEM_UI_DIR);
+
+  if (!existsSync(packageUiDirectory)) return componentNames;
+
+  for (const filePath of collectSourceFiles(packageUiDirectory)) {
+    const relativePath = relative(packageUiDirectory, filePath);
+    if (!relativePath.includes(sep)) {
+      componentNames.add(relativePath.slice(0, -extname(relativePath).length));
+    }
+  }
+
+  return componentNames;
+}
+
+function sourceRelativePath(sourceRoot: string, filePath: string): string {
+  return normalizedSourcePath(relative(resolve(sourceRoot), resolve(filePath)));
+}
+
+function sourcePathWithoutExtension(sourceRoot: string, filePath: string): string {
+  const relativePath = sourceRelativePath(sourceRoot, filePath);
+  return relativePath.replace(/\.(?:tsx?|jsx?)$/, '');
+}
+
+function isDesignSystemUiFile(
+  sourceRoot: string,
+  filePath: string,
+  componentNames: ReadonlySet<string>,
+): boolean {
+  const relativePath = sourceRelativePath(sourceRoot, filePath);
+  if (!relativePath.startsWith(`${normalizedSourcePath(DESIGN_SYSTEM_UI_DIR)}/`)) {
+    return false;
+  }
+
+  const componentPath = relativePath.slice(`${normalizedSourcePath(DESIGN_SYSTEM_UI_DIR)}/`.length);
+  const componentName = componentPath.split('/')[0].replace(/\.(?:tsx?|jsx?)$/, '');
+  return componentNames.has(componentName);
+}
+
+function isDesignSystemHelperFile(sourceRoot: string, filePath: string): boolean {
+  return DESIGN_SYSTEM_HELPER_PATHS.has(sourcePathWithoutExtension(sourceRoot, filePath));
+}
+
+function isToastHookFile(sourceRoot: string, filePath: string): boolean {
+  return sourcePathWithoutExtension(sourceRoot, filePath) === 'src/hooks/use-toast';
+}
+
+function localDesignSystemImportKind(
+  importer: string,
+  specifier: string,
+  sourceRoot: string,
+  componentNames: ReadonlySet<string>,
+): 'ui' | 'utils' | 'toast' | null {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const uiPrefix = 'components/ui/';
+  const normalizedSpecifier = specifier.replace(/\\/g, '/').replace(/\.(?:tsx?|jsx?)$/, '');
+
+  if (
+    normalizedSpecifier.startsWith(`@/${uiPrefix}`) &&
+    componentNames.has(normalizedSpecifier.slice(`@/${uiPrefix}`.length).split('/')[0])
+  ) {
+    return 'ui';
+  }
+  if (normalizedSpecifier === '@/lib/utils' || normalizedSpecifier === '@/hooks/use-toast') {
+    return normalizedSpecifier === '@/lib/utils' ? 'utils' : 'toast';
+  }
+
+  const imported = resolveImport(importer, specifier, absoluteSourceRoot);
+  if (!imported) return null;
+  if (isDesignSystemUiFile(absoluteSourceRoot, imported, componentNames)) return 'ui';
+  if (isDesignSystemHelperFile(absoluteSourceRoot, imported)) {
+    return isToastHookFile(absoluteSourceRoot, imported) ? 'toast' : 'utils';
+  }
+  return null;
+}
+
+function expectedDesignSystemImport(
+  importer: string,
+  specifier: string,
+  kind: 'ui' | 'utils' | 'toast',
+  sourceRoot: string,
+): string {
+  const normalizedSpecifier = specifier.replace(/\\/g, '/').replace(/\.(?:tsx?|jsx?)$/, '');
+  if (kind === 'ui') {
+    const uiPrefix = '@/components/ui/';
+    const componentName = normalizedSpecifier.startsWith(uiPrefix)
+      ? normalizedSpecifier.slice(uiPrefix.length).split('/')[0]
+      : (() => {
+          const imported = resolveImport(importer, specifier, sourceRoot);
+          return imported
+            ? sourceRelativePath(sourceRoot, imported)
+                .slice(`${normalizedSourcePath(DESIGN_SYSTEM_UI_DIR)}/`.length)
+                .split('/')[0]
+                .replace(/\.(?:tsx?|jsx?)$/, '')
+            : normalizedSpecifier;
+        })();
+    return `${DESIGN_SYSTEM_PACKAGE}/components/ui/${componentName}`;
+  }
+
+  return `${DESIGN_SYSTEM_PACKAGE}/${kind === 'utils' ? 'lib/utils' : 'hooks/use-toast'}`;
+}
+
+/**
+ * Finds local copies of package-owned UI modules, cn, and the toast hook.
+ */
+export function findRecreatedDesignSystemFiles(sourceRoot = DEFAULT_SOURCE_ROOT): string[] {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const componentNames = designSystemUiComponents(absoluteSourceRoot);
+  const sourceFiles = collectSourceFiles(join(absoluteSourceRoot, 'src'));
+  const recreated = sourceFiles.filter((filePath) => {
+    if (isDesignSystemUiFile(absoluteSourceRoot, filePath, componentNames)) return true;
+    if (isToastHookFile(absoluteSourceRoot, filePath)) return true;
+    if (sourcePathWithoutExtension(absoluteSourceRoot, filePath) !== 'src/lib/utils') {
+      return false;
+    }
+
+    return /\b(?:export\s+)?(?:const|let|var|function)\s+cn\b|\bexport\s*\{[^}]*\bcn\b/.test(
+      readFileSync(filePath, 'utf8'),
+    );
+  });
+
+  return recreated.map((filePath) => relative(absoluteSourceRoot, filePath)).sort();
+}
+
+/**
+ * Finds imports that bypass the design-system package for package-owned APIs.
+ */
+export function findDesignSystemImportViolations(
+  sourceRoot = DEFAULT_SOURCE_ROOT,
+): string[] {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const componentNames = designSystemUiComponents(absoluteSourceRoot);
+  const violations: string[] = [];
+
+  for (const filePath of collectSourceFiles(join(absoluteSourceRoot, 'src'))) {
+    for (const specifier of moduleSpecifiers(filePath)) {
+      const kind = localDesignSystemImportKind(
+        filePath,
+        specifier,
+        absoluteSourceRoot,
+        componentNames,
+      );
+      if (!kind) continue;
+
+      const expected = expectedDesignSystemImport(
+        filePath,
+        specifier,
+        kind,
+        absoluteSourceRoot,
+      );
+      violations.push(
+        `${relative(absoluteSourceRoot, filePath)}: ${specifier} (use ${expected})`,
+      );
+    }
+  }
+
+  return violations.sort();
+}
+
+/**
+ * Checks that the consumer uses the package's generated theme stylesheet.
+ */
+export function findDesignSystemThemeViolations(
+  sourceRoot = DEFAULT_SOURCE_ROOT,
+): string[] {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const stylesheetPath = join(absoluteSourceRoot, 'src', 'index.css');
+
+  if (!existsSync(stylesheetPath)) {
+    return ['src/index.css: missing the design-system styles.css import'];
+  }
+
+  const stylesheet = readFileSync(stylesheetPath, 'utf8');
+  return DESIGN_SYSTEM_STYLE_IMPORT_RE.test(stylesheet)
+    ? []
+    : ['src/index.css: missing the design-system styles.css import'];
+}
+
+export function findDesignSystemDrift(sourceRoot = DEFAULT_SOURCE_ROOT): string[] {
+  return [
+    ...findRecreatedDesignSystemFiles(sourceRoot).map(
+      (filePath) => `local package-owned module: ${filePath}`,
+    ),
+    ...findDesignSystemImportViolations(sourceRoot),
+    ...findDesignSystemThemeViolations(sourceRoot),
+  ].sort();
 }
 
 function unreachableSourceFiles(
@@ -238,17 +461,35 @@ export function findUnusedApplicationFiles(
 
 export function validateUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): void {
   const unusedComponents = findUnusedUiComponents(sourceRoot);
+  const designSystemDrift = findDesignSystemDrift(sourceRoot);
 
-  if (unusedComponents.length === 0) {
-    console.log('UI component reachability check passed: every UI component is used.');
+  if (unusedComponents.length > 0) {
+    console.error('Unused UI components found:');
+    for (const component of unusedComponents) console.error(`  - ${component}`);
+  }
+
+  if (designSystemDrift.length > 0) {
+    console.error('Design-system migration violations found:');
+    for (const violation of designSystemDrift) console.error(`  - ${violation}`);
+  }
+
+  if (unusedComponents.length === 0 && designSystemDrift.length === 0) {
+    console.log(
+      'UI component and design-system migration checks passed.',
+    );
     return;
   }
 
-  console.error('Unused UI components found:');
-  for (const component of unusedComponents) console.error(`  - ${component}`);
-  throw new Error(
-    `${unusedComponents.length} UI component(s) are not reachable from application source.`,
-  );
+  const failures = [];
+  if (unusedComponents.length > 0) {
+    failures.push(
+      `${unusedComponents.length} UI component(s) are not reachable from application source`,
+    );
+  }
+  if (designSystemDrift.length > 0) {
+    failures.push(`${designSystemDrift.length} design-system migration violation(s)`);
+  }
+  throw new Error(`${failures.join('; ')}.`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

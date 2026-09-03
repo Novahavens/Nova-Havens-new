@@ -1,4 +1,4 @@
-import { deepEqual, equal } from 'node:assert/strict';
+import { deepEqual, equal, throws } from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -7,8 +7,12 @@ import { test } from 'node:test';
 import {
   DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
   findUnusedApplicationFiles,
+  findDesignSystemDrift,
+  findDesignSystemImportViolations,
+  findRecreatedDesignSystemFiles,
   findUnreachableSourceFiles,
   findUnusedUiComponents,
+  validateUiComponents,
 } from '../scripts/validate-ui-components.ts';
 
 const temporaryDirectories: string[] = [];
@@ -138,4 +142,93 @@ test('reports unreachable application files outside UI and honors exclusions', (
 
 test('the checked-in UI directory has no unreachable components', () => {
   equal(findUnusedUiComponents().length, 0);
+});
+
+test('fails when package-owned modules are recreated or imported locally', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-design-system-drift-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src', 'components', 'ui'), { recursive: true });
+  mkdirSync(join(sourceRoot, 'src', 'hooks'), { recursive: true });
+  mkdirSync(join(sourceRoot, 'src', 'lib'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'index.css'),
+    '@import "@workspace/nova-havens-design-system/styles.css";\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    [
+      "import { Button } from '@/components/ui/button';",
+      "import { cn } from '@/lib/utils';",
+      "import { useToast } from '@/hooks/use-toast';",
+      'export default function App() {',
+      '  useToast();',
+      '  return <Button className={cn("example")}>Example</Button>;',
+      '}',
+    ].join('\n'),
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'components', 'ui', 'button.tsx'),
+    'export function Button() { return null; }\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'lib', 'utils.ts'),
+    'export function cn(...values: unknown[]) { return values.join(" "); }\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'hooks', 'use-toast.ts'),
+    'export function useToast() { return { toast: () => undefined }; }\n',
+  );
+
+  deepEqual(findRecreatedDesignSystemFiles(sourceRoot), [
+    'src/components/ui/button.tsx',
+    'src/hooks/use-toast.ts',
+    'src/lib/utils.ts',
+  ]);
+  deepEqual(findDesignSystemImportViolations(sourceRoot), [
+    "src/App.tsx: @/components/ui/button (use @workspace/nova-havens-design-system/components/ui/button)",
+    "src/App.tsx: @/hooks/use-toast (use @workspace/nova-havens-design-system/hooks/use-toast)",
+    "src/App.tsx: @/lib/utils (use @workspace/nova-havens-design-system/lib/utils)",
+  ]);
+  equal(findDesignSystemDrift(sourceRoot).length, 6);
+  throws(
+    () => validateUiComponents(sourceRoot),
+    /design-system migration violation/,
+  );
+});
+
+test('accepts package-backed primitives, helpers, and theme imports', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-design-system-package-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'index.css'),
+    '@import "@workspace/nova-havens-design-system/styles.css";\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    [
+      "import { Button } from '@workspace/nova-havens-design-system/components/ui/button';",
+      "import { cn } from '@workspace/nova-havens-design-system/lib/utils';",
+      "import { useToast } from '@workspace/nova-havens-design-system/hooks/use-toast';",
+      'export default function App() {',
+      '  useToast();',
+      '  return <Button className={cn("example")}>Example</Button>;',
+      '}',
+    ].join('\n'),
+  );
+
+  deepEqual(findRecreatedDesignSystemFiles(sourceRoot), []);
+  deepEqual(findDesignSystemImportViolations(sourceRoot), []);
+  deepEqual(findDesignSystemDrift(sourceRoot), []);
+  validateUiComponents(sourceRoot);
 });
