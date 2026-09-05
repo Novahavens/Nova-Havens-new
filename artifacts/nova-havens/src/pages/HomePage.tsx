@@ -372,7 +372,7 @@ export default function HomePage() {
                 <div>
                   <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">20,000+</span>
                   <span className="mt-3 block text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified homes nationwide</span>
-                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2025.</span>
+                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2026.</span>
                 </div>
               </div>
               <CoverageMapPlaceholder />
