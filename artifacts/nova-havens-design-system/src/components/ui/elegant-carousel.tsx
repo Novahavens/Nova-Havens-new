@@ -119,6 +119,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
         }}
         aria-hidden="true"
       />
+
       <div className="relative flex flex-col md:flex-row">
         <div className="flex w-full items-center p-8 md:w-1/2 md:p-12 lg:p-16">
           <div className="w-full">
@@ -182,7 +183,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
             <img
               src={currentSlide.imageUrl}
               alt={currentSlide.imageAlt}
-              className="h-full w-full object-cover ml-[1px] mr-[1px] pl-[5px] pr-[5px] pt-[0px] pb-[0px] mt-[30px] mb-[30px]"
+              className="h-full w-full object-cover"
               loading={currentIndex === 0 ? 'eager' : 'lazy'}
             />
             <div
@@ -205,6 +206,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
           />
         </div>
       </div>
+
       <div className="relative grid grid-cols-3 gap-3 px-6 pb-6 md:grid-cols-9 md:px-10 md:pb-8">
         {slides.map((slide, index) => (
           <button

@@ -24,10 +24,150 @@ const DESIGN_SYSTEM_STYLE_IMPORT_RE = new RegExp(
   `@import\\s+["']${DESIGN_SYSTEM_PACKAGE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\/styles\\.css["']\\s*;`,
 );
 const DESIGN_SYSTEM_UI_DIR = join('src', 'components', 'ui');
+const DESIGN_SYSTEM_STYLESHEET = join('src', 'index.css');
+const DESIGN_SYSTEM_PACKAGE_STYLESHEET = join(
+  '..',
+  'nova-havens-design-system',
+  'src',
+  'index.css',
+);
 const DESIGN_SYSTEM_HELPER_PATHS = new Set([
   'src/lib/utils',
   'src/hooks/use-toast',
 ]);
+
+/**
+ * The fallback inventory keeps theme validation useful in isolated fixture
+ * directories. In the real app, the inventory is read from the design-system
+ * stylesheet so newly added package-owned variables are covered automatically.
+ */
+export const FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES = [
+  '--accent',
+  '--accent-border',
+  '--accent-foreground',
+  '--app-font-mono',
+  '--app-font-sans',
+  '--app-font-serif',
+  '--background',
+  '--badge-outline',
+  '--border',
+  '--button-outline',
+  '--card',
+  '--card-border',
+  '--card-foreground',
+  '--chart-1',
+  '--chart-2',
+  '--chart-3',
+  '--chart-4',
+  '--chart-5',
+  '--color-accent',
+  '--color-accent-border',
+  '--color-accent-foreground',
+  '--color-background',
+  '--color-border',
+  '--color-card',
+  '--color-card-border',
+  '--color-card-foreground',
+  '--color-chart-1',
+  '--color-chart-2',
+  '--color-chart-3',
+  '--color-chart-4',
+  '--color-chart-5',
+  '--color-destructive',
+  '--color-destructive-border',
+  '--color-destructive-foreground',
+  '--color-foreground',
+  '--color-input',
+  '--color-muted',
+  '--color-muted-border',
+  '--color-muted-foreground',
+  '--color-popover',
+  '--color-popover-border',
+  '--color-popover-foreground',
+  '--color-primary',
+  '--color-primary-border',
+  '--color-primary-foreground',
+  '--color-ring',
+  '--color-secondary',
+  '--color-secondary-border',
+  '--color-secondary-foreground',
+  '--color-sidebar',
+  '--color-sidebar-accent',
+  '--color-sidebar-accent-border',
+  '--color-sidebar-accent-foreground',
+  '--color-sidebar-border',
+  '--color-sidebar-foreground',
+  '--color-sidebar-primary',
+  '--color-sidebar-primary-border',
+  '--color-sidebar-primary-foreground',
+  '--color-sidebar-ring',
+  '--destructive',
+  '--destructive-border',
+  '--destructive-foreground',
+  '--elevate-1',
+  '--elevate-2',
+  '--font-mono',
+  '--font-sans',
+  '--font-serif',
+  '--foreground',
+  '--input',
+  '--muted',
+  '--muted-border',
+  '--muted-foreground',
+  '--opaque-button-border-intensity',
+  '--popover',
+  '--popover-border',
+  '--popover-foreground',
+  '--primary',
+  '--primary-border',
+  '--primary-foreground',
+  '--radius',
+  '--radius-lg',
+  '--radius-md',
+  '--radius-sm',
+  '--radius-xl',
+  '--ring',
+  '--secondary',
+  '--secondary-border',
+  '--secondary-foreground',
+  '--sidebar',
+  '--sidebar-accent',
+  '--sidebar-accent-border',
+  '--sidebar-accent-foreground',
+  '--sidebar-border',
+  '--sidebar-foreground',
+  '--sidebar-primary',
+  '--sidebar-primary-border',
+  '--sidebar-primary-foreground',
+  '--sidebar-ring',
+  '--spacing',
+  '--text-2xl',
+  '--text-2xl--line-height',
+  '--text-3xl',
+  '--text-3xl--line-height',
+  '--text-4xl',
+  '--text-4xl--line-height',
+  '--text-5xl',
+  '--text-5xl--line-height',
+  '--text-6xl',
+  '--text-6xl--line-height',
+  '--text-7xl',
+  '--text-7xl--line-height',
+  '--text-8xl',
+  '--text-8xl--line-height',
+  '--text-9xl',
+  '--text-9xl--line-height',
+  '--text-base',
+  '--text-base--line-height',
+  '--text-lg',
+  '--text-lg--line-height',
+  '--text-sm',
+  '--text-sm--line-height',
+  '--text-xl',
+  '--text-xl--line-height',
+  '--text-xs',
+  '--text-xs--line-height',
+] as const;
 
 /**
  * The fallback inventory keeps this validator useful in isolated fixture
@@ -79,6 +219,27 @@ function collectSourceFiles(directory: string, files: string[] = []): string[] {
   }
 
   return files;
+}
+
+function withoutCssComments(stylesheet: string): string {
+  return stylesheet.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+function customPropertyNames(stylesheet: string): Set<string> {
+  return new Set(
+    [...withoutCssComments(stylesheet).matchAll(/(--[a-z0-9-]+)\s*:/gi)].map(
+      (match) => match[1],
+    ),
+  );
+}
+
+function designSystemThemeVariables(sourceRoot: string): ReadonlySet<string> {
+  const packageStylesheetPath = resolve(sourceRoot, DESIGN_SYSTEM_PACKAGE_STYLESHEET);
+  if (!existsSync(packageStylesheetPath)) {
+    return new Set(FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES);
+  }
+
+  return customPropertyNames(readFileSync(packageStylesheetPath, 'utf8'));
 }
 
 function isWithin(filePath: string, directory: string): boolean {
@@ -365,16 +526,34 @@ export function findDesignSystemThemeViolations(
   sourceRoot = DEFAULT_SOURCE_ROOT,
 ): string[] {
   const absoluteSourceRoot = resolve(sourceRoot);
-  const stylesheetPath = join(absoluteSourceRoot, 'src', 'index.css');
+  const stylesheetPath = join(absoluteSourceRoot, DESIGN_SYSTEM_STYLESHEET);
 
   if (!existsSync(stylesheetPath)) {
     return ['src/index.css: missing the design-system styles.css import'];
   }
 
-  const stylesheet = readFileSync(stylesheetPath, 'utf8');
-  return DESIGN_SYSTEM_STYLE_IMPORT_RE.test(stylesheet)
-    ? []
-    : ['src/index.css: missing the design-system styles.css import'];
+  const stylesheet = withoutCssComments(readFileSync(stylesheetPath, 'utf8'));
+  const violations: string[] = [];
+
+  if (!DESIGN_SYSTEM_STYLE_IMPORT_RE.test(stylesheet)) {
+    violations.push('src/index.css: missing the design-system styles.css import');
+  }
+
+  const packageThemeVariables = designSystemThemeVariables(absoluteSourceRoot);
+  const localThemeVariables = customPropertyNames(stylesheet);
+  for (const variable of [...localThemeVariables].sort()) {
+    if (packageThemeVariables.has(variable)) {
+      violations.push(`src/index.css: local package-owned theme variable ${variable}`);
+    }
+  }
+
+  if (/(?:^|[}\n])\s*\.dark\s*\{/m.test(stylesheet)) {
+    violations.push(
+      'src/index.css: scaffolded .dark token block; use the design-system theme instead',
+    );
+  }
+
+  return violations.sort();
 }
 
 export function findDesignSystemDrift(sourceRoot = DEFAULT_SOURCE_ROOT): string[] {

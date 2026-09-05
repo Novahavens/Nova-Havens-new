@@ -9,6 +9,7 @@ import {
   findUnusedApplicationFiles,
   findDesignSystemDrift,
   findDesignSystemImportViolations,
+  findDesignSystemThemeViolations,
   findRecreatedDesignSystemFiles,
   findUnreachableSourceFiles,
   findUnusedUiComponents,
@@ -231,4 +232,62 @@ test('accepts package-backed primitives, helpers, and theme imports', () => {
   deepEqual(findDesignSystemImportViolations(sourceRoot), []);
   deepEqual(findDesignSystemDrift(sourceRoot), []);
   validateUiComponents(sourceRoot);
+});
+
+test('rejects consumer-owned package theme variables and scaffolded dark blocks', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-theme-drift-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'index.css'),
+    [
+      '@import "@workspace/nova-havens-design-system/styles.css";',
+      ':root {',
+      '  --background: 220 23% 5%;',
+      '  --surface-1: #0d0f14;',
+      '}',
+      '.dark {',
+      '  --primary: 38 61% 56%;',
+      '}',
+    ].join('\n'),
+  );
+
+  deepEqual(findDesignSystemThemeViolations(sourceRoot), [
+    'src/index.css: local package-owned theme variable --background',
+    'src/index.css: local package-owned theme variable --primary',
+    'src/index.css: scaffolded .dark token block; use the design-system theme instead',
+  ]);
+  deepEqual(findDesignSystemDrift(sourceRoot), [
+    'src/index.css: local package-owned theme variable --background',
+    'src/index.css: local package-owned theme variable --primary',
+    'src/index.css: scaffolded .dark token block; use the design-system theme instead',
+  ]);
+});
+
+test('allows Nova Havens surface and layout variables in the consumer theme', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-theme-extensions-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'index.css'),
+    [
+      '@import "@workspace/nova-havens-design-system/styles.css";',
+      '@theme inline {',
+      '  --color-surface-1: var(--surface-1);',
+      '  --width-site: 75rem;',
+      '}',
+      ':root {',
+      '  --surface-1: #0d0f14;',
+      '  --surface-2: #151820;',
+      '  --tertiary: #7a828f;',
+      '  --min-h-map: 18.75rem;',
+      '  --text-hero: clamp(3rem, 6vw, 5rem);',
+      '}',
+    ].join('\n'),
+  );
+
+  deepEqual(findDesignSystemThemeViolations(sourceRoot), []);
+  deepEqual(findDesignSystemDrift(sourceRoot), []);
 });
