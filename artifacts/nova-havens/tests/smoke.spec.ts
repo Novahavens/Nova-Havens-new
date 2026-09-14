@@ -364,6 +364,56 @@ test.describe('Page smoke tests', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Trust Strip section regression
+// ---------------------------------------------------------------------------
+
+/**
+ * The full-page homepage screenshot's `maxDiffPixelRatio` (0.01) is measured
+ * against the ENTIRE page's pixel count. A small alignment regression inside
+ * one above-the-fold section — e.g. a stray negative-margin utility class
+ * shifting the large "20,000+ verified homes" tile out of alignment with its
+ * sibling cards — can be too small a fraction of the full screenshot to cross
+ * that threshold on a tall page, even though it is plainly visible in the
+ * section itself. This happened for real: that exact bug only failed the
+ * mobile-chrome smoke tests, because on chromium/tablet-chrome the full page
+ * is much taller relative to the Trust Strip, diluting the same pixel delta
+ * below 1%. Those projects stayed green the whole time the bug was live.
+ *
+ * This check screenshots ONLY the Trust Strip section, independent of the
+ * full-page homepage screenshot, with a far tighter tolerance so the same
+ * class of regression fails at every viewport — not just the ones where it
+ * happens to be a large-enough fraction of total page height.
+ */
+test.describe('Trust Strip section regression', () => {
+  test('stat tiles stay aligned with their siblings', async ({ page }) => {
+    if (test.info().project.name.endsWith('-dark')) {
+      await page.emulateMedia({ colorScheme: 'dark' });
+    }
+
+    await page.goto('/');
+    await waitForStable(page);
+
+    const trustStrip = page.locator('#trust-strip');
+    await expect(trustStrip).toBeVisible();
+    // Confirm all three tiles this section protects are present before
+    // trusting the screenshot below to catch a regression among them.
+    await expect(page.getByTestId('stat-homes')).toBeVisible();
+    await expect(page.getByTestId('stat-families')).toBeVisible();
+    await expect(page.getByTestId('stat-days')).toBeVisible();
+
+    await expect(trustStrip).toHaveScreenshot({
+      // Far tighter than the full-page homepage screenshot's 1%: this
+      // section-scoped capture is small enough that the same tolerance would
+      // let a several-pixel misalignment slip through again. Tight enough to
+      // fail on a reintroduced stray margin/alignment regression, loose
+      // enough to absorb sub-pixel anti-aliasing drift between runs.
+      maxDiffPixelRatio: 0.002,
+      animations: 'disabled',
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Mobile layout regression checks
 // ---------------------------------------------------------------------------
 
