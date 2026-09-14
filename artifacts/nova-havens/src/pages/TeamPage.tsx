@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { Phone, Mail, HeartHandshake, Clock, ShieldCheck } from 'lucide-react';
 import { TEAM_MEMBERS, type TeamMember, type TeamMemberProfile } from '@/data/teamMembers';
 import TeamMemberModal from '@/components/TeamMemberModal';
+import { trackEvent } from '@/lib/analytics';
 
 /** Shape of one member in the synced team/team.json (see scripts/sync-team.js). */
 interface SyncedMember {
@@ -161,6 +162,7 @@ export default function TeamPage() {
   const openProfile = (member: TeamMember & { profile: TeamMemberProfile }, trigger: HTMLElement) => {
     lastTriggerRef.current = trigger;
     setActiveMember(member);
+    trackEvent('team_member_viewed', { member: member.name });
   };
 
   const closeProfile = () => {

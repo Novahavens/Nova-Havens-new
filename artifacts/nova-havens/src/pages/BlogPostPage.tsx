@@ -3,6 +3,7 @@ import { useParams, Link } from 'wouter';
 import { ArrowLeft, Calendar, Tag, User } from 'lucide-react';
 import { getPostBySlug } from '@/data/blogPosts';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
+import { trackEvent } from '@/lib/analytics';
 
 // ---------------------------------------------------------------------------
 // Inline text renderer: handles **bold** and *italic* markers
@@ -283,6 +284,7 @@ export default function BlogPostPage() {
                   <a
                     href={post.cta === 'property' ? INTAKE_FORMS.property : INTAKE_FORMS.housing}
                     {...EXTERNAL_FORM_LINK_PROPS}
+                    onClick={() => trackEvent('intake_form_click', { form: post.cta === 'property' ? 'property' : 'housing', location: 'blog_post_cta' })}
                     className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
                     data-testid={post.cta === 'property' ? 'btn-submit-property-cta' : 'btn-submit-housing-cta'}
                   >

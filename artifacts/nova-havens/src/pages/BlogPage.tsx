@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight } from 'lucide-react';
 import { BLOG_POSTS, BLOG_FILTERS } from '@/data/blogPosts';
+import { trackEvent } from '@/lib/analytics';
 
 // hint: Logic changed on both sides. Requires understanding intent of each change.
 export default function BlogPage() {
@@ -37,7 +38,10 @@ export default function BlogPage() {
           {BLOG_FILTERS.map((filter) => (
             <button
               key={filter}
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => {
+                if (filter !== activeFilter) trackEvent('blog_filter_selected', { filter });
+                setActiveFilter(filter);
+              }}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-colors border ${
                 activeFilter === filter
                   ? 'bg-primary text-primary-foreground border-primary hover:brightness-105'

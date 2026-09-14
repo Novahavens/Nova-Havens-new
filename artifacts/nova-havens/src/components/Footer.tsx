@@ -2,6 +2,7 @@ import { Link } from 'wouter';
 import { Logo } from './Navbar';
 import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import AskAiAboutUs from './AskAiAboutUs';
+import { trackEvent } from '@/lib/analytics';
 
 export default function Footer() {
   return (
@@ -45,6 +46,7 @@ export default function Footer() {
                 aria-label="Nova Havens on LinkedIn"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 data-testid="link-footer-linkedin"
+                onClick={() => trackEvent('social_link_click', { platform: 'linkedin' })}
               >
                 <FaLinkedin className="w-6 h-6" aria-hidden="true" />
               </a>
@@ -55,6 +57,7 @@ export default function Footer() {
                 aria-label="Nova Havens on Instagram"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 data-testid="link-footer-instagram"
+                onClick={() => trackEvent('social_link_click', { platform: 'instagram' })}
               >
                 <FaInstagram className="w-6 h-6" aria-hidden="true" />
               </a>
@@ -65,6 +68,7 @@ export default function Footer() {
                 aria-label="Nova Havens on Facebook"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 data-testid="link-footer-facebook"
+                onClick={() => trackEvent('social_link_click', { platform: 'facebook' })}
               >
                 <FaFacebook className="w-6 h-6" aria-hidden="true" />
               </a>

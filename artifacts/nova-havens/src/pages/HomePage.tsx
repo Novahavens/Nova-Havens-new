@@ -8,6 +8,7 @@ import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import ElegantCarousel, { type ElegantSlide } from '@workspace/nova-havens-design-system/components/ui/elegant-carousel';
 import GoogleRating from '@/components/GoogleRating';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
+import { trackEvent } from '@/lib/analytics';
 
 type PartnerLogo = { name: string; websiteUrl: string; logo?: string; logoClass?: string; showName: boolean };
 
@@ -342,10 +343,10 @@ export default function HomePage() {
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mb-10 mx-auto text-muted-foreground" data-testid="text-hero-subtitle">At Nova Havens, we specialize in providing prompt and compassionate relocation services for families in need. We understand the stress that comes with displacement, and it's our priority to ensure a seamless experience.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-hero-primary">
+            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'housing', location: 'home_hero' })} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-hero-primary">
               Request Housing
             </a>
-            <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-hero-secondary">
+            <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'property', location: 'home_hero' })} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-hero-secondary">
               Submit Your Property
             </a>
           </div>
@@ -504,7 +505,7 @@ export default function HomePage() {
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md" data-testid="text-pets">
               Nova Havens maintains a growing network of verified pet-friendly furnished homes across 48 states — so displaced families never have to choose between a safe place to stay and bringing their pets along. Share your pet details on the first call and Nova Havens will match your family to a compatible home.
             </p>
-            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4" data-testid="btn-pets">
+            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'housing', location: 'home_pets' })} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4" data-testid="btn-pets">
               Find Pet-Friendly Homes
             </a>
           </div>
@@ -709,7 +710,7 @@ export default function HomePage() {
         </Tabs>
 
         <div className="flex justify-center mt-12">
-          <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-how-it-works-submit-claim">
+          <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'housing', location: 'home_how_it_works' })} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-how-it-works-submit-claim">
             Request Housing
           </a>
         </div>
@@ -805,7 +806,11 @@ export default function HomePage() {
                       >
                         <button
                           className="w-full flex items-center justify-between p-6 text-left gap-4 hover:bg-white/[0.02] transition-colors"
-                          onClick={() => setOpenFaq(openFaq === faqIdx ? null : faqIdx)}
+                          onClick={() => {
+                            const next = openFaq === faqIdx ? null : faqIdx;
+                            setOpenFaq(next);
+                            if (next !== null) trackEvent('faq_expanded', { question: item.question });
+                          }}
                           aria-expanded={openFaq === faqIdx}
                         >
                           <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>
@@ -848,7 +853,7 @@ export default function HomePage() {
             </a>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-request-housing">
+            <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'housing', location: 'home_emergency' })} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-request-housing">
               Request Housing
             </a>
             <Link href="/contact" className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors border border-primary text-primary hover:bg-primary/10 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-contact-page">

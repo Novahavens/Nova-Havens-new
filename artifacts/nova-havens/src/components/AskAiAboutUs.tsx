@@ -1,6 +1,7 @@
 import type React from 'react';
 import { AI_ASSISTANTS, AI_TRADEMARK_NOTICE, type AiAssistant } from '@/lib/askAi';
 import { ChatGptIcon, ClaudeIcon, PerplexityIcon } from '@/components/icons/AiAssistantIcons';
+import { trackEvent } from '@/lib/analytics';
 
 const ICONS: Record<AiAssistant['id'], (props: { className?: string }) => React.JSX.Element> = {
   chatgpt: ChatGptIcon,
@@ -33,6 +34,7 @@ export default function AskAiAboutUs({ variant = 'full' }: AskAiAboutUsProps) {
         rel="noopener noreferrer"
         className={className}
         data-testid={`btn-ask-ai-${assistant.id}`}
+        onClick={() => trackEvent('ask_ai_click', { assistant: assistant.id, location: variant === 'full' ? 'home_section' : 'footer_compact' })}
       >
         <Icon className={iconClassName} />
         {assistant.label}
