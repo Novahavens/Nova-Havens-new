@@ -357,7 +357,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5">
             {/* Large tile */}
             <div
-              className="md:col-span-4 relative overflow-hidden rounded-2xl border border-white/10 bg-surface-1 p-8 md:p-10 grid grid-cols-1 md:grid-cols-2 items-center gap-8 transition-colors hover:border-primary/30 -m-4"
+              className="md:col-span-4 relative overflow-hidden rounded-2xl border border-white/10 bg-surface-1 p-8 md:p-10 grid grid-cols-1 md:grid-cols-2 items-center gap-8 transition-colors hover:border-primary/30"
               data-testid="stat-homes"
             >
               <div

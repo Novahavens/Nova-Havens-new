@@ -12,3 +12,4 @@
 - [Node source integration tests](node-source-integration-tests.md) — direct Node type-strip workers need explicit TS module specifiers throughout imported workspace packages.
 - [Contact rate-limit retention](contact-rate-limit-retention.md) — cleanup must use each namespace’s window length and the database clock so active buckets survive.
 - [Nova Havens design-system migration](nova-havens-design-system.md) — live screens consume the approved package; preserve dark-first fidelity and keep app-only compositions local.
+- [Visual regression tolerance](visual-regression-tolerance.md) — a green full-page smoke screenshot doesn't prove one section is correct on every viewport; small shifts can hide under the 1% full-page threshold on desktop/tablet while failing on mobile.
