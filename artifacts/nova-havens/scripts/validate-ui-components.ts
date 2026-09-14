@@ -40,6 +40,11 @@ const DESIGN_SYSTEM_HELPER_PATHS = new Set([
  * The fallback inventory keeps theme validation useful in isolated fixture
  * directories. In the real app, the inventory is read from the design-system
  * stylesheet so newly added package-owned variables are covered automatically.
+ *
+ * findFallbackThemeVariableDrift() checks this list against the live
+ * design-system stylesheet, so editing the stylesheet without updating this
+ * list fails validateUiComponents() -- and the dedicated test that calls it
+ * with no arguments -- clearly.
  */
 export const FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES = [
   '--accent',
@@ -240,6 +245,40 @@ function designSystemThemeVariables(sourceRoot: string): ReadonlySet<string> {
   }
 
   return customPropertyNames(readFileSync(packageStylesheetPath, 'utf8'));
+}
+
+/**
+ * Compares FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES against the live
+ * design-system stylesheet so the two cannot silently drift apart. Without
+ * this, a token added to the package stylesheet would be protected in the
+ * real app (which always reads the live stylesheet) while staying invisible
+ * to any test that runs against an isolated fixture -- fixtures have no
+ * sibling design-system package, so they fall back to this hand-maintained
+ * list instead.
+ *
+ * Returns an empty array when the live stylesheet cannot be found relative to
+ * sourceRoot: with nothing to compare against, that is the expected, benign
+ * case for fixtures that do not model the design-system package at all.
+ */
+export function findFallbackThemeVariableDrift(
+  sourceRoot = DEFAULT_SOURCE_ROOT,
+): string[] {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const packageStylesheetPath = resolve(absoluteSourceRoot, DESIGN_SYSTEM_PACKAGE_STYLESHEET);
+
+  if (!existsSync(packageStylesheetPath)) return [];
+
+  const liveVariables = customPropertyNames(readFileSync(packageStylesheetPath, 'utf8'));
+  const fallbackVariables = new Set(FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES);
+
+  const missingFromFallback = [...liveVariables]
+    .filter((name) => !fallbackVariables.has(name))
+    .map((name) => `missing from FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES: ${name}`);
+  const staleInFallback = [...fallbackVariables]
+    .filter((name) => !liveVariables.has(name))
+    .map((name) => `stale in FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES: ${name}`);
+
+  return [...missingFromFallback, ...staleInFallback].sort();
 }
 
 function isWithin(filePath: string, directory: string): boolean {
@@ -641,6 +680,7 @@ export function findUnusedApplicationFiles(
 export function validateUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): void {
   const unusedComponents = findUnusedUiComponents(sourceRoot);
   const designSystemDrift = findDesignSystemDrift(sourceRoot);
+  const fallbackThemeDrift = findFallbackThemeVariableDrift(sourceRoot);
 
   if (unusedComponents.length > 0) {
     console.error('Unused UI components found:');
@@ -652,7 +692,16 @@ export function validateUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): void {
     for (const violation of designSystemDrift) console.error(`  - ${violation}`);
   }
 
-  if (unusedComponents.length === 0 && designSystemDrift.length === 0) {
+  if (fallbackThemeDrift.length > 0) {
+    console.error('Fallback design-system theme inventory is out of date:');
+    for (const violation of fallbackThemeDrift) console.error(`  - ${violation}`);
+  }
+
+  if (
+    unusedComponents.length === 0 &&
+    designSystemDrift.length === 0 &&
+    fallbackThemeDrift.length === 0
+  ) {
     console.log(
       'UI component and design-system migration checks passed.',
     );
@@ -667,6 +716,9 @@ export function validateUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): void {
   }
   if (designSystemDrift.length > 0) {
     failures.push(`${designSystemDrift.length} design-system migration violation(s)`);
+  }
+  if (fallbackThemeDrift.length > 0) {
+    failures.push(`${fallbackThemeDrift.length} fallback design-system theme inventory drift(s)`);
   }
   throw new Error(`${failures.join('; ')}.`);
 }

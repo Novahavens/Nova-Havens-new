@@ -6,10 +6,12 @@ import { test } from 'node:test';
 
 import {
   DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
+  FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES,
   findUnusedApplicationFiles,
   findDesignSystemDrift,
   findDesignSystemImportViolations,
   findDesignSystemThemeViolations,
+  findFallbackThemeVariableDrift,
   findRecreatedDesignSystemFiles,
   findUnreachableSourceFiles,
   findUnusedUiComponents,
@@ -290,4 +292,65 @@ test('allows Nova Havens surface and layout variables in the consumer theme', ()
 
   deepEqual(findDesignSystemThemeViolations(sourceRoot), []);
   deepEqual(findDesignSystemDrift(sourceRoot), []);
+});
+
+test('the fallback theme-variable inventory matches the live design-system stylesheet', () => {
+  // Guards against exactly the gap this validator exists to close: if a
+  // future package token is added to the design-system stylesheet without a
+  // matching update to FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES, this fails
+  // clearly instead of leaving the fixture-based tests below silently unaware
+  // of the new token.
+  deepEqual(findFallbackThemeVariableDrift(), []);
+});
+
+test('flags a package theme variable missing from the fallback inventory', () => {
+  const parent = mkdtempSync(join(tmpdir(), 'nova-havens-fallback-theme-missing-'));
+  temporaryDirectories.push(parent);
+  const sourceRoot = join(parent, 'app');
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+  const designSystemSrcDir = join(parent, 'nova-havens-design-system', 'src');
+  mkdirSync(designSystemSrcDir, { recursive: true });
+
+  writeFileSync(
+    join(designSystemSrcDir, 'index.css'),
+    [
+      ':root {',
+      ...FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES.map((name) => `  ${name}: 0 0% 0%;`),
+      '  --brand-new-token: 0 0% 0%;',
+      '}',
+    ].join('\n'),
+  );
+
+  deepEqual(findFallbackThemeVariableDrift(sourceRoot), [
+    'missing from FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES: --brand-new-token',
+  ]);
+});
+
+test('flags a fallback theme variable that no longer exists in the design-system stylesheet', () => {
+  const parent = mkdtempSync(join(tmpdir(), 'nova-havens-fallback-theme-stale-'));
+  temporaryDirectories.push(parent);
+  const sourceRoot = join(parent, 'app');
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+  const designSystemSrcDir = join(parent, 'nova-havens-design-system', 'src');
+  mkdirSync(designSystemSrcDir, { recursive: true });
+
+  const remainingVariables = FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES.filter(
+    (name) => name !== '--accent',
+  );
+  writeFileSync(
+    join(designSystemSrcDir, 'index.css'),
+    [':root {', ...remainingVariables.map((name) => `  ${name}: 0 0% 0%;`), '}'].join('\n'),
+  );
+
+  deepEqual(findFallbackThemeVariableDrift(sourceRoot), [
+    'stale in FALLBACK_DESIGN_SYSTEM_THEME_VARIABLES: --accent',
+  ]);
+});
+
+test('the fallback theme-variable check is a no-op without a sibling design-system stylesheet', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-fallback-theme-noop-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src'), { recursive: true });
+
+  deepEqual(findFallbackThemeVariableDrift(sourceRoot), []);
 });
