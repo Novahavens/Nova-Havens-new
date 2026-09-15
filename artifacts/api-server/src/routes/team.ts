@@ -28,43 +28,56 @@ const EXT_MIME: Record<string, string> = {
   ".webp": "image/webp",
 };
 
-const storage = new Client();
+export interface TeamStorage {
+  downloadAsText(key: string): Promise<
+    | { ok: true; value: string }
+    | { ok: false; error: unknown }
+  >;
+  downloadAsBytes(key: string): Promise<
+    | { ok: true; value: [Uint8Array, unknown] }
+    | { ok: false; error: unknown }
+  >;
+}
 
-const router: IRouter = Router();
+export function createTeamRouter(storage: TeamStorage): IRouter {
+  const router: IRouter = Router();
 
-router.get("/team/team.json", async (_req, res) => {
-  const result = await storage.downloadAsText(TEAM_JSON_KEY);
-  if (!result.ok) {
-    res.status(404).json({ error: "team data not synced yet" });
-    return;
-  }
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Cache-Control", CACHE_CONTROL);
-  res.send(result.value);
-});
+  router.get("/team/team.json", async (_req, res) => {
+    const result = await storage.downloadAsText(TEAM_JSON_KEY);
+    if (!result.ok) {
+      res.status(404).json({ error: "team data not synced yet" });
+      return;
+    }
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Cache-Control", CACHE_CONTROL);
+    res.send(result.value);
+  });
 
-router.get("/team/images/:file", async (req, res) => {
-  const file = req.params.file;
-  // Single flat segment only — no traversal out of the team/ prefix.
-  if (!file || file.includes("/") || file.includes("..")) {
-    res.status(400).json({ error: "invalid file" });
-    return;
-  }
-  const ext = file.slice(file.lastIndexOf(".")).toLowerCase();
-  const mime = EXT_MIME[ext];
-  if (!mime) {
-    res.status(400).json({ error: "unsupported file type" });
-    return;
-  }
+  router.get("/team/images/:file", async (req, res) => {
+    const file = req.params.file;
+    // Single flat segment only — no traversal out of the team/ prefix.
+    if (!file || file.includes("/") || file.includes("..")) {
+      res.status(400).json({ error: "invalid file" });
+      return;
+    }
+    const ext = file.slice(file.lastIndexOf(".")).toLowerCase();
+    const mime = EXT_MIME[ext];
+    if (!mime) {
+      res.status(400).json({ error: "unsupported file type" });
+      return;
+    }
 
-  const result = await storage.downloadAsBytes(`${TEAM_PREFIX}${file}`);
-  if (!result.ok) {
-    res.status(404).json({ error: "photo not found" });
-    return;
-  }
-  res.setHeader("Content-Type", mime);
-  res.setHeader("Cache-Control", CACHE_CONTROL);
-  res.send(result.value[0]);
-});
+    const result = await storage.downloadAsBytes(`${TEAM_PREFIX}${file}`);
+    if (!result.ok) {
+      res.status(404).json({ error: "photo not found" });
+      return;
+    }
+    res.setHeader("Content-Type", mime);
+    res.setHeader("Cache-Control", CACHE_CONTROL);
+    res.send(result.value[0]);
+  });
 
-export default router;
+  return router;
+}
+
+export default createTeamRouter(new Client() as TeamStorage);

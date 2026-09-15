@@ -120,6 +120,10 @@ args = "token-rule"
 task = "workflow.run"
 args = "contact-contract"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "team-contract"
+
 [[workflows.workflow]]
 name = "token-rule"
 author = "agent"
@@ -138,6 +142,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pnpm --filter @workspace/api-server run test:contact-contract"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "team-contract"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server run test:team-contract"
 
 [workflows.workflow.metadata]
 isValidation = true
