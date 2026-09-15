@@ -1033,6 +1033,73 @@ test.describe('Reduced-motion carousel behavior', () => {
     ).toBeVisible();
     await expect(page.getByTestId('carousel-progress-2')).toHaveCSS('width', '0px');
   });
+
+  test('pauses and cleanly resumes autoplay when the motion preference changes mid-visit', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioral preference check — one viewport is enough; other projects cover layout.',
+    );
+
+    await page.goto('/');
+
+    const carousel = page.getByTestId('carousel-showcase');
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'false');
+    await expect(carousel.getByRole('heading', { name: 'Living Spaces' })).toBeVisible();
+
+    // Let autoplay run for a moment so there is real progress to freeze.
+    await page.waitForTimeout(1_500);
+    const progressWhileRunning = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      parseFloat(progressWhileRunning),
+      'Autoplay should already be advancing progress before the preference change',
+    ).toBeGreaterThan(0);
+
+    // The OS-level preference changes while the page stays open.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'true');
+
+    const progressAtSwitch = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+
+    // Wait well past a full slide duration -- autoplay must stay stopped and
+    // progress must stay frozen, not merely slow down.
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'Autoplay must not advance once reduced motion is detected mid-visit',
+    ).toBeVisible();
+    const progressAfterWait = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      progressAfterWait,
+      'Progress must stay frozen while reduced motion is active, not merely slow down',
+    ).toBe(progressAtSwitch);
+
+    // The preference clears while the page is still open.
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'false');
+
+    // One slide duration later, autoplay should have advanced exactly once --
+    // resuming, not staying stuck.
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Walk in showers' }),
+      'Autoplay should resume automatically once normal motion returns',
+    ).toBeVisible();
+
+    // A second slide duration should advance exactly one more slide. If the
+    // resume left a duplicate timer running, this would instead have already
+    // skipped past "Full Kitchens" to a later slide.
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Full Kitchens' }),
+      'Only one autoplay timer should drive advances after resuming -- no skipped slides',
+    ).toBeVisible();
+  });
 });
 
 // ---------------------------------------------------------------------------

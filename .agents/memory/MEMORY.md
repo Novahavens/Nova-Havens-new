@@ -15,3 +15,4 @@
 - [Visual regression tolerance](visual-regression-tolerance.md) — green ≠ correct (shifts hide under the 1% full-page threshold); also, a diffuse antialiasing diff ≠ a real regression.
 - [Fallback inventory drift checks](fallback-inventory-drift-checks.md) — hand-maintained fixture fallback lists need an automated diff against generated source (not tokens.json alone) or they silently drift.
 - [Nova Havens analytics taxonomy](analytics-taxonomy.md) — 8-event custom taxonomy (conversion + engagement) via shared trackEvent wrapper; keep naming/location conventions consistent for new events.
+- [Playwright inline style comparisons](playwright-inline-style-assertions.md) — toHaveCSS resolves to computed pixels; compare captured inline percentage styles with evaluate + toBe instead.
