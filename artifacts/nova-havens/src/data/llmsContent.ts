@@ -31,9 +31,9 @@ export const LLMS_TXT_PAGE_INTRO =
 export const BLOG_INDEX_URL_PREFIX = 'https://novahavens.com/blog/';
 
 /**
- * The AI index intentionally lists the three currently selected live articles.
- * The property-owner article remains a separate site record but is not part of
- * this file because the current index requirements specify these three posts.
+ * The AI index lists every currently published article by slug (rather than
+ * spreading BLOG_POSTS directly) so a newly added post must be deliberately
+ * added here before it appears in llms.txt.
  */
 const LLMS_BLOG_POST_SLUGS = [
   'details-that-speed-up-housing-placement',
