@@ -754,6 +754,66 @@ test.describe('Contact form', () => {
     });
   }
 
+  test('retries the same message successfully after the first send fails', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioural check — one viewport is enough; the other projects cover layout.',
+    );
+
+    const submittedBodies: unknown[] = [];
+    await page.route('**/api/contact', async (route) => {
+      expect(route.request().method()).toBe('POST');
+      submittedBodies.push(route.request().postDataJSON());
+
+      if (submittedBodies.length === 1) {
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Internal Server Error' }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto('/contact');
+    await waitForStable(page);
+
+    const expectedSubmission = {
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      phone: '(555) 123-4567',
+      subject: 'Housing Request',
+      message: 'We need furnished housing for a displaced family in Nashville.',
+      company: '',
+    };
+
+    await page.getByTestId('input-name').fill(expectedSubmission.name);
+    await page.getByTestId('input-email').fill(expectedSubmission.email);
+    await page.getByTestId('input-phone').fill(expectedSubmission.phone);
+    await page.getByTestId('select-subject').selectOption(expectedSubmission.subject);
+    await page.getByTestId('input-message').fill(expectedSubmission.message);
+
+    const submitButton = page.getByTestId('btn-submit-contact');
+    await submitButton.click();
+    await expect(page.getByTestId('message-submit-error')).toBeVisible();
+    await expect(submitButton).toBeEnabled();
+
+    await submitButton.click();
+
+    await expect(page.getByTestId('message-success')).toBeVisible();
+    await expect(page.getByTestId('message-submit-error')).toBeHidden();
+    expect(submittedBodies, 'The retry did not send the original form values twice').toEqual([
+      expectedSubmission,
+      expectedSubmission,
+    ]);
+  });
+
   test('keeps the 24/7 phone fallback visible when the API throttles a submission', async ({ page }) => {
     test.skip(
       test.info().project.name !== 'chromium',
