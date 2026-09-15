@@ -17,6 +17,7 @@ import {
   findUnusedUiComponents,
   validateUiComponents,
 } from '../scripts/validate-ui-components.ts';
+import { validateSourceReachability } from '../scripts/validate-source-reachability.ts';
 
 const temporaryDirectories: string[] = [];
 
@@ -141,6 +142,42 @@ test('reports unreachable application files outside UI and honors exclusions', (
     ]),
     [],
   );
+});
+
+test('source reachability validation blocks unexpected files but permits explicit build-time exclusions', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-source-guard-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src', 'build'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    'export default function App() { return null; }\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'dead-responsive-helper.ts'),
+    'export const breakpoint = 768;\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'build', 'route-content.ts'),
+    'export const routeContent = true;\n',
+  );
+
+  throws(
+    () =>
+      validateSourceReachability(sourceRoot, ['src/main.tsx'], [
+        'src/build',
+      ]),
+    /1 non-UI application source file\(s\) are not reachable/,
+  );
+
+  validateSourceReachability(sourceRoot, ['src/main.tsx'], [
+    'src/build',
+    'src/dead-responsive-helper.ts',
+  ]);
 });
 
 test('the checked-in UI directory has no unreachable components', () => {

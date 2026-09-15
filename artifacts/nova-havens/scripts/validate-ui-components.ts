@@ -6,7 +6,7 @@
  * is a candidate for use in a route and can bring a runtime dependency with
  * it. Following the source import graph catches both directly unused files
  * and files referenced only by another unused UI primitive. The same graph is
- * also used by the informational application-source report.
+ * also used by the blocking application-source reachability guard.
  *
  * Run with: node --experimental-strip-types scripts/validate-ui-components.ts
  */
@@ -200,8 +200,10 @@ export const APPLICATION_ENTRY_POINTS = ['src/main.tsx'] as const;
 
 /**
  * Source modules used by build-time entry points rather than the browser
- * entry point. Keep this list explicit: adding a source file here should be a
- * deliberate decision, not an accidental way to silence the report.
+ * entry point. Exclusions may name a file or a directory relative to
+ * DEFAULT_SOURCE_ROOT. Keep this list explicit: adding a path here should be a
+ * deliberate decision backed by a non-browser build entry point, not a way to
+ * silence an unexpected unreachable-file failure.
  */
 export const DEFAULT_APPLICATION_SOURCE_EXCLUSIONS = [
   'src/lib/routeContent.ts',
