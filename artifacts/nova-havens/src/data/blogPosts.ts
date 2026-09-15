@@ -305,6 +305,5 @@ export const BLOG_FILTERS = [
   "All",
   "For Insurance Professionals",
   "For Displaced Families",
-  "For Property Owners",
   "Market Guides",
 ] as const;

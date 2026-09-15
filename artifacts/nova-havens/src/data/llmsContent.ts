@@ -86,16 +86,15 @@ For multiple property submissions, email properties@novahavens.com.`,
   },
   {
     heading: 'Guides and articles',
-    content: `The blog is organised into four topic areas: guidance for insurance professionals, guidance for displaced families, guidance for property owners, and market guides.
+    content: `The blog is organised into three topic areas: guidance for insurance professionals, guidance for displaced families, and market guides.
 
 ${BLOG_ARTICLE_LINKS}`,
   },
   {
     heading: 'Common questions',
-    content: `The site has an FAQ for two audiences: families who need temporary housing and property owners joining the network. See the [FAQ on the homepage](https://novahavens.com/).
+    content: `The site has an FAQ for families who need temporary housing. See the [FAQ on the homepage](https://novahavens.com/).
 
-- Families: questions about placement timing, who requests housing, carrier billing, what a furnished home includes, pets, school or medical location needs, accessibility, extensions, what to bring, and support after move-in.
-- Property owners: questions about property fit, submitting and vetting a home, accepted property types, placement length, accepting requests, rates and payment, pet policies, move-in readiness, move-out, and property-manager submissions.
+Questions cover placement timing, who requests housing, what a furnished home includes, pets, school or medical location needs, accessibility, extensions, what to bring, and support after move-in.
 
 Questions about what an individual insurance policy covers, coverage limits, or how long coverage lasts should be directed to the policyholder's own insurance carrier or adjuster. Nova Havens does not make those determinations.`,
   },

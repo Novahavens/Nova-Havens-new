@@ -179,11 +179,11 @@ const HOME_HTML = `
   <section>
     <h2>How It Works</h2>
 
-    <h3>For Carriers &amp; Relocation Specialists</h3>
+    <h3>For Carriers &amp; Specialists</h3>
     <ol>
-      <li><strong>Submit a Claim</strong> — Send us the claim details: household size, location, and pets.</li>
-      <li><strong>Review Placement Options</strong> — We send back verified homes that match, usually within hours.</li>
-      <li><strong>Approve &amp; Coordinate</strong> — We handle move-in with the family and keep you updated.</li>
+      <li><strong>Submit a Claim</strong> — Within the hour.</li>
+      <li><strong>Approve and coordinate</strong> — Keeps carriers and specialists updated.</li>
+      <li><strong>Move in</strong> — Nova Havens coordinates all move-in logistics with one point of contact.</li>
     </ol>
 
     <h3>For Displaced Families</h3>
@@ -191,13 +191,6 @@ const HOME_HTML = `
       <li><strong>Receive Your Options</strong> — Your adjuster or carrier connects you with Nova Havens.</li>
       <li><strong>Choose Your Home</strong> — Browse furnished options matched to your family's needs.</li>
       <li><strong>Move In</strong> — We coordinate move-in logistics so you can focus on what matters.</li>
-    </ol>
-
-    <h3>For Property Owners</h3>
-    <ol>
-      <li><strong>Submit Your Property</strong> — Tell us about your furnished home: location, size, and availability.</li>
-      <li><strong>Get Verified</strong> — We check your property against our furnishing and safety standards.</li>
-      <li><strong>Start Hosting</strong> — We match your home with displaced families and handle the coordination.</li>
     </ol>
   </section>
 
@@ -225,7 +218,7 @@ const BLOG_INDEX_HTML = (() => {
 <main>
   <section>
     <h1>Insights &amp; Resources</h1>
-    <p>Industry knowledge for insurance professionals, displaced families, and property owners — from the Nova Havens team.</p>
+    <p>Industry knowledge for insurance professionals and displaced families — from the Nova Havens team.</p>
   </section>
   <section>
     ${postItems}

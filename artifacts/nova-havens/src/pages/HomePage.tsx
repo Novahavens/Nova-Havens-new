@@ -285,11 +285,36 @@ function CoverageMapPlaceholder() {
   );
 }
 
+// Pet-placement counters shown in the Pet-Friendly section below are
+// illustrative, formula-driven figures for marketing display — not a live
+// feed from placement records. They start from a fixed baseline and increase
+// by a fixed amount on the 1st of every calendar month after that, computed
+// from the visitor's local clock so the numbers stay stable within a month
+// and advance automatically at each month boundary.
+const PET_COUNTER_BASELINE = new Date(2026, 8, 1); // September 1, 2026
+const PET_COUNTER_BASE_VALUES = { dogs: 340, cats: 70, birds: 13 } as const;
+const PET_COUNTER_MONTHLY_GROWTH = { dogs: 21, cats: 7, birds: 3 } as const;
+
+function getPetPlacementCounts(now: Date = new Date()): { dogs: number; cats: number; birds: number } {
+  const monthsElapsed = Math.max(
+    0,
+    (now.getFullYear() - PET_COUNTER_BASELINE.getFullYear()) * 12
+      + (now.getMonth() - PET_COUNTER_BASELINE.getMonth()),
+  );
+
+  return {
+    dogs: PET_COUNTER_BASE_VALUES.dogs + monthsElapsed * PET_COUNTER_MONTHLY_GROWTH.dogs,
+    cats: PET_COUNTER_BASE_VALUES.cats + monthsElapsed * PET_COUNTER_MONTHLY_GROWTH.cats,
+    birds: PET_COUNTER_BASE_VALUES.birds + monthsElapsed * PET_COUNTER_MONTHLY_GROWTH.birds,
+  };
+}
+
 export default function HomePage() {
   // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
   // LocalBusiness structured data is emitted statically via routeMeta.ts ('/').
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const petCounts = getPetPlacementCounts();
   const [propertyStats, setPropertyStats] = useState<PropertyStats>({
     totalProperties: 12000,
     statesCovered: 48,
@@ -371,9 +396,9 @@ export default function HomePage() {
                   <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">20,000+</span>
+                  <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">60,000+</span>
                   <span className="mt-3 block text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified homes nationwide</span>
-                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains 20,000+ verified furnished homes across 48 contiguous US states, as of 2026.</span>
+                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains 60,000+ verified furnished homes across 48 contiguous US states, as of 2026.</span>
                 </div>
               </div>
               <CoverageMapPlaceholder />
@@ -419,7 +444,7 @@ export default function HomePage() {
               <Zap className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Rapid Placements</h3>
-            <p className="text-muted-foreground leading-relaxed">Nova Havens uses automation and agentic technology to process claims with precision — surfacing matched housing options within hours and completing most placements in under 5 days.</p>
+            <p className="text-muted-foreground leading-relaxed">Nova Havens uses automation and agentic technology to process claims with precision — surfacing matched housing options in minutes, not days, and completing most placements in under 5 days.</p>
           </div>
           <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-2">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -433,7 +458,7 @@ export default function HomePage() {
               <Globe className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Vetted Nationwide Network</h3>
-            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 20,000+ verified furnished properties across 48 states — each inspected and ready for immediate placement.</p>
+            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 20,000+ verified properties across 48 states — each ready for immediate placement.</p>
           </div>
           <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -451,7 +476,7 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-5xl font-extrabold mb-8 text-foreground" data-testid="heading-mission">What Is Nova Havens' Mission?</h2>
           <div className="space-y-6 text-lg md:text-xl text-muted-foreground leading-relaxed">
             <p data-testid="text-mission-p1">
-              Nova Havens was founded to provide fast, compassionate housing for families displaced by water, fire, or mold damage. Losing your home — even temporarily — disrupts every part of family life: schools, routines, pets, and the sense of stability children depend on.
+              We are here to provide a safe haven for families in their time of need.
             </p>
           </div>
         </div>
@@ -505,6 +530,20 @@ export default function HomePage() {
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md" data-testid="text-pets">
               Nova Havens maintains a growing network of verified pet-friendly furnished homes across 48 states — so displaced families never have to choose between a safe place to stay and bringing their pets along. Share your pet details on the first call and Nova Havens will match your family to a compatible home.
             </p>
+            <div className="grid grid-cols-3 gap-6 mb-8 w-full max-w-md" data-testid="pet-counters">
+              <div className="flex flex-col items-start" data-testid="counter-dogs">
+                <span className="block text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">{petCounts.dogs}+</span>
+                <span className="mt-1 block text-xs md:text-sm text-muted-foreground">dogs placed</span>
+              </div>
+              <div className="flex flex-col items-start" data-testid="counter-cats">
+                <span className="block text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">{petCounts.cats}+</span>
+                <span className="mt-1 block text-xs md:text-sm text-muted-foreground">cats placed</span>
+              </div>
+              <div className="flex flex-col items-start" data-testid="counter-birds">
+                <span className="block text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">{petCounts.birds}+</span>
+                <span className="mt-1 block text-xs md:text-sm text-muted-foreground">birds placed</span>
+              </div>
+            </div>
             <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'housing', location: 'home_pets' })} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4" data-testid="btn-pets">
               Find Pet-Friendly Homes
             </a>
@@ -637,9 +676,8 @@ export default function HomePage() {
         
         <Tabs defaultValue="adjusters" className="w-full flex flex-col items-center">
           <TabsList className="bg-card border border-white/10 p-1 rounded-full h-auto flex flex-col sm:flex-row w-full sm:w-auto mb-12" data-testid="tabs-how-it-works">
-            <TabsTrigger value="adjusters" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-adjusters">Carriers & Relocation Specialists</TabsTrigger>
+            <TabsTrigger value="adjusters" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-adjusters">Carriers & Specialists</TabsTrigger>
             <TabsTrigger value="families" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-families">Displaced Families</TabsTrigger>
-            <TabsTrigger value="owners" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-owners">Property Owners</TabsTrigger>
           </TabsList>
           
           <TabsContent value="adjusters" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
@@ -649,17 +687,17 @@ export default function HomePage() {
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-1">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Submit a Claim</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Send Nova Havens the claim details — household size, location, and pets</p>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Within the hour.</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-2">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Review Placement Options</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens sends back verified homes that match, usually within hours</p>
+                <h3 className="text-xl font-bold mb-3 text-foreground">Approve and coordinate</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Keeps carriers and specialists updated</p>
               </div>
               <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-3">
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Approve & Coordinate</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens handles move-in with the family and keeps carriers and relocation specialists updated</p>
+                <h3 className="text-xl font-bold mb-3 text-foreground">Move in</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens coordinates all move-in logistics with one point of contact.</p>
               </div>
             </div>
           </TabsContent>
@@ -682,28 +720,6 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Move In</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens coordinates move-in logistics with your carrier and the property owner — you get the keys and a direct line to your coordinator</p>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="owners" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
-              
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-1">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Submit Your Property</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Tell Nova Havens about your furnished home — location, size, and availability</p>
-              </div>
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-2">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Get Verified</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">A coordinator checks your property against Nova Havens furnishing and safety standards</p>
-              </div>
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-owners-3">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Start Hosting</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens matches your home with displaced families and handles the coordination</p>
               </div>
             </div>
           </TabsContent>
@@ -845,12 +861,6 @@ export default function HomePage() {
           </p>
           <p className="text-base md:text-lg font-medium text-muted-foreground" data-testid="text-emergency-desc">
             Displaced and need somewhere to stay tonight? Call Nova Havens — someone answers 24/7.
-          </p>
-          <p className="text-sm md:text-base text-muted-foreground" data-testid="text-emergency-main-line">
-            Main line:{' '}
-            <a href="tel:6294010054" className="font-bold text-foreground hover:text-primary transition-colors" data-testid="link-emergency-phone">
-              (629) 401-0054
-            </a>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href={INTAKE_FORMS.housing} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'housing', location: 'home_emergency' })} className="inline-flex items-center justify-center whitespace-nowrap text-base font-bold transition-colors bg-primary text-primary-foreground hover:brightness-105 rounded-full px-8 py-4 w-full sm:w-auto" data-testid="btn-emergency-request-housing">

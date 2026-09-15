@@ -160,27 +160,27 @@ const STATIC_META: Record<string, RouteMeta> = {
         },
         {
           '@type': 'HowTo',
-          name: 'How Insurance Adjusters & Carriers Work with Nova Havens',
+          name: 'How Carriers & Specialists Work with Nova Havens',
           description:
-            'The step-by-step process for insurance adjusters and carriers to coordinate temporary housing placements through Nova Havens.',
+            'The step-by-step process for carriers and specialists to coordinate temporary housing placements through Nova Havens.',
           step: [
             {
               '@type': 'HowToStep',
               position: 1,
               name: 'Submit a Claim',
-              text: 'Share the claim details with our team via phone or portal.',
+              text: 'Within the hour.',
             },
             {
               '@type': 'HowToStep',
               position: 2,
-              name: 'Review Placement Options',
-              text: 'We surface verified homes within your parameters within hours.',
+              name: 'Approve and coordinate',
+              text: 'Keeps carriers and specialists updated',
             },
             {
               '@type': 'HowToStep',
               position: 3,
-              name: 'Approve & Coordinate',
-              text: 'We handle all logistics with the family directly.',
+              name: 'Move in',
+              text: 'Nova Havens coordinates all move-in logistics with one point of contact.',
             },
           ],
         },
@@ -211,32 +211,6 @@ const STATIC_META: Record<string, RouteMeta> = {
           ],
         },
         {
-          '@type': 'HowTo',
-          name: 'How Property Owners Join the Nova Havens Network',
-          description:
-            'The step-by-step process for property owners to list their furnished homes with Nova Havens and start hosting displaced families.',
-          step: [
-            {
-              '@type': 'HowToStep',
-              position: 1,
-              name: 'Submit Your Property',
-              text: 'Tell us about your furnished home and availability.',
-            },
-            {
-              '@type': 'HowToStep',
-              position: 2,
-              name: 'Get Verified',
-              text: 'We inspect and onboard your property into our network.',
-            },
-            {
-              '@type': 'HowToStep',
-              position: 3,
-              name: 'Start Hosting',
-              text: 'We match you with families and handle all coordination.',
-            },
-          ],
-        },
-        {
           '@type': 'FAQPage',
           mainEntity: HOME_FAQS.map((faq) => ({
             '@type': 'Question',
@@ -253,7 +227,7 @@ const STATIC_META: Record<string, RouteMeta> = {
   '/blog': {
     title: `Blog & Resources | ${SITE_NAME}`,
     description:
-      'Nova Havens publishes guides for insurance professionals, displaced families, and property owners on temporary housing, ALE coverage, and claims coordination.',
+      'Nova Havens publishes guides for insurance professionals and displaced families on temporary housing, ALE coverage, and claims coordination.',
     ogType: 'website',
     canonicalUrl: `${BASE_URL}/blog`,
     jsonLd: {
@@ -264,7 +238,7 @@ const STATIC_META: Record<string, RouteMeta> = {
           '@type': 'ItemList',
           name: 'Nova Havens Blog & Resources',
           description:
-            'Guides and resources for insurance professionals, displaced families, and property owners on temporary housing, ALE coverage, and claims coordination.',
+            'Guides and resources for insurance professionals and displaced families on temporary housing, ALE coverage, and claims coordination.',
           url: `${BASE_URL}/blog`,
           itemListElement: BLOG_POSTS.map((post, index) => ({
             '@type': 'ListItem',

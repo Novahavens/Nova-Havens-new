@@ -27,7 +27,7 @@ export default function BlogPage() {
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
             data-testid="text-blog-subtitle"
           >
-            Industry knowledge for insurance professionals, displaced families, and property owners.
+            Industry knowledge for insurance professionals and displaced families.
           </p>
         </div>
       </section>
