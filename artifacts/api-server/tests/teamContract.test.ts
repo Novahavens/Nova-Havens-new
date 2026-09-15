@@ -14,6 +14,7 @@ import {
   createTeamRouter,
   type TeamStorage,
 } from "../src/routes/team.ts";
+import { teamPhotoUrl } from "../../nova-havens/src/lib/teamPhoto.ts";
 
 const TEAM_PAGE_PATH = fileURLToPath(
   new URL("../../nova-havens/src/pages/TeamPage.tsx", import.meta.url),
@@ -117,6 +118,50 @@ test("the real handler returns the shape the Team page consumes", async () => {
   assert.equal(response.status, 200);
   assertMatchesTeamPageConsumer(response.body);
   assert.deepEqual(response.body, storedTeamResponse);
+});
+
+test("a synced photo key reaches the real image handler with renderable bytes", async () => {
+  const member = storedTeamResponse.members[0];
+  assert.ok(member.photo, "The representative synced member needs a photo key.");
+
+  const expectedBytes = Uint8Array.from([0xff, 0xd8, 0xff, 0xdb]);
+  const requestedKeys: string[] = [];
+  const storage: TeamStorage = {
+    async downloadAsText() {
+      return { ok: false, error: new Error("not used") };
+    },
+    async downloadAsBytes(key) {
+      requestedKeys.push(key);
+      return { ok: true, value: [expectedBytes, undefined] };
+    },
+  };
+  const app = express();
+  app.use("/api", createTeamRouter(storage));
+  const server = app.listen(0);
+  await new Promise<void>((resolve) => server.once("listening", resolve));
+  const { port } = server.address() as AddressInfo;
+
+  try {
+    const pagePhotoPath = teamPhotoUrl("/", member.photo);
+    assert.equal(pagePhotoPath, "/api/team/images/dana-ellis.jpg");
+
+    const response = await fetch(`http://127.0.0.1:${port}${pagePhotoPath}`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "image/jpeg");
+    assert.deepEqual(
+      new Uint8Array(await response.arrayBuffer()),
+      expectedBytes,
+    );
+    assert.deepEqual(
+      requestedKeys,
+      [member.photo],
+      "The page route and API prefix must resolve to the exact synced Object Storage key.",
+    );
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
 });
 
 test("a renamed field fails the Team page response contract", () => {

@@ -106,12 +106,6 @@ export const TEAM_MEMBERS: TeamMember[] = [
     },
   },
   {
-    // No profile form submission yet — card renders static, with no modal.
-    name: "Alejandra",
-    role: "[Role TBC]",
-    initials: "A",
-  },
-  {
     name: "Fazal Abed",
     role: "AI Engineer",
     initials: "FA",

@@ -117,7 +117,7 @@ const HOME_HTML = `
     <h1>A safe place to land, fast.</h1>
     <p>Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.</p>
     <ul>
-      <li>20,000+ verified homes nationwide</li>
+      <li>60,000+ verified homes nationwide</li>
       <li>531+ families assisted this year</li>
       <li>Average placement in under 5 days</li>
     </ul>

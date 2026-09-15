@@ -6,8 +6,6 @@ description: The custom Umami event taxonomy instrumented on the nova-havens web
 ## Events
 
 - `intake_form_click` — props: `form` ('housing' | 'property'), `location`. Fired on every external Jotform CTA link site-wide (navbar desktop/mobile, home hero/pets/how-it-works/emergency, contact quick actions, blog post CTA).
-- `contact_form_submitted` — props: `subject`. Fires only after the `/api/contact` POST succeeds.
-- `contact_form_failed` — props: `reason` ('rate_limited' | 'error'). Fires on the 429 branch and on the catch-block (network/other errors) separately.
 - `ask_ai_click` — props: `assistant`, `location`.
 - `team_member_viewed` — props: `member`. Fired from the single `openProfile` handler, covers all team-card entry points automatically.
 - `faq_expanded` — props: `question`. Fires only when a FAQ item transitions closed→open, never on collapse.

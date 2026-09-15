@@ -28,14 +28,13 @@
     "test:intake-forms": "node --experimental-strip-types --test tests/intakeFormsAvailability.test.ts && pnpm run validate:intake-forms",
     "test:chromium-libraries": "node --experimental-strip-types --test tests/withNixChromiumLibs.test.ts",
     "test:llms-sync": "node --experimental-strip-types --test tests/llmsTxtSync.test.ts",
-    "test:smoke": "pnpm run validate:intake-forms && pnpm run validate:ui-components && pnpm run validate:source-reachability && pnpm run test:ui-components && pnpm run test:llms-sync && pnpm run test:contact-form && pnpm test:chromium-libraries && bash scripts/with-nix-chromium-libs.sh playwright test --config playwright.config.ts",
+    "test:smoke": "pnpm run validate:intake-forms && pnpm run validate:ui-components && pnpm run validate:source-reachability && pnpm run test:ui-components && pnpm run test:llms-sync && pnpm test:chromium-libraries && bash scripts/with-nix-chromium-libs.sh playwright test --config playwright.config.ts",
     "test:smoke:update": "pnpm test:chromium-libraries && bash scripts/with-nix-chromium-libs.sh playwright test --config playwright.config.ts --update-snapshots",
     "test:token-plugin": "node --experimental-strip-types --test tests/vitePluginValidateTokens.test.ts",
     "test:token-rule": "node --experimental-strip-types --test tests/noHardcodedTokenValues.test.ts",
     "test:color-rule": "node --experimental-strip-types --test tests/noHardcodedColorValues.test.ts",
     "test:bundle-budget": "node --experimental-strip-types --test tests/validateBundleBudget.test.ts",
     "test:build-freshness": "node --experimental-strip-types --test tests/buildFreshness.test.ts",
-    "test:contact-form": "node --experimental-strip-types --test tests/contactFormValidation.test.ts",
     "test:ui-components": "node --experimental-strip-types --test tests/validateUiComponents.test.ts"
   },
   "devDependencies": {

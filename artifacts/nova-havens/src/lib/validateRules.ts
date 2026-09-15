@@ -53,6 +53,7 @@ export const WIDTH_TOKEN_MAP = new Map<number, string>([
   [800,  'max-w-prose-wide'],  // --width-prose-wide: 50rem
   [760,  'max-w-prose'],       // --width-prose:      47.5rem
   [420,  'max-w-cta'],         // --width-cta:        26.25rem
+  [720,  'max-w-contact-form'],// --width-contact-form: 45rem
 ]);
 
 /**

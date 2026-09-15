@@ -1,174 +1,79 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'wouter';
+import React, { useEffect, useState } from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
-import { Button } from '@workspace/nova-havens-design-system/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/nova-havens-design-system/components/ui/form';
-import { Input } from '@workspace/nova-havens-design-system/components/ui/input';
-import { Textarea } from '@workspace/nova-havens-design-system/components/ui/textarea';
-import { NativeSelect } from '@workspace/nova-havens-design-system/components/ui/native-select';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
-import {
-  CONTACT_FORM_DEFAULT_VALUES,
-  contactFormResolver,
-  type ContactFormValues,
-} from '@/lib/contactFormValidation';
 import { trackEvent } from '@/lib/analytics';
 
-type FormValues = ContactFormValues;
+/** Nova Havens' Jotform contact form, embedded directly rather than re-implemented. */
+const CONTACT_FORM_URL = 'https://form.jotform.com/262575434019055';
 
-const HTTP_DATE_PATTERN =
-  /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT|((?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)), (\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{2}) (\d{2}):(\d{2}):(\d{2}) GMT|(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) {1,2}(\d{1,2}) (\d{2}):(\d{2}):(\d{2}) (\d{4}))$/;
+/** How long to wait for the embed to report success before treating it as failed. */
+const EMBED_LOAD_TIMEOUT_MS = 15_000;
 
-const HTTP_WEEKDAYS = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-] as const;
+type EmbedStatus = 'loading' | 'loaded' | 'error';
 
-const HTTP_MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-] as const;
+/**
+ * The embedded contact form: a placeholder while it loads (so the page never
+ * jumps once it appears), the iframe itself, and an email fallback if it
+ * never finishes loading — a cross-origin iframe has no reliable `onError`
+ * for anything short of a hard network failure, so a load timeout catches
+ * the rest.
+ */
+function ContactFormEmbed() {
+  const [status, setStatus] = useState<EmbedStatus>('loading');
 
-function parseHttpDate(value: string): number {
-  const match = value.match(HTTP_DATE_PATTERN);
-  if (!match) return Number.NaN;
+  useEffect(() => {
+    if (status !== 'loading') return;
 
-  const isImfFixdate = match[1] !== undefined;
-  const isRfc850 = match[8] !== undefined;
-  const weekday = isImfFixdate ? match[1] : isRfc850 ? match[8] : match[15];
-  const month = isImfFixdate ? match[3] : isRfc850 ? match[10] : match[16];
-  const day = Number(isImfFixdate ? match[2] : isRfc850 ? match[9] : match[17]);
-  const hour = Number(isImfFixdate ? match[5] : isRfc850 ? match[12] : match[18]);
-  const minute = Number(isImfFixdate ? match[6] : isRfc850 ? match[13] : match[19]);
-  const second = Number(isImfFixdate ? match[7] : isRfc850 ? match[14] : match[20]);
-  const year = Number(isImfFixdate ? match[4] : isRfc850 ? match[11] : match[21]);
-  const dateValue = isRfc850 || isImfFixdate ? value : `${value} GMT`;
-  const parsedAt = Date.parse(dateValue);
+    const timer = window.setTimeout(() => {
+      setStatus((current) => (current === 'loading' ? 'error' : current));
+    }, EMBED_LOAD_TIMEOUT_MS);
 
-  if (
-    Number.isNaN(parsedAt) ||
-    !weekday ||
-    !month ||
-    !HTTP_MONTHS.includes(month as (typeof HTTP_MONTHS)[number]) ||
-    hour > 23 ||
-    minute > 59 ||
-    second > 59
-  ) {
-    return Number.NaN;
+    return () => window.clearTimeout(timer);
+  }, [status]);
+
+  if (status === 'error') {
+    return (
+      <div
+        className="bg-background border border-white/10 rounded-lg min-h-[var(--min-h-contact-embed)] flex flex-col items-center justify-center gap-3 text-center p-8"
+        data-testid="message-embed-error"
+      >
+        <p className="text-muted-foreground">The contact form couldn't load.</p>
+        <a
+          href="mailto:william@novahavens.com"
+          className="text-primary font-semibold hover:brightness-110 transition-colors"
+          data-testid="link-embed-fallback-email"
+        >
+          Email william@novahavens.com
+        </a>
+      </div>
+    );
   }
 
-  const parsedDate = new Date(parsedAt);
-  const expectedWeekday = weekday.length === 3
-    ? HTTP_WEEKDAYS.findIndex((name) => name.startsWith(weekday))
-    : HTTP_WEEKDAYS.indexOf(weekday as (typeof HTTP_WEEKDAYS)[number]);
-  const expectedYear = isRfc850 ? parsedDate.getUTCFullYear() % 100 : year;
-
-  if (
-    parsedDate.getUTCFullYear() !== (isRfc850 ? parsedDate.getUTCFullYear() : year) ||
-    parsedDate.getUTCMonth() !== HTTP_MONTHS.indexOf(month as (typeof HTTP_MONTHS)[number]) ||
-    parsedDate.getUTCDate() !== day ||
-    parsedDate.getUTCHours() !== hour ||
-    parsedDate.getUTCMinutes() !== minute ||
-    parsedDate.getUTCSeconds() !== second ||
-    parsedDate.getUTCDay() !== expectedWeekday ||
-    expectedYear !== year
-  ) {
-    return Number.NaN;
-  }
-
-  return parsedAt;
-}
-
-function getThrottleMessage(retryAfter: string | null): string {
-  const retryAfterValue = retryAfter?.trim() ?? '';
-  const isNumericRetryAfter = /^[+-]?\d+$/.test(retryAfterValue);
-  const retryAfterSeconds = /^\d+$/.test(retryAfterValue)
-    ? Number(retryAfterValue)
-    : Number.NaN;
-
-  if (Number.isSafeInteger(retryAfterSeconds) && retryAfterSeconds > 0) {
-    const unit = retryAfterSeconds === 1 ? 'second' : 'seconds';
-    return `Messages are temporarily limited. Please wait ${retryAfterSeconds} ${unit} before trying again.`;
-  }
-
-  const retryAt = isNumericRetryAfter ? Number.NaN : parseHttpDate(retryAfterValue);
-  if (!Number.isNaN(retryAt)) {
-    const remainingSeconds = Math.ceil((retryAt - Date.now()) / 1000);
-    if (remainingSeconds > 0) {
-      const unit = remainingSeconds === 1 ? 'second' : 'seconds';
-      return `Messages are temporarily limited. Please wait ${remainingSeconds} ${unit} before trying again.`;
-    }
-  }
-
-  return 'Messages are temporarily limited. Please wait a few minutes before trying again.';
+  return (
+    <div className="relative min-h-[var(--min-h-contact-embed)]">
+      {status === 'loading' && (
+        <div
+          className="absolute inset-0 bg-card border border-white/10 rounded-lg animate-pulse"
+          aria-hidden="true"
+          data-testid="placeholder-contact-embed"
+        />
+      )}
+      <iframe
+        src={CONTACT_FORM_URL}
+        title="Contact Nova Havens"
+        className={`relative w-full min-h-[var(--min-h-contact-embed)] rounded-lg border-0 transition-opacity duration-300 ${
+          status === 'loaded' ? 'opacity-100' : 'opacity-0'
+        }`}
+        onLoad={() => setStatus('loaded')}
+        onError={() => setStatus('error')}
+        data-testid="iframe-contact-form"
+      />
+    </div>
+  );
 }
 
 export default function ContactPage() {
-  const [isSubmitted, setIsSubmitted] = React.useState(false);
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const [isThrottled, setIsThrottled] = React.useState(false);
-
-  useEffect(() => {
-    // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
-  }, []);
-
-  const form = useForm<FormValues>({
-    resolver: contactFormResolver,
-    defaultValues: CONTACT_FORM_DEFAULT_VALUES
-  });
-
-  // Honeypot: hidden from people and assistive technology, but present in the
-  // DOM for scripts that blindly fill every input. The API rejects any
-  // submission that arrives with it filled in.
-  const honeypotRef = React.useRef<HTMLInputElement>(null);
-
-  const onSubmit = async (data: FormValues) => {
-    setSubmitError(null);
-    setIsThrottled(false);
-
-    try {
-      const response = await fetch(`${import.meta.env.BASE_URL}api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, company: honeypotRef.current?.value ?? '' }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          setIsThrottled(true);
-          setSubmitError(getThrottleMessage(response.headers.get('Retry-After')));
-          trackEvent('contact_form_failed', { reason: 'rate_limited' });
-          return;
-        }
-
-        throw new Error(`Contact endpoint responded ${response.status}`);
-      }
-
-      // Only now has the message actually reached Nova Havens.
-      setIsSubmitted(true);
-      trackEvent('contact_form_submitted', { subject: data.subject });
-    } catch {
-      setSubmitError('Your message could not be sent to Nova Havens.');
-      trackEvent('contact_form_failed', { reason: 'error' });
-    }
-  };
-
+  // Title/description/OG tags are applied centrally by useRouteMeta (App.tsx).
   return (
     <div className="w-full">
       {/* Hero */}
@@ -202,7 +107,7 @@ export default function ContactPage() {
           <div className="bg-card rounded-lg border border-white/10 p-8 flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-3 text-foreground">Own a Furnished Property?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Join the Nova Havens network of 20,000+ verified furnished homes and start hosting displaced families — with carrier billing handled entirely by Nova Havens.
+              Join the Nova Havens network of 60,000+ verified furnished homes and start hosting displaced families — with carrier billing handled entirely by Nova Havens.
             </p>
             <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'property', location: 'contact_quick_action' })} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-submit-property">
               Submit Your Property
@@ -210,10 +115,10 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8" id="contact-form">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-8" id="contact-form">
           
           {/* Contact Info Side */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <div className="bg-card rounded-lg border border-white/5 p-6 flex items-start gap-4" data-testid="card-contact-phone">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Phone className="w-5 h-5 text-primary" />
@@ -257,136 +162,11 @@ export default function ContactPage() {
           </div>
 
           {/* Form Side */}
-          <div className="lg:col-span-2 bg-card rounded-lg border border-white/10 p-8 md:p-10">
+          <div className="lg:col-span-3 bg-card rounded-lg border border-white/10 p-8 md:p-10 max-w-contact-form w-full">
             <h2 className="text-2xl font-bold mb-2 text-foreground" data-testid="heading-form">Send a Message to Nova Havens</h2>
             <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold">(629) 401-0054</a> directly — 24/7.</p>
-            
-            {isSubmitted ? (
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 text-center" data-testid="message-success">
-                <p className="text-primary font-bold text-lg mb-2">Thank you!</p>
-                <p className="text-muted-foreground">Nova Havens has received your message and will be in touch within one business day. For urgent requests, call (629) 401-0054.</p>
-              </div>
-            ) : (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Bot trap — never shown, never focusable, never announced. */}
-                  <div aria-hidden="true" className="hidden">
-                    <label htmlFor="contact-company">Company (leave blank)</label>
-                    <input
-                      id="contact-company"
-                      name="company"
-                      type="text"
-                      ref={honeypotRef}
-                      tabIndex={-1}
-                      autoComplete="off"
-                      defaultValue=""
-                    />
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground">Name *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John Doe" className="bg-background border-white/10 text-foreground" {...field} data-testid="input-name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground">Email *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="john@example.com" type="email" className="bg-background border-white/10 text-foreground" {...field} data-testid="input-email" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground">Phone (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="(555) 123-4567" className="bg-background border-white/10 text-foreground" {...field} data-testid="input-phone" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="subject"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-muted-foreground">Subject *</FormLabel>
-                          <FormControl>
-                            <NativeSelect
-                              placeholder="Select a subject"
-                              className="bg-background border-white/10 text-foreground"
-                              data-testid="select-subject"
-                              {...field}
-                            >
-                              <option value="General Inquiry">General Inquiry</option>
-                              <option value="Housing Request">Housing Request — Displaced Family or Adjuster</option>
-                              <option value="Property Submission">Property Submission — Join the Network</option>
-                              <option value="Partnership">Carrier or Partner Inquiry</option>
-                              <option value="Press">Press</option>
-                            </NativeSelect>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-muted-foreground">Message *</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Describe your housing need, claim details, property, or question — the more context you provide, the faster Nova Havens can help." 
-                            className="bg-background border-white/10 text-foreground min-h-[var(--min-h-textarea)]" 
-                            {...field} 
-                            data-testid="input-message"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {submitError && (
-                    <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4" role="alert" data-testid="message-submit-error">
-                      <p className="text-sm text-foreground">
-                        {submitError}{' '}{isThrottled ? 'For immediate assistance, call' : 'Please try again, or call'}{' '}
-                        <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a>
-                        {' '}— Nova Havens answers 24/7.
-                      </p>
-                    </div>
-                  )}
-
-                  <Button type="submit" disabled={form.formState.isSubmitting} className="rounded-full bg-primary text-primary-foreground hover:brightness-105 font-bold px-8 py-6 h-auto" data-testid="btn-submit-contact">
-                    {form.formState.isSubmitting ? 'Sending…' : 'Send Message'}
-                  </Button>
-                </form>
-              </Form>
-            )}
+            <ContactFormEmbed />
           </div>
         </div>
       </section>

@@ -12,6 +12,7 @@
   --width-prose-wide: 50rem;
   --width-prose: 47.5rem;
   --width-cta: 26.25rem;
+  --width-contact-form: 45rem;
 }
 
 :root {
@@ -26,6 +27,7 @@
   --min-h-map: 18.75rem;
   --min-h-map-md: 21.875rem;
   --min-h-map-lg: 31.25rem;
+  --min-h-contact-embed: 40rem;
 
   /* Hero heading fluid size — use as fontSize: 'var(--text-hero)'. */
   --text-hero: clamp(3rem, 6vw, 5rem);

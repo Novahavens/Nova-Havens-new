@@ -44,7 +44,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Nova Havens on LinkedIn"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="text-muted-foreground hover:text-primary opacity-70 hover:opacity-100 transition-all duration-150 ease-out"
                 data-testid="link-footer-linkedin"
                 onClick={() => trackEvent('social_link_click', { platform: 'linkedin' })}
               >
@@ -55,7 +55,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Nova Havens on Instagram"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="text-muted-foreground hover:text-primary opacity-70 hover:opacity-100 transition-all duration-150 ease-out"
                 data-testid="link-footer-instagram"
                 onClick={() => trackEvent('social_link_click', { platform: 'instagram' })}
               >
@@ -66,7 +66,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Nova Havens on Facebook"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="text-muted-foreground hover:text-primary opacity-70 hover:opacity-100 transition-all duration-150 ease-out"
                 data-testid="link-footer-facebook"
                 onClick={() => trackEvent('social_link_click', { platform: 'facebook' })}
               >

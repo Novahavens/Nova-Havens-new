@@ -60,10 +60,10 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
   },
   {
     title: 'Home Exteriors',
-    subtitle: 'Part of a 20,000+ Network',
+    subtitle: 'Part of a 60,000+ Network',
     description: 'Comfortable, well-kept homes in real neighborhoods — nationwide coverage across 48 contiguous states.',
     imageUrl: '/property-6.webp',
-    imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens 20,000+ property network',
+    imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens 60,000+ property network',
   },
   {
     title: 'Fenced-In Yards',
@@ -279,7 +279,7 @@ function CoverageMapPlaceholder() {
       </svg>
       <div className="absolute bottom-3 right-4 flex items-center gap-2 text-xs font-medium text-muted-foreground md:bottom-4 md:right-5">
         <span className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-        20,000+ available homes
+        60,000+ available homes
       </div>
     </div>
   );
@@ -458,7 +458,7 @@ export default function HomePage() {
               <Globe className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Vetted Nationwide Network</h3>
-            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 20,000+ verified properties across 48 states — each ready for immediate placement.</p>
+            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 60,000+ verified properties across 48 states — each ready for immediate placement.</p>
           </div>
           <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -517,7 +517,7 @@ export default function HomePage() {
           <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-6">
             <Map className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Nationwide Network</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">With 20,000+ verified homes across every major metro and many rural areas in 48 states, Nova Havens places families close to their schools, workplaces, and community.</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">With 60,000+ verified homes across every major metro and many rural areas in 48 states, Nova Havens places families close to their schools, workplaces, and community.</p>
           </div>
         </div>
       </section>

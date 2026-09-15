@@ -4,6 +4,7 @@ import { Phone, Mail, HeartHandshake, Clock, ShieldCheck } from 'lucide-react';
 import { TEAM_MEMBERS, type TeamMember, type TeamMemberProfile } from '@/data/teamMembers';
 import TeamMemberModal from '@/components/TeamMemberModal';
 import { trackEvent } from '@/lib/analytics';
+import { teamPhotoUrl } from '@/lib/teamPhoto';
 
 /** Shape of one member in the synced team/team.json (see scripts/sync-team.js). */
 interface SyncedMember {
@@ -33,11 +34,6 @@ function isSyncedMember(value: unknown): value is SyncedMember {
   );
 }
 
-/** team/ photo keys are served through the API server. */
-function photoUrlFor(key: string): string {
-  return `${import.meta.env.BASE_URL}api/team/images/${key.replace(/^team\//, '')}`;
-}
-
 function toTeamMember(synced: SyncedMember): TeamMember {
   const profile = {} as TeamMemberProfile;
   for (const key of ANSWER_KEYS) profile[key] = synced[key];
@@ -47,7 +43,9 @@ function toTeamMember(synced: SyncedMember): TeamMember {
     role: synced.role || undefined,
     initials: synced.initials,
     profile: hasProfile ? profile : undefined,
-    photoUrl: synced.photo ? photoUrlFor(synced.photo) : null,
+    photoUrl: synced.photo
+      ? teamPhotoUrl(import.meta.env.BASE_URL, synced.photo)
+      : null,
   };
 }
 

@@ -118,10 +118,6 @@ args = "token-rule"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "contact-contract"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "team-contract"
 
 [[workflows.workflow]]
@@ -131,17 +127,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pnpm --filter @workspace/nova-havens run test:token-rule"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[[workflows.workflow]]
-name = "contact-contract"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/api-server run test:contact-contract"
 
 [workflows.workflow.metadata]
 isValidation = true

@@ -15,9 +15,10 @@ import { Router, type IRouter, type Request, type Response } from "express";
  * validation stay testable without a live Postgres.
  */
 
-// Mirrors artifacts/nova-havens/src/lib/contactFormValidation.ts so the
-// browser and the server agree on what a valid submission looks like. The
-// server is the authority: the client check can be bypassed entirely.
+// The Contact page now embeds a hosted Jotform instead of a local form, so
+// this server-side check is the only validation a submission to this route
+// ever receives. Kept deliberately strict since nothing upstream screens
+// input before it arrives here.
 const EMAIL_PATTERN =
   /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
 
