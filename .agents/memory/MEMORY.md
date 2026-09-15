@@ -16,3 +16,5 @@
 - [Fallback inventory drift checks](fallback-inventory-drift-checks.md) — hand-maintained fixture fallback lists need an automated diff against generated source (not tokens.json alone) or they silently drift.
 - [Nova Havens analytics taxonomy](analytics-taxonomy.md) — 8-event custom taxonomy (conversion + engagement) via shared trackEvent wrapper; keep naming/location conventions consistent for new events.
 - [Playwright inline style comparisons](playwright-inline-style-assertions.md) — toHaveCSS resolves to computed pixels; compare captured inline percentage styles with evaluate + toBe instead.
+- [Full-page screenshot + mask tiling race](mobile-viewport-hover-pause-flake.md) — tall pages needing many scroll tiles can misplace mask boxes; raise toHaveScreenshot's timeout, don't loosen tolerance.
+- [markTaskComplete rebase corruption](task-complete-rebase-corruption.md) — a rejected completion's validation rebase can silently splice/corrupt a shared file; recover via gitsafe-backup refs, reapply on current upstream.

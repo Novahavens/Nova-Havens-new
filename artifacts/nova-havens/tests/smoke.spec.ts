@@ -335,6 +335,15 @@ async function smokeTest(page: Page, path: string): Promise<void> {
     maxDiffPixelRatio: 0.01,
     animations: 'disabled',
     mask: await imgLocators.all(),
+    // On the tallest pages (e.g. mobile viewports), a full-page screenshot
+    // is stitched from many scroll tiles, each re-checking every mask
+    // locator's bounding box. That gives Playwright's internal
+    // stability polling more tiles to reconcile than the default 5s
+    // budget reliably allows, so a still-settling tile can be misread as
+    // "unstable" even though the page itself has stopped changing. The
+    // default timeout is too tight for that case; a longer one gives the
+    // same poll loop room to converge without loosening maxDiffPixelRatio.
+    timeout: 20_000,
   });
 }
 
@@ -407,6 +416,103 @@ test.describe('Trust Strip section regression', () => {
       // let a several-pixel misalignment slip through again. Tight enough to
       // fail on a reintroduced stray margin/alignment regression, loose
       // enough to absorb sub-pixel anti-aliasing drift between runs.
+      maxDiffPixelRatio: 0.002,
+      animations: 'disabled',
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Feature and stat grid regressions
+// ---------------------------------------------------------------------------
+
+/**
+ * Same failure mode as the Trust Strip check above (task #152): the
+ * full-page homepage screenshot's 1% `maxDiffPixelRatio` is measured against
+ * the ENTIRE page, so a small alignment regression inside one card/stat grid
+ * — e.g. a stray margin utility class knocking one card out of line with its
+ * siblings — can be too small a fraction of a tall page to cross that
+ * threshold on chromium/tablet-chrome, even though it is plainly visible in
+ * the grid itself. The "Why Choose Nova Havens", "Amenities", and "Where We
+ * Operate" stat-card grids share the exact card-grid structure that let that
+ * class of bug ship undetected in the Trust Strip, so each gets the same
+ * section-scoped, tightly-toleranced screenshot independent of the full-page
+ * homepage screenshot — failing at every viewport, not just the ones where
+ * the regression happens to be a large-enough fraction of total page height.
+ *
+ * Each grid is captured on its own (not the whole enclosing <section>) so
+ * unrelated content sharing that section — the state-coverage map and Google
+ * rating badge above the "Where We Operate" stat row, in particular — can't
+ * dilute the tolerance or introduce unrelated diff noise.
+ */
+test.describe('Feature and stat grid regressions', () => {
+  test('"Why Choose Nova Havens" cards stay aligned with their siblings', async ({ page }) => {
+    if (test.info().project.name.endsWith('-dark')) {
+      await page.emulateMedia({ colorScheme: 'dark' });
+    }
+
+    await page.goto('/');
+    await waitForStable(page);
+
+    const whyGrid = page.getByTestId('grid-why');
+    await expect(whyGrid).toBeVisible();
+    // Confirm all four cards this section protects are present before
+    // trusting the screenshot below to catch a regression among them.
+    await expect(page.getByTestId('card-why-1')).toBeVisible();
+    await expect(page.getByTestId('card-why-2')).toBeVisible();
+    await expect(page.getByTestId('card-why-3')).toBeVisible();
+    await expect(page.getByTestId('card-why-4')).toBeVisible();
+
+    await expect(whyGrid).toHaveScreenshot({
+      // Far tighter than the full-page homepage screenshot's 1% — see the
+      // Trust Strip check above for why that matters.
+      maxDiffPixelRatio: 0.002,
+      animations: 'disabled',
+    });
+  });
+
+  test('"Amenities" cards stay aligned with their siblings', async ({ page }) => {
+    if (test.info().project.name.endsWith('-dark')) {
+      await page.emulateMedia({ colorScheme: 'dark' });
+    }
+
+    await page.goto('/');
+    await waitForStable(page);
+
+    const amenitiesGrid = page.getByTestId('grid-experience');
+    await expect(amenitiesGrid).toBeVisible();
+    // Confirm all six cards this section protects are present before
+    // trusting the screenshot below to catch a regression among them.
+    await expect(page.getByTestId('card-exp-1')).toBeVisible();
+    await expect(page.getByTestId('card-exp-2')).toBeVisible();
+    await expect(page.getByTestId('card-exp-3')).toBeVisible();
+    await expect(page.getByTestId('card-exp-4')).toBeVisible();
+    await expect(page.getByTestId('card-exp-5')).toBeVisible();
+    await expect(page.getByTestId('card-exp-6')).toBeVisible();
+
+    await expect(amenitiesGrid).toHaveScreenshot({
+      maxDiffPixelRatio: 0.002,
+      animations: 'disabled',
+    });
+  });
+
+  test('"Where We Operate" stat cards stay aligned with their siblings', async ({ page }) => {
+    if (test.info().project.name.endsWith('-dark')) {
+      await page.emulateMedia({ colorScheme: 'dark' });
+    }
+
+    await page.goto('/');
+    await waitForStable(page);
+
+    const statsGrid = page.getByTestId('grid-stats');
+    await expect(statsGrid).toBeVisible();
+    // Confirm all three stat cards this section protects are present before
+    // trusting the screenshot below to catch a regression among them.
+    await expect(page.getByTestId('stat-card-properties')).toBeVisible();
+    await expect(page.getByTestId('stat-card-states')).toBeVisible();
+    await expect(page.getByTestId('stat-card-speed')).toBeVisible();
+
+    await expect(statsGrid).toHaveScreenshot({
       maxDiffPixelRatio: 0.002,
       animations: 'disabled',
     });

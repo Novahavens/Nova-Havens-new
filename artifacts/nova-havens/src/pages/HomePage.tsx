@@ -438,7 +438,7 @@ export default function HomePage() {
       {/* 3. Why Choose Nova Havens */}
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-16" data-testid="heading-why">Why Choose Nova Havens for Insurance Housing?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" data-testid="grid-why">
           <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-1">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Zap className="w-6 h-6 text-primary" />
@@ -488,7 +488,7 @@ export default function HomePage() {
           <p className="text-lg text-muted-foreground" data-testid="subtitle-experience">Every verified Nova Havens property is move-in ready from day one</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="grid-experience">
           <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-1">
             <BedDouble className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Cozy Bedding</h3>
@@ -602,7 +602,7 @@ export default function HomePage() {
 
         <GoogleRating />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="grid-stats">
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-properties">
             <div className="text-4xl font-extrabold text-foreground mb-2">20 000+</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">Active Properties</div>
