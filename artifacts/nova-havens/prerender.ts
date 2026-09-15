@@ -16,7 +16,7 @@
  * Node.js 22.6+ / 24 is required for --experimental-strip-types.
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,10 +24,40 @@ import { ALL_ROUTES, resolveRouteMeta } from './src/lib/routeMeta.ts';
 
 const DEFAULT_OG_IMAGE = 'https://novahavens.com/og-image.png';
 import { getRouteBodyHtml } from './src/lib/routeContent.ts';
+import { StaleBuildOutputError, assertBuildFresh } from './scripts/lib/buildFreshness.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = join(__dirname, 'dist', 'public');
 const templatePath = join(distDir, 'index.html');
+
+// ── Freshness guard ────────────────────────────────────────────────────────
+// prerender.ts only rewrites HTML shells with the current route metadata; it
+// never touches the JS/CSS bundle. If dist/public was built before the latest
+// source change, re-running this script would relabel a stale bundle with
+// today's metadata and titles, making it look freshly published when the code
+// it ships is not. Refuse instead of writing anything.
+
+if (!existsSync(templatePath)) {
+  console.error(
+    'prerender: dist/public/index.html not found — run `pnpm run build` first (this script runs after `vite build`).',
+  );
+  process.exit(1);
+}
+
+try {
+  assertBuildFresh({
+    sourceRoot: __dirname,
+    distDir,
+    label: 'Prerender',
+    consequence: 'so the HTML it writes would relabel a stale bundle as current.',
+  });
+} catch (error) {
+  if (error instanceof StaleBuildOutputError) {
+    console.error(error.message);
+    process.exit(2);
+  }
+  throw error;
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

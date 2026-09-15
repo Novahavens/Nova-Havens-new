@@ -11,7 +11,11 @@
  * route, so a broken template replacement cannot silently ship bad previews.
  *
  * If dist/public/index.html is missing (no build yet), it runs the build
- * first (set SKIP_BUILD=1 to fail fast instead).
+ * first (set SKIP_BUILD=1 to fail fast instead). If dist/public exists but
+ * was built before the current source (e.g. this script is run standalone,
+ * well after the last `pnpm run build`), it refuses rather than validating —
+ * and possibly "healing" — output that no longer matches the source it would
+ * be reporting on.
  *
  * Run with: node --experimental-strip-types scripts/validate-prerender.ts
  */
@@ -23,6 +27,7 @@ import { execSync } from 'node:child_process';
 
 import { ALL_ROUTE_META } from '../src/lib/routeMeta.ts';
 import { renderLlmsTxtPrerenderHtml } from '../src/data/llmsContent.ts';
+import { StaleBuildOutputError, assertBuildFresh } from './lib/buildFreshness.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgDir = join(__dirname, '..');
@@ -55,6 +60,25 @@ if (!existsSync(join(distDir, 'index.html'))) {
     },
   });
 } else {
+  // dist/public exists, but it may predate the current source if this script
+  // is run standalone (its own workflow) rather than right after `pnpm run
+  // build`. Validating — or worse, healing missing routes into — a stale
+  // build would report the old bundle as matching today's routeMeta.ts.
+  try {
+    assertBuildFresh({
+      sourceRoot: pkgDir,
+      distDir,
+      label: 'Prerender metadata validation',
+      consequence: 'so it cannot confirm the shipped HTML matches the current source.',
+    });
+  } catch (error) {
+    if (error instanceof StaleBuildOutputError) {
+      console.error(error.message);
+      process.exit(2);
+    }
+    throw error;
+  }
+
   // The Vite build exists but individual prerendered route files may be missing
   // if new routes were added to routeMeta.ts after the last full build.
   // Re-running prerender.ts is much faster than a full rebuild and keeps the

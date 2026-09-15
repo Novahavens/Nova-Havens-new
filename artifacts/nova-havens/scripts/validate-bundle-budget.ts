@@ -15,9 +15,18 @@
  * Run with: node --experimental-strip-types scripts/validate-bundle-budget.ts
  */
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import {
+  DEFAULT_SOURCE_ROOT,
+  SOURCE_PATHS,
+  StaleBuildOutputError,
+  assertBuildFresh,
+} from './lib/buildFreshness.ts';
+
+export { DEFAULT_SOURCE_ROOT, SOURCE_PATHS, StaleBuildOutputError };
 
 export const ENTRY_BUDGET_BYTES = 500_000;
 
@@ -41,85 +50,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const DEFAULT_DIST_DIR = join(__dirname, '..', 'dist', 'public');
 
-export const DEFAULT_SOURCE_ROOT = join(__dirname, '..');
-
-/**
- * Files and directories (relative to the artifact root) whose contents end up
- * in dist/public. If any of them is newer than the build output, whatever is
- * in dist/public was produced by a different build and its sizes say nothing
- * about the current source.
- */
-export const SOURCE_PATHS = [
-  'index.html',
-  'src',
-  'public',
-  'package.json',
-  'vite.config.ts',
-  'vitePluginMetaInject.ts',
-  'vitePluginValidateColors.ts',
-  'vitePluginValidateTokens.ts',
-];
-
-/** Newest modification time (ms) across the tracked source paths, or 0. */
-function newestSourceMtime(sourceRoot: string): { mtimeMs: number; path: string | null } {
-  let newest = 0;
-  let newestPath: string | null = null;
-
-  const visit = (path: string): void => {
-    let stats;
-
-    try {
-      stats = statSync(path);
-    } catch {
-      return;
-    }
-
-    if (stats.isDirectory()) {
-      for (const child of readdirSync(path)) visit(join(path, child));
-      return;
-    }
-
-    if (stats.mtimeMs > newest) {
-      newest = stats.mtimeMs;
-      newestPath = relative(sourceRoot, path);
-    }
-  };
-
-  for (const entry of SOURCE_PATHS) visit(join(sourceRoot, entry));
-
-  return { mtimeMs: newest, path: newestPath };
-}
-
-/**
- * Oldest modification time (ms) across every emitted file, which is what dates
- * the build: a stale dist can have a freshly rewritten index.html
- * (prerendering) or a current entry bundle sitting beside old route chunks.
- */
-function oldestOutputMtime(distDir: string): number {
-  let oldest = Number.POSITIVE_INFINITY;
-
-  const visit = (path: string): void => {
-    let stats;
-
-    try {
-      stats = statSync(path);
-    } catch {
-      return;
-    }
-
-    if (stats.isDirectory()) {
-      for (const child of readdirSync(path)) visit(join(path, child));
-      return;
-    }
-
-    if (stats.mtimeMs < oldest) oldest = stats.mtimeMs;
-  };
-
-  visit(distDir);
-
-  return oldest;
-}
-
 type ManifestEntry = {
   file?: string;
   src?: string;
@@ -136,15 +66,6 @@ export type ValidateBundleBudgetOptions = {
   /** Where progress lines go; defaults to console.log. */
   log?: (message: string) => void;
 };
-
-class StaleBuildOutputError extends Error {
-  constructor(message: string) {
-    super(`Bundle budget check SKIPPED — stale build output: ${message}`);
-    this.name = 'StaleBuildOutputError';
-  }
-}
-
-export { StaleBuildOutputError };
 
 class BundleBudgetError extends Error {
   constructor(message: string) {
@@ -178,18 +99,12 @@ export function validateBundleBudget(
   }
 
   if (options.skipStaleCheck !== true) {
-    const sourceRoot = normalize(options.sourceRoot ?? DEFAULT_SOURCE_ROOT);
-    const newestSource = newestSourceMtime(sourceRoot);
-
-    if (newestSource.mtimeMs > oldestOutputMtime(distDir)) {
-      const relativeDist = relative(sourceRoot, distDir);
-      const displayDist = relativeDist.startsWith('..') ? distDir : relativeDist;
-
-      throw new StaleBuildOutputError(
-        `${displayDist} contains output built before ${newestSource.path} was last changed, `
-          + 'so its sizes do not describe the current source. Run `pnpm run build` and check again.',
-      );
-    }
+    assertBuildFresh({
+      sourceRoot: normalize(options.sourceRoot ?? DEFAULT_SOURCE_ROOT),
+      distDir,
+      label: 'Bundle budget check',
+      consequence: 'so its sizes do not describe the current source.',
+    });
   }
 
   const html = readFileSync(indexPath, 'utf8');
