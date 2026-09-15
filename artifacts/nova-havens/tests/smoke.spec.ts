@@ -997,6 +997,45 @@ test.describe('Contact form', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Reduced-motion carousel behavior
+// ---------------------------------------------------------------------------
+
+test.describe('Reduced-motion carousel behavior', () => {
+  test('keeps direct navigation instant and disables autoplay progress', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioral preference check — one viewport is enough; other projects cover layout.',
+    );
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+
+    const carousel = page.getByTestId('carousel-showcase');
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'true');
+    await expect(carousel.getByRole('heading', { name: 'Living Spaces' })).toBeVisible();
+    await expect(page.getByTestId('carousel-progress-1')).toHaveCSS('width', '0px');
+
+    await carousel.getByTestId('btn-carousel-slide-2').click();
+
+    await expect(carousel).toHaveAttribute('data-transitioning', 'false');
+    await expect(carousel.getByRole('heading', { name: 'Walk in showers' })).toBeVisible();
+    await expect(carousel.getByRole('heading', { name: 'Walk in showers' })).toHaveCSS(
+      'transition-duration',
+      '0s',
+    );
+    await expect(page.getByTestId('carousel-progress-2')).toHaveCSS('width', '0px');
+
+    await page.waitForTimeout(6_250);
+
+    await expect(
+      carousel.getByRole('heading', { name: 'Walk in showers' }),
+      'Reduced-motion visitors should not be moved to another slide by autoplay',
+    ).toBeVisible();
+    await expect(page.getByTestId('carousel-progress-2')).toHaveCSS('width', '0px');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Compact-navigation breakpoint regressions
 // ---------------------------------------------------------------------------
 

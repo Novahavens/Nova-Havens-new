@@ -6,8 +6,8 @@
   800ms transitions, previous/next controls, progress indicators, touch
   swiping, and lazy loading for non-initial images.
 - **Accessibility:** every slide image requires descriptive alt text; controls
-  have labels and current-slide state; the consuming page should honor
-  `prefers-reduced-motion` by disabling or simplifying motion.
+  have labels and current-slide state; under `prefers-reduced-motion`, autoplay
+  and progress stop and direct navigation changes slides without transitions.
 - **Dependencies:** React state/effects and Lucide controls.
 - **Consumers:** `HomePage.tsx:484` with property showcase and testimonial slides.
 - **Implementation:** `src/components/ui/elegant-carousel.tsx`; preview story:

@@ -21,6 +21,11 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartX = useRef(0);
@@ -34,9 +39,24 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+
+    updatePreference();
+    mediaQuery.addEventListener('change', updatePreference);
+    return () => mediaQuery.removeEventListener('change', updatePreference);
+  }, []);
+
   const goToSlide = useCallback(
     (index: number) => {
       if (isTransitioning || index === currentIndex || slides.length < 2) return;
+
+      if (prefersReducedMotion) {
+        setCurrentIndex(index);
+        setProgress(0);
+        return;
+      }
 
       setIsTransitioning(true);
       setProgress(0);
@@ -49,7 +69,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
         }, TRANSITION_DURATION / 2),
       );
     },
-    [currentIndex, isTransitioning, slides.length],
+    [currentIndex, isTransitioning, prefersReducedMotion, slides.length],
   );
 
   const goNext = useCallback(() => {
@@ -61,7 +81,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
   }, [currentIndex, goToSlide, slides.length]);
 
   useEffect(() => {
-    if (isPaused || slides.length < 2) return;
+    if (isPaused || prefersReducedMotion || slides.length < 2) return;
 
     progressRef.current = setInterval(() => {
       setProgress((previous) =>
@@ -75,7 +95,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (progressRef.current) clearInterval(progressRef.current);
     };
-  }, [currentIndex, goNext, isPaused, slides.length]);
+  }, [currentIndex, goNext, isPaused, prefersReducedMotion, slides.length]);
 
   const handleTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.targetTouches[0].clientX;
@@ -97,9 +117,14 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
   if (!slides.length) return null;
 
   const currentSlide = slides[currentIndex] ?? slides[0];
-  const fadeClass = isTransitioning
-    ? 'opacity-0 translate-y-3'
-    : 'opacity-100 translate-y-0';
+  const fadeClass = prefersReducedMotion
+    ? 'opacity-100 translate-y-0'
+    : isTransitioning
+      ? 'opacity-0 translate-y-3'
+      : 'opacity-100 translate-y-0';
+  const contentTransitionClass = prefersReducedMotion
+    ? ''
+    : 'transition-all duration-500';
 
   return (
     <div
@@ -110,6 +135,8 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       data-testid="carousel-showcase"
+      data-reduced-motion={prefersReducedMotion ? 'true' : 'false'}
+      data-transitioning={isTransitioning ? 'true' : 'false'}
     >
       <div
         className="pointer-events-none absolute inset-0 transition-all duration-700"
@@ -124,7 +151,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
         <div className="flex w-full items-center p-8 md:w-1/2 md:p-12 lg:p-16">
           <div className="w-full">
             <div
-              className={`mb-6 flex items-center gap-3 transition-all duration-500 ${fadeClass}`}
+              className={`mb-6 flex items-center gap-3 ${contentTransitionClass} ${fadeClass}`}
             >
               <span className="h-px w-10 bg-primary/60" aria-hidden="true" />
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -134,19 +161,19 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
             </div>
 
             <h3
-              className={`mb-3 text-2xl font-extrabold text-foreground transition-all duration-500 delay-75 md:text-3xl lg:text-4xl ${fadeClass}`}
+              className={`mb-3 text-2xl font-extrabold text-foreground ${contentTransitionClass} ${prefersReducedMotion ? '' : 'delay-75'} md:text-3xl lg:text-4xl ${fadeClass}`}
             >
               {currentSlide.title}
             </h3>
 
             <p
-              className={`mb-4 text-sm font-bold uppercase tracking-widest text-primary transition-all duration-500 delay-100 ${fadeClass}`}
+              className={`mb-4 text-sm font-bold uppercase tracking-widest text-primary ${contentTransitionClass} ${prefersReducedMotion ? '' : 'delay-100'} ${fadeClass}`}
             >
               {currentSlide.subtitle}
             </p>
 
             <p
-              className={`mb-8 max-w-md leading-relaxed text-muted-foreground transition-all duration-500 delay-150 ${fadeClass}`}
+              className={`mb-8 max-w-md leading-relaxed text-muted-foreground ${contentTransitionClass} ${prefersReducedMotion ? '' : 'delay-150'} ${fadeClass}`}
             >
               {currentSlide.description}
             </p>
@@ -176,7 +203,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
 
         <div className="relative w-full p-6 md:w-1/2 md:p-10">
           <div
-            className={`relative aspect-[4/3] overflow-hidden rounded-[12px] transition-all duration-500 ${
+            className={`relative aspect-[4/3] overflow-hidden rounded-[12px] ${contentTransitionClass} ${
               isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'
             }`}
           >
@@ -224,7 +251,12 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
           >
             <span className="block h-[3px] w-full overflow-hidden rounded-full bg-white/10">
               <span
-                className="block h-full rounded-full bg-primary transition-[width] duration-100 ease-linear"
+                className={`block h-full rounded-full bg-primary ${
+                  prefersReducedMotion
+                    ? ''
+                    : 'transition-[width] duration-100 ease-linear'
+                }`}
+                data-testid={`carousel-progress-${index + 1}`}
                 style={{
                   width:
                     index === currentIndex

@@ -55,11 +55,12 @@ export function ElegantCarouselDemo() {
       />
       <p className="text-sm text-muted-foreground">
         Autoplay advances every six seconds and pauses while the pointer is over
-        the carousel. The surrounding page should honor
+        the carousel. When
         <code className="mx-1 rounded bg-muted px-1 py-0.5 text-xs">
           prefers-reduced-motion
         </code>
-        for the transition experience.
+        is enabled, autoplay and progress stop, and direct navigation changes
+        slides without a transition.
       </p>
     </div>
   );
