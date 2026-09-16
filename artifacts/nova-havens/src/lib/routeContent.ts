@@ -13,8 +13,13 @@
  */
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
+import { HOME_FAQ_GROUPS } from '../data/homeFaqs.ts';
 import { renderLlmsTxtPrerenderHtml } from '../data/llmsContent.ts';
 import { TEAM_MEMBERS, type TeamMemberProfile } from '../data/teamMembers.ts';
+import {
+  SERVICE_AREA_COVERAGE_SENTENCE,
+  SERVICE_AREA_STATE_COUNT,
+} from './companyFacts.ts';
 import { INTAKE_FORMS } from './intakeForms.ts';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -111,6 +116,22 @@ function inlineToHtml(s: string): string {
 
 // ── Per-route static HTML ──────────────────────────────────────────────────
 
+const HOME_FAQ_HTML = HOME_FAQ_GROUPS.map(
+  (group) => `
+    <section>
+      <h3>${esc(group.heading)}</h3>
+      ${group.items
+        .map(
+          (faq) => `
+      <article>
+        <h4>${esc(faq.question)}</h4>
+        <p>${esc(faq.answer)}</p>
+      </article>`,
+        )
+        .join('')}
+    </section>`,
+).join('');
+
 const HOME_HTML = `
 <main>
   <section>
@@ -168,10 +189,10 @@ const HOME_HTML = `
 
   <section>
     <h2>Where We Operate</h2>
-    <p>Nova Havens operates across the 48 contiguous United States.</p>
+    <p>${esc(SERVICE_AREA_COVERAGE_SENTENCE)}</p>
     <ul>
       <li>12,000+ active properties</li>
-      <li>48 states covered</li>
+      <li>${SERVICE_AREA_STATE_COUNT} states covered</li>
       <li>Average placement in under 5 days</li>
     </ul>
   </section>
@@ -197,6 +218,11 @@ const HOME_HTML = `
   <section>
     <h2>Trusted Partnerships</h2>
     <p>Nova Havens works with leading insurance carriers nationwide, including Allstate, Travelers, Farmers Insurance, State Farm, Mercury, Lemonade, and Chubb.</p>
+  </section>
+
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    ${HOME_FAQ_HTML}
   </section>
 </main>
 `;

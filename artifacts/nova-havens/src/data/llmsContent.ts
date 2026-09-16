@@ -1,4 +1,5 @@
 import { BLOG_POSTS } from './blogPosts.ts';
+import { SERVICE_AREA_US_NAME } from '../lib/companyFacts.ts';
 
 export interface LlmsFaq {
   q: string;
@@ -21,7 +22,7 @@ export interface LlmsSection {
 const LLMS_TXT_TITLE = '# Nova Havens';
 
 const LLMS_TXT_DESCRIPTION =
-  '> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, works with insurance carriers, adjusters, relocation specialists, and a network of property owners. Nova Havens maintains properties across 47 states. It is not an insurance company and does not underwrite policies or make coverage determinations.';
+  `> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, works with insurance carriers, adjusters, relocation specialists, and a network of property owners. Nova Havens maintains properties across all ${SERVICE_AREA_US_NAME}. It is not an insurance company and does not underwrite policies or make coverage determinations.`;
 
 export const LLMS_TXT_PAGE_TITLE = 'llms.txt — AI & Machine-Readable Site Index';
 

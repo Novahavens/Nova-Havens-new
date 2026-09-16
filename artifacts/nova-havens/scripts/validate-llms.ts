@@ -16,6 +16,7 @@ import {
   renderLlmsTxt,
   renderLlmsTxtPrerenderHtml,
 } from '../src/data/llmsContent.ts';
+import { SERVICE_AREA_US_NAME } from '../src/lib/companyFacts.ts';
 import { getRouteBodyHtml } from '../src/lib/routeContent.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -87,9 +88,9 @@ for (const [description, pattern] of forbiddenPatterns) {
   }
 }
 
-if (!actualText.includes('47 states')) {
+if (!actualText.includes(SERVICE_AREA_US_NAME)) {
   console.error(
-    'llms.txt validation FAILED: the verified 47-state coverage statement is missing.',
+    `llms.txt validation FAILED: the canonical ${SERVICE_AREA_US_NAME} coverage statement is missing.`,
   );
   process.exit(1);
 }

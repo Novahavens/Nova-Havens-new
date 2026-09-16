@@ -9,6 +9,12 @@ import ElegantCarousel, { type ElegantSlide } from '@workspace/nova-havens-desig
 import GoogleRating from '@/components/GoogleRating';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 import { trackEvent } from '@/lib/analytics';
+import {
+  SERVICE_AREA_COVERAGE_SENTENCE,
+  SERVICE_AREA_NAME,
+  SERVICE_AREA_STATE_COUNT,
+  SERVICE_AREA_US_NAME,
+} from '@/lib/companyFacts';
 
 type PartnerLogo = { name: string; websiteUrl: string; logo?: string; logoClass?: string; showName: boolean };
 
@@ -61,7 +67,7 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
   {
     title: 'Home Exteriors',
     subtitle: 'Part of a 60,000+ Network',
-    description: 'Comfortable, well-kept homes in real neighborhoods — nationwide coverage across 48 contiguous states.',
+    description: `Comfortable, well-kept homes in real neighborhoods — nationwide coverage across ${SERVICE_AREA_US_NAME}.`,
     imageUrl: '/property-6.webp',
     imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens 60,000+ property network',
   },
@@ -398,7 +404,7 @@ export default function HomePage() {
                 <div>
                   <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">60,000+</span>
                   <span className="mt-3 block text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified homes nationwide</span>
-                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains 60,000+ verified furnished homes across 48 contiguous US states, as of 2026.</span>
+                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains 60,000+ verified furnished homes across {SERVICE_AREA_US_NAME}, as of 2026.</span>
                 </div>
               </div>
               <CoverageMapPlaceholder />
@@ -458,7 +464,7 @@ export default function HomePage() {
               <Globe className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Vetted Nationwide Network</h3>
-            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 60,000+ verified properties across 48 states — each ready for immediate placement.</p>
+            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 60,000+ verified properties across {SERVICE_AREA_STATE_COUNT} states — each ready for immediate placement.</p>
           </div>
           <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -517,7 +523,7 @@ export default function HomePage() {
           <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-6">
             <Map className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Nationwide Network</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">With 60,000+ verified homes across every major metro and many rural areas in 48 states, Nova Havens places families close to their schools, workplaces, and community.</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">With 60,000+ verified homes across every major metro and many rural areas in {SERVICE_AREA_STATE_COUNT} states, Nova Havens places families close to their schools, workplaces, and community.</p>
           </div>
         </div>
       </section>
@@ -528,7 +534,7 @@ export default function HomePage() {
             <span className="text-xs font-bold tracking-widest uppercase mb-4 text-primary" data-testid="eyebrow-pets">PET-FRIENDLY PROPERTIES</span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 text-foreground leading-tight" data-testid="heading-pets">Your furry friends are welcome</h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md" data-testid="text-pets">
-              Nova Havens maintains a growing network of verified pet-friendly furnished homes across 48 states — so displaced families never have to choose between a safe place to stay and bringing their pets along. Share your pet details on the first call and Nova Havens will match your family to a compatible home.
+              Nova Havens maintains a growing network of verified pet-friendly furnished homes across {SERVICE_AREA_STATE_COUNT} states — so displaced families never have to choose between a safe place to stay and bringing their pets along. Share your pet details on the first call and Nova Havens will match your family to a compatible home.
             </p>
             <div className="grid grid-cols-3 gap-6 mb-8 w-full max-w-md" data-testid="pet-counters">
               <div className="flex flex-col items-start" data-testid="counter-dogs">
@@ -567,12 +573,12 @@ export default function HomePage() {
       <section className="py-20 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" data-testid="heading-map">Where Does Nova Havens Operate?</h2>
         <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto" data-testid="text-map-coverage">
-          Nova Havens operates across the 48 contiguous United States.
+          {SERVICE_AREA_COVERAGE_SENTENCE}
         </p>
 
         <div className="w-full bg-card rounded-lg border border-white/10 mb-8 relative overflow-hidden p-6 md:p-10" data-testid="card-map">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-          <div className="relative flex flex-col gap-1.5 md:gap-2" role="img" aria-label="Map of the 48 contiguous United States with the states Nova Havens serves highlighted">
+          <div className="relative flex flex-col gap-1.5 md:gap-2" role="img" aria-label={`Map of the ${SERVICE_AREA_NAME} with the states Nova Havens serves highlighted`}>
             {STATE_TILE_GRID.map((row, rowIdx) => (
               <div key={rowIdx} className="grid grid-cols-11 gap-1.5 md:gap-2">
                 {row.map((stateCode, colIdx) => {

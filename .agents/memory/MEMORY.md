@@ -19,3 +19,4 @@
 - [Full-page screenshot + mask tiling race](mobile-viewport-hover-pause-flake.md) — tall pages needing many scroll tiles can misplace mask boxes; raise toHaveScreenshot's timeout, don't loosen tolerance.
 - [markTaskComplete rebase corruption](task-complete-rebase-corruption.md) — a rejected completion's validation rebase can silently splice/corrupt a shared file; recover via gitsafe-backup refs, reapply on current upstream.
 - [Testing the prerender freshness guard's wiring](prerender-freshness-guard-testing.md) — subprocess-test top-level scripts with a distDir-only env override; editing SOURCE_PATHS files stales the real dist/public.
+- [Nova Havens service area](nova-havens-service-area.md) — authoritative claim is all 48 contiguous US states; crawler and visible copies must derive from shared company facts.
