@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ToastAction } from '../components/ui/toast';
 import { Toaster } from '../components/ui/toaster';
-import { reducer, toast } from './use-toast';
+import { reducer, toast, useToast } from './use-toast';
 
 const firstToast = {
   id: 'first',
@@ -19,6 +19,36 @@ const secondToast = {
   open: true,
   title: 'Second message',
 };
+
+type ToastSnapshot = {
+  id?: string;
+  open?: boolean;
+  title?: React.ReactNode;
+};
+
+function ToastSubscriber({
+  onChange,
+}: {
+  onChange: (snapshot: ToastSnapshot) => void;
+}) {
+  const { toasts } = useToast();
+  const currentToast = toasts[0];
+
+  React.useEffect(() => {
+    onChange({
+      id: currentToast?.id,
+      open: currentToast?.open,
+      title: currentToast?.title,
+    });
+  }, [
+    currentToast?.id,
+    currentToast?.open,
+    currentToast?.title,
+    onChange,
+  ]);
+
+  return null;
+}
 
 afterEach(() => {
   cleanup();
@@ -129,6 +159,80 @@ describe('toast lifecycle reducer', () => {
 });
 
 describe('shared Toaster output', () => {
+  it('keeps mounted hook subscribers synchronized and stops notifying an unmounted subscriber', () => {
+    vi.useFakeTimers();
+    const firstSubscriber = vi.fn<(snapshot: ToastSnapshot) => void>();
+    const secondSubscriber = vi.fn<(snapshot: ToastSnapshot) => void>();
+    const firstConsumer = render(
+      <ToastSubscriber onChange={firstSubscriber} />,
+    );
+    const secondConsumer = render(
+      <ToastSubscriber onChange={secondSubscriber} />,
+    );
+
+    let currentToast: ReturnType<typeof toast>;
+    act(() => {
+      currentToast = toast({ title: 'Shared notification' });
+    });
+
+    const added = {
+      id: currentToast.id,
+      open: true,
+      title: 'Shared notification',
+    };
+    expect(firstSubscriber).toHaveBeenLastCalledWith(added);
+    expect(secondSubscriber).toHaveBeenLastCalledWith(added);
+
+    act(() => {
+      currentToast.update({
+        id: currentToast.id,
+        title: 'Updated notification',
+      });
+    });
+
+    const updated = {
+      id: currentToast.id,
+      open: true,
+      title: 'Updated notification',
+    };
+    expect(firstSubscriber).toHaveBeenLastCalledWith(updated);
+    expect(secondSubscriber).toHaveBeenLastCalledWith(updated);
+
+    act(() => {
+      currentToast.dismiss();
+    });
+
+    const dismissed = {
+      id: currentToast.id,
+      open: false,
+      title: 'Updated notification',
+    };
+    expect(firstSubscriber).toHaveBeenLastCalledWith(dismissed);
+    expect(secondSubscriber).toHaveBeenLastCalledWith(dismissed);
+
+    firstConsumer.unmount();
+    const firstSubscriberCallCount = firstSubscriber.mock.calls.length;
+
+    act(() => {
+      currentToast.update({
+        id: currentToast.id,
+        title: 'Still synchronized',
+      });
+    });
+
+    expect(firstSubscriber).toHaveBeenCalledTimes(firstSubscriberCallCount);
+    expect(secondSubscriber).toHaveBeenLastCalledWith({
+      id: currentToast.id,
+      open: false,
+      title: 'Still synchronized',
+    });
+
+    secondConsumer.unmount();
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+  });
+
   it('removes a dismissed toast after the removal delay', async () => {
     vi.useFakeTimers();
 
