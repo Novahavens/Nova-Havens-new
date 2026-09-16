@@ -294,6 +294,7 @@ export default function BlogPostPage() {
                     href="tel:+16294010054"
                     className="px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
                     data-testid="link-call-cta"
+                    onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'blog_post_cta' })}
                   >
                     (629) 401-0054
                   </a>

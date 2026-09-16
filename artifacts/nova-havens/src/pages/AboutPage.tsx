@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { ArrowRight, CheckCircle2, ChevronDown, Heart, Home, ShieldCheck, Users } from 'lucide-react';
 import { COMPANY_DEFINITION, COMPANY_FACTS } from '@/lib/companyFacts';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
+import { trackEvent } from '@/lib/analytics';
 
 const PRINCIPLES = [
   {
@@ -162,7 +163,11 @@ export default function AboutPage() {
                         >
                           <button
                             className="w-full flex items-center justify-between p-6 text-left gap-4 hover:bg-white/[0.02] transition-colors"
-                            onClick={() => setOpenFaq(openFaq === faqIdx ? null : faqIdx)}
+                            onClick={() => {
+                              const next = openFaq === faqIdx ? null : faqIdx;
+                              setOpenFaq(next);
+                              if (next !== null) trackEvent('faq_expanded', { question: item.question, location: 'about_faq' });
+                            }}
                             aria-expanded={openFaq === faqIdx}
                           >
                             <span className="font-semibold text-foreground text-base leading-snug">{item.question}</span>

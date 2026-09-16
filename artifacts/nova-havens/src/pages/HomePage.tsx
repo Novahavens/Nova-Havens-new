@@ -825,7 +825,7 @@ export default function HomePage() {
                           onClick={() => {
                             const next = openFaq === faqIdx ? null : faqIdx;
                             setOpenFaq(next);
-                            if (next !== null) trackEvent('faq_expanded', { question: item.question });
+                            if (next !== null) trackEvent('faq_expanded', { question: item.question, location: 'home_faq' });
                           }}
                           aria-expanded={openFaq === faqIdx}
                         >
@@ -853,7 +853,12 @@ export default function HomePage() {
       <section className="w-full py-12 px-4 bg-surface-1 border-y border-white/5">
         <div className="max-w-prose-wide mx-auto text-center flex flex-col items-center gap-4 text-foreground">
           <Phone className="w-8 h-8 text-primary" />
-          <a href="tel:6292062360" className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity" data-testid="link-emergency-after-hours-phone">
+          <a
+            href="tel:6292062360"
+            className="text-4xl md:text-5xl font-extrabold hover:opacity-80 transition-opacity"
+            data-testid="link-emergency-after-hours-phone"
+            onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'home_emergency' })}
+          >
             (629) 206-2360
           </a>
           <p className="text-sm md:text-base font-semibold uppercase tracking-widest text-primary" data-testid="text-emergency-after-hours-label">

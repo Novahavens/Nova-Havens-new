@@ -311,6 +311,7 @@ export default function TeamPage() {
                 href="tel:+16294010054"
                 className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
                 data-testid="link-team-call"
+                onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'team_cta' })}
               >
                 <Phone className="w-4 h-4" aria-hidden="true" />
                 Call (629) 401-0054

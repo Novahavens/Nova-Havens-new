@@ -42,6 +42,7 @@ function ContactFormEmbed() {
           href="mailto:william@novahavens.com"
           className="text-primary font-semibold hover:brightness-110 transition-colors"
           data-testid="link-embed-fallback-email"
+          onClick={() => trackEvent('contact_link_click', { method: 'email', location: 'contact_embed_fallback' })}
         >
           Email william@novahavens.com
         </a>
@@ -85,7 +86,7 @@ export default function ContactPage() {
               Request Emergency Housing or Get in Touch
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed" data-testid="text-contact-subtitle">
-              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors">(629) 401-0054</a> or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
+              To request emergency furnished housing through Nova Havens, call <a href="tel:+16294010054" className="text-primary font-semibold hover:brightness-110 transition-colors" onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'contact_hero' })}>(629) 401-0054</a> or submit the form below. Nova Havens responds to urgent housing requests 24 hours a day, 7 days a week. For general inquiries, expect a response within one business day.
             </p>
           </div>
         </div>
@@ -125,11 +126,20 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-1">Phone — 24/7 for emergency claims</h3>
-                <a href="tel:6294010054" className="text-lg font-bold text-foreground hover:text-primary transition-colors block">
+                <a
+                  href="tel:6294010054"
+                  className="text-lg font-bold text-foreground hover:text-primary transition-colors block"
+                  onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'contact_info' })}
+                >
                   (629) 401-0054
                 </a>
                 <h3 className="text-sm font-semibold text-muted-foreground mt-3 mb-1">After Hours Specialty Line</h3>
-                <a href="tel:6292062360" className="text-lg font-bold text-foreground hover:text-primary transition-colors block" data-testid="link-contact-after-hours-phone">
+                <a
+                  href="tel:6292062360"
+                  className="text-lg font-bold text-foreground hover:text-primary transition-colors block"
+                  data-testid="link-contact-after-hours-phone"
+                  onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'contact_info' })}
+                >
                   (629) 206-2360
                 </a>
               </div>
@@ -141,7 +151,11 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-1">Email — general inquiries</h3>
-                <a href="mailto:info@novahavens.com" className="text-lg font-bold text-foreground hover:text-primary transition-colors block">
+                <a
+                  href="mailto:info@novahavens.com"
+                  className="text-lg font-bold text-foreground hover:text-primary transition-colors block"
+                  onClick={() => trackEvent('contact_link_click', { method: 'email', location: 'contact_info' })}
+                >
                   info@novahavens.com
                 </a>
               </div>
@@ -164,7 +178,7 @@ export default function ContactPage() {
           {/* Form Side */}
           <div className="lg:col-span-3 bg-card rounded-lg border border-white/10 p-8 md:p-10 max-w-contact-form w-full">
             <h2 className="text-2xl font-bold mb-2 text-foreground" data-testid="heading-form">Send a Message to Nova Havens</h2>
-            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold">(629) 401-0054</a> directly — 24/7.</p>
+            <p className="text-sm text-muted-foreground mb-8">For urgent housing placements, call <a href="tel:+16294010054" className="text-primary font-semibold" onClick={() => trackEvent('contact_link_click', { method: 'phone', location: 'contact_form_side' })}>(629) 401-0054</a> directly — 24/7.</p>
 
             <ContactFormEmbed />
           </div>
