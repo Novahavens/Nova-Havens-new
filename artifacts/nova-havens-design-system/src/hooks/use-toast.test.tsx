@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import * as React from 'react';
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ToastAction } from '../components/ui/toast';
@@ -76,6 +76,45 @@ describe('toast lifecycle reducer', () => {
       { ...firstToast, open: false },
       { ...secondToast, open: false },
     ]);
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+  });
+
+  it('does not schedule duplicate removal timers for repeated dismissals', () => {
+    vi.useFakeTimers();
+
+    const dismissed = reducer({ toasts: [firstToast] }, {
+      type: 'DISMISS_TOAST',
+      toastId: firstToast.id,
+    });
+    reducer(dismissed, {
+      type: 'DISMISS_TOAST',
+      toastId: firstToast.id,
+    });
+
+    expect(vi.getTimerCount()).toBe(1);
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+  });
+
+  it('schedules and completes removal for every dismissed toast', () => {
+    vi.useFakeTimers();
+
+    reducer({ toasts: [firstToast, secondToast] }, {
+      type: 'DISMISS_TOAST',
+    });
+
+    expect(vi.getTimerCount()).toBe(2);
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('removes one toast or clears every toast', () => {
@@ -90,6 +129,34 @@ describe('toast lifecycle reducer', () => {
 });
 
 describe('shared Toaster output', () => {
+  it('removes a dismissed toast after the removal delay', async () => {
+    vi.useFakeTimers();
+
+    render(<Toaster />);
+
+    let currentToast: ReturnType<typeof toast>;
+    act(() => {
+      currentToast = toast({
+        forceMount: true,
+        title: 'Dismissed notification',
+      });
+    });
+
+    expect(screen.getByText('Dismissed notification')).toBeTruthy();
+
+    act(() => {
+      currentToast.dismiss();
+    });
+
+    expect(screen.getByText('Dismissed notification')).toBeTruthy();
+
+    act(() => {
+      vi.advanceTimersByTime(1_000_000);
+    });
+
+    expect(screen.queryByText('Dismissed notification')).toBeNull();
+  });
+
   it('reflects updates triggered by an action control', async () => {
     const user = userEvent.setup();
     let currentToast: ReturnType<typeof toast>;
