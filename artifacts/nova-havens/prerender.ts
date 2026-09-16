@@ -17,7 +17,7 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ALL_ROUTES, resolveRouteMeta } from './src/lib/routeMeta.ts';
@@ -27,7 +27,13 @@ import { getRouteBodyHtml } from './src/lib/routeContent.ts';
 import { StaleBuildOutputError, assertBuildFresh } from './scripts/lib/buildFreshness.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const distDir = join(__dirname, 'dist', 'public');
+// Test-only override: lets tests point this script at a disposable dist/public
+// fixture (e.g. to prove the freshness guard below fires) without touching
+// real build output. Unset in normal operation (`pnpm run build`, or running
+// this script directly) — see tests/prerenderFreshnessGuard.test.ts.
+const distDir = process.env.PRERENDER_TEST_DIST_DIR
+  ? resolve(process.env.PRERENDER_TEST_DIST_DIR)
+  : join(__dirname, 'dist', 'public');
 const templatePath = join(distDir, 'index.html');
 
 // ── Freshness guard ────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 
@@ -31,7 +31,13 @@ import { StaleBuildOutputError, assertBuildFresh } from './lib/buildFreshness.ts
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgDir = join(__dirname, '..');
-const distDir = join(pkgDir, 'dist', 'public');
+// Test-only override: lets tests point this script at a disposable dist/public
+// fixture (e.g. to prove the freshness guard below fires before the
+// missing-routes healing logic runs) without touching real build output.
+// Unset in normal operation — see tests/prerenderFreshnessGuard.test.ts.
+const distDir = process.env.VALIDATE_PRERENDER_TEST_DIST_DIR
+  ? resolve(process.env.VALIDATE_PRERENDER_TEST_DIST_DIR)
+  : join(pkgDir, 'dist', 'public');
 
 // ── Ensure a build exists ──────────────────────────────────────────────────
 

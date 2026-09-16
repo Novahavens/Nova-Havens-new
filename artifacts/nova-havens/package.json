@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "pnpm run validate:intake-forms && pnpm run validate:ui-components && pnpm run validate:source-reachability && node --experimental-strip-types scripts/validate-llms.ts && pnpm run test:color-rule && node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && pnpm run test:build-freshness && pnpm run test:bundle-budget && pnpm run validate:bundle-budget && node --experimental-strip-types prerender.ts",
+    "build": "pnpm run validate:intake-forms && pnpm run validate:ui-components && pnpm run validate:source-reachability && node --experimental-strip-types scripts/validate-llms.ts && pnpm run test:color-rule && node --experimental-strip-types scripts/validate-colors.ts && node --experimental-strip-types scripts/validate-tokens.ts && node --experimental-strip-types scripts/generate-og-images.mjs && vite build --config vite.config.ts && pnpm run test:build-freshness && pnpm run test:prerender-freshness-guard && pnpm run test:bundle-budget && pnpm run validate:bundle-budget && node --experimental-strip-types prerender.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:vite": "tsc -p tsconfig.vite.json --noEmit",
@@ -35,6 +35,7 @@
     "test:color-rule": "node --experimental-strip-types --test tests/noHardcodedColorValues.test.ts",
     "test:bundle-budget": "node --experimental-strip-types --test tests/validateBundleBudget.test.ts",
     "test:build-freshness": "node --experimental-strip-types --test tests/buildFreshness.test.ts",
+    "test:prerender-freshness-guard": "node --experimental-strip-types --test tests/prerenderFreshnessGuard.test.ts",
     "test:ui-components": "node --experimental-strip-types --test tests/validateUiComponents.test.ts"
   },
   "devDependencies": {

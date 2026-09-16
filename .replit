@@ -120,6 +120,10 @@ args = "token-rule"
 task = "workflow.run"
 args = "team-contract"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "prerender-freshness-guard"
+
 [[workflows.workflow]]
 name = "token-rule"
 author = "agent"
@@ -138,6 +142,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pnpm --filter @workspace/api-server run test:team-contract"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "prerender-freshness-guard"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/nova-havens run test:prerender-freshness-guard"
 
 [workflows.workflow.metadata]
 isValidation = true
