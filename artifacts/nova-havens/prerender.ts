@@ -90,7 +90,7 @@ function injectMeta(html: string, pathname: string): string {
     )
     .replace(
       /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/,
-      `<meta name="robots" content="noindex, nofollow" />`,
+      `<meta name="robots" content="index, follow" />`,
     )
     .replace(
       /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/,
