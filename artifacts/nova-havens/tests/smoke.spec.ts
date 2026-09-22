@@ -18,7 +18,7 @@
  * if any route registered in the router is missing from the manifest.
  */
 
-import { test, expect, Page, ConsoleMessage, Response, Request } from '@playwright/test';
+import { test, expect, Page, Locator, ConsoleMessage, Response, Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -255,6 +255,44 @@ async function expectPageToFitViewport(page: Page, path: string): Promise<void> 
     dimensions.pageWidth,
     `The page is wider than the ${dimensions.viewportWidth}px compact-navigation viewport on ${path}: ${dimensions.pageWidth}px`,
   ).toBeLessThanOrEqual(dimensions.viewportWidth);
+}
+
+/**
+ * Dispatch a single real Touch/TouchEvent directly on `locator`'s element.
+ * Playwright's built-in touch APIs (`page.touchscreen`, `locator.tap()`)
+ * only synthesize an instantaneous stationary tap; they cannot hold a touch
+ * open across a wait or move it partway through a gesture, which is exactly
+ * what the carousel's touch-pause contract needs to exercise.
+ */
+async function dispatchTouch(
+  locator: Locator,
+  type: 'touchstart' | 'touchmove' | 'touchend',
+  clientX: number,
+  clientY: number,
+): Promise<void> {
+  await locator.evaluate(
+    (element, args) => {
+      const touch = new Touch({
+        identifier: 0,
+        target: element,
+        clientX: args.clientX,
+        clientY: args.clientY,
+        pageX: args.clientX,
+        pageY: args.clientY,
+      });
+      const isEnd = args.type === 'touchend';
+      const event = new TouchEvent(args.type, {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        touches: isEnd ? [] : [touch],
+        targetTouches: isEnd ? [] : [touch],
+        changedTouches: [touch],
+      });
+      element.dispatchEvent(event);
+    },
+    { type, clientX, clientY },
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -908,6 +946,133 @@ test.describe('Normal-motion carousel autoplay contract', () => {
     await expect(
       carousel.getByRole('heading', { name: 'Walk in showers' }),
       'Autoplay should resume automatically once the pointer leaves the carousel',
+    ).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Touch interaction pauses carousel autoplay
+// ---------------------------------------------------------------------------
+//
+// Touch devices never fire hover events, so elegant-carousel.tsx pauses its
+// autoplay timer for the whole touchstart-to-touchend span, mirroring the
+// hover pause above. Without this, a 6s timer firing mid-swipe can change
+// the slide out from under a visitor's gesture -- a jarring double
+// transition, or a swipe that gets cut short.
+
+test.describe('Touch interaction pauses carousel autoplay', () => {
+  test('does not advance while a touch is held, and resumes a fresh interval once it ends', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'mobile-chrome',
+      'Touch-specific behavioral check -- one touch-enabled viewport is enough; other projects cover layout.',
+    );
+
+    await page.goto('/');
+
+    const carousel = page.getByTestId('carousel-showcase');
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'false');
+    await expect(carousel.getByRole('heading', { name: 'Living Spaces' })).toBeVisible();
+
+    // Let autoplay run for a moment so there is real progress to freeze.
+    await page.waitForTimeout(1_500);
+    const progressWhileRunning = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      parseFloat(progressWhileRunning),
+      'Autoplay should already be advancing progress before the touch starts',
+    ).toBeGreaterThan(0);
+
+    // Touch down without moving -- this alone must pause autoplay, the same
+    // way onMouseEnter does.
+    await dispatchTouch(carousel, 'touchstart', 200, 400);
+    // Let the pause take effect (React state update + interval teardown)
+    // before sampling the frozen baseline, so a tick already in-flight when
+    // the touch landed can't sneak into the comparison.
+    await page.waitForTimeout(200);
+    const progressAtTouchStart = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+
+    // Hold well past the documented 6s interval -- a timer firing mid-touch
+    // is exactly the bug this check guards against.
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'A touch in progress must pause slide advancement the same way hover does',
+    ).toBeVisible();
+    const progressWhileTouching = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      progressWhileTouching,
+      'Progress must stay frozen while a touch is in progress, not merely slow down',
+    ).toBe(progressAtTouchStart);
+
+    // End the touch without enough horizontal movement to register as a
+    // swipe, isolating the pause/resume contract from swipe navigation.
+    await dispatchTouch(carousel, 'touchend', 200, 400);
+
+    // Resuming restarts a full, fresh 6s interval rather than crediting time
+    // already elapsed before the touch -- confirm the slide has NOT advanced
+    // at the point an elapsed-preserving resume would already have fired
+    // (remaining ~4.5s). Timers only fire late under load, never early, so
+    // this "before" check has no flake risk.
+    await page.waitForTimeout(5_500);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'Resuming must restart a full 6s interval, not credit time elapsed before the touch',
+    ).toBeVisible();
+
+    // The fresh post-touch interval should still complete the advance --
+    // resumed, not stuck.
+    await page.waitForTimeout(6_800 - 5_500);
+    await expect(
+      carousel.getByRole('heading', { name: 'Walk in showers' }),
+      'Autoplay should resume automatically once the touch ends',
+    ).toBeVisible();
+  });
+
+  test('a completed swipe does not produce a competing autoplay transition', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'mobile-chrome',
+      'Touch-specific behavioral check -- one touch-enabled viewport is enough; other projects cover layout.',
+    );
+
+    await page.goto('/');
+
+    const carousel = page.getByTestId('carousel-showcase');
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'false');
+    await expect(carousel.getByRole('heading', { name: 'Living Spaces' })).toBeVisible();
+
+    // Start a swipe and hold it well past the documented 6s interval before
+    // releasing -- this reproduces the reported bug, where an in-flight
+    // autoplay timer fires mid-drag and fights the visitor's own gesture.
+    await dispatchTouch(carousel, 'touchstart', 300, 400);
+    await dispatchTouch(carousel, 'touchmove', 260, 400);
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'Autoplay must not sneak in a transition while the swipe is still in progress',
+    ).toBeVisible();
+
+    // Complete the swipe (left by >60px) -- exactly one transition should
+    // occur, to the next slide, not a double-hop from a stray autoplay
+    // advance landing on top of the swipe's own navigation.
+    await dispatchTouch(carousel, 'touchmove', 200, 400);
+    await dispatchTouch(carousel, 'touchend', 200, 400);
+
+    await expect(
+      carousel.getByRole('heading', { name: 'Walk in showers' }),
+      'A left swipe should advance exactly one slide, not be skipped or doubled by autoplay',
+    ).toBeVisible();
+
+    // Confirm autoplay resumed cleanly after the swipe: exactly one further
+    // advance after a full fresh interval, no leftover duplicate timer.
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Full Kitchens' }),
+      'Autoplay should resume with a single fresh interval after the swipe',
     ).toBeVisible();
   });
 });

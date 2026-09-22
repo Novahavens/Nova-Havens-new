@@ -21,6 +21,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isTouchActive, setIsTouchActive] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -81,7 +82,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
   }, [currentIndex, goToSlide, slides.length]);
 
   useEffect(() => {
-    if (isPaused || prefersReducedMotion || slides.length < 2) return;
+    if (isPaused || isTouchActive || prefersReducedMotion || slides.length < 2) return;
 
     progressRef.current = setInterval(() => {
       setProgress((previous) =>
@@ -95,9 +96,14 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (progressRef.current) clearInterval(progressRef.current);
     };
-  }, [currentIndex, goNext, isPaused, prefersReducedMotion, slides.length]);
+  }, [currentIndex, goNext, isPaused, isTouchActive, prefersReducedMotion, slides.length]);
 
+  // Touch devices never fire hover events, so autoplay would otherwise keep
+  // running while a visitor is mid-swipe: a timer firing during the drag can
+  // change the slide out from under their gesture. Pause for the full
+  // touchstart-to-touchend span, mirroring the existing hover pause.
   const handleTouchStart = (event: React.TouchEvent) => {
+    setIsTouchActive(true);
     touchStartX.current = event.targetTouches[0].clientX;
     touchEndX.current = event.targetTouches[0].clientX;
   };
@@ -112,6 +118,14 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       if (difference > 0) goNext();
       else goPrev();
     }
+    setIsTouchActive(false);
+  };
+
+  // A cancelled touch (e.g. an OS gesture or incoming call interrupts the
+  // sequence) never fires touchend. Without this, autoplay would stay
+  // paused for the rest of the visit.
+  const handleTouchCancel = () => {
+    setIsTouchActive(false);
   };
 
   if (!slides.length) return null;
@@ -134,6 +148,7 @@ export default function ElegantCarousel({ slides }: ElegantCarouselProps) {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
       data-testid="carousel-showcase"
       data-reduced-motion={prefersReducedMotion ? 'true' : 'false'}
       data-transitioning={isTransitioning ? 'true' : 'false'}

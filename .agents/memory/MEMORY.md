@@ -21,3 +21,4 @@
 - [Build-input surface for the stale-build guard](build-input-freshness-surface.md) — tracked inputs = artifact root minus a narrow exclusion set; exclude specific paths, never whole dirs.
 - [Testing the prerender freshness guard's wiring](prerender-freshness-guard-testing.md) — subprocess-test top-level scripts with a distDir-only env override; editing SOURCE_PATHS files stales the real dist/public.
 - [Nova Havens service area](nova-havens-service-area.md) — authoritative claim is all 48 contiguous US states; crawler and visible copies must derive from shared company facts.
+- [Playwright touch gesture simulation](playwright-touch-simulation.md) — dispatch real Touch/TouchEvent objects via locator.evaluate to hold or move a touch mid-gesture; tap() can't.
