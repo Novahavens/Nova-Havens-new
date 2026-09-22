@@ -679,6 +679,43 @@ export function findUnusedApplicationFiles(
     .sort();
 }
 
+/**
+ * Finds exclusions that no longer suppress anything: the path was deleted,
+ * renamed, or became reachable from the browser entry point.
+ *
+ * An exclusion earns its place only while it covers at least one unreachable
+ * build-time-only application file. A directory exclusion therefore stays
+ * valid as long as one descendant is still build-time-only, and reachable
+ * siblings under the same directory do not make it stale. Left unchecked, an
+ * obsolete exclusion keeps silently covering the directory it names, so the
+ * next genuinely unreachable file added there is never reported.
+ */
+export function findStaleSourceExclusions(
+  sourceRoot = DEFAULT_SOURCE_ROOT,
+  entryPoints: readonly string[] = APPLICATION_ENTRY_POINTS,
+  exclusions: readonly string[] = DEFAULT_APPLICATION_SOURCE_EXCLUSIONS,
+): string[] {
+  const absoluteSourceRoot = resolve(sourceRoot);
+  const uiDirectory = join(absoluteSourceRoot, UI_DIR);
+
+  // The unfiltered set this guard would report without any exclusions. The UI
+  // directory is left out because its own validator owns those files, so an
+  // exclusion covering only UI files suppresses nothing here.
+  const suppressibleFiles = unreachableSourceFiles(absoluteSourceRoot, entryPoints)
+    .map((sourceFile) => resolve(absoluteSourceRoot, sourceFile))
+    .filter((sourceFile) => !isWithin(sourceFile, uiDirectory));
+
+  return exclusions
+    .filter(
+      (exclusion) =>
+        !suppressibleFiles.some((sourceFile) =>
+          isExcludedSourceFile(sourceFile, absoluteSourceRoot, [exclusion]),
+        ),
+    )
+    .map((exclusion) => normalizedSourcePath(exclusion).replace(/\/+$/, ''))
+    .sort();
+}
+
 export function validateUiComponents(sourceRoot = DEFAULT_SOURCE_ROOT): void {
   const unusedComponents = findUnusedUiComponents(sourceRoot);
   const designSystemDrift = findDesignSystemDrift(sourceRoot);

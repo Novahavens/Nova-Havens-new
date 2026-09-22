@@ -13,6 +13,7 @@ import {
   findDesignSystemThemeViolations,
   findFallbackThemeVariableDrift,
   findRecreatedDesignSystemFiles,
+  findStaleSourceExclusions,
   findUnreachableSourceFiles,
   findUnusedUiComponents,
   validateUiComponents,
@@ -178,6 +179,122 @@ test('source reachability validation blocks unexpected files but permits explici
     'src/build',
     'src/dead-responsive-helper.ts',
   ]);
+});
+
+test('flags exclusions that no longer name an unreachable build-time-only path', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-stale-exclusions-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src', 'build'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    "import { helper } from './promoted-helper';\nexport default helper;\n",
+  );
+  // Excluded as build-time-only once, now imported by the browser entry point.
+  writeFileSync(
+    join(sourceRoot, 'src', 'promoted-helper.ts'),
+    'export const helper = true;\n',
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'build', 'route-content.ts'),
+    'export const routeContent = true;\n',
+  );
+
+  deepEqual(
+    findStaleSourceExclusions(sourceRoot, ['src/main.tsx'], [
+      'src/build',
+      'src/promoted-helper.ts',
+      'src/deleted-generator.ts',
+      'src/deleted-build-dir',
+    ]),
+    ['src/deleted-build-dir', 'src/deleted-generator.ts', 'src/promoted-helper.ts'],
+  );
+
+  // A stale exclusion fails validation even though every source file is
+  // either reachable or legitimately excluded.
+  throws(
+    () =>
+      validateSourceReachability(sourceRoot, ['src/main.tsx'], [
+        'src/build',
+        'src/promoted-helper.ts',
+      ]),
+    /1 configured build-time source exclusion\(s\) no longer name an unreachable path/,
+  );
+
+  validateSourceReachability(sourceRoot, ['src/main.tsx'], ['src/build']);
+});
+
+test('keeps a directory exclusion that still covers a build-time-only descendant', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-live-exclusions-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src', 'build', 'nested'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    "import { shared } from './build/shared';\nexport default shared;\n",
+  );
+  // Lives under the excluded directory but is reachable from the browser.
+  writeFileSync(
+    join(sourceRoot, 'src', 'build', 'shared.ts'),
+    'export const shared = true;\n',
+  );
+  // Still build-time-only, so the directory exclusion is still earning its
+  // place even though a reachable sibling sits next to it.
+  writeFileSync(
+    join(sourceRoot, 'src', 'build', 'nested', 'prerender.ts'),
+    'export const prerender = true;\n',
+  );
+
+  deepEqual(findStaleSourceExclusions(sourceRoot, ['src/main.tsx'], ['src/build']), []);
+  deepEqual(findStaleSourceExclusions(sourceRoot, ['src/main.tsx'], ['src/build/']), []);
+  validateSourceReachability(sourceRoot, ['src/main.tsx'], ['src/build']);
+});
+
+test('flags a directory exclusion once its last build-time-only descendant becomes reachable', () => {
+  const sourceRoot = mkdtempSync(join(tmpdir(), 'nova-havens-emptied-exclusion-'));
+  temporaryDirectories.push(sourceRoot);
+  mkdirSync(join(sourceRoot, 'src', 'build'), { recursive: true });
+
+  writeFileSync(
+    join(sourceRoot, 'src', 'main.tsx'),
+    "import App from './App';\nexport default App;\n",
+  );
+  writeFileSync(
+    join(sourceRoot, 'src', 'App.tsx'),
+    "import { promoted } from './build/promoted';\nexport default promoted;\n",
+  );
+  // The directory still exists, but nothing under it is build-time-only now.
+  writeFileSync(
+    join(sourceRoot, 'src', 'build', 'promoted.ts'),
+    'export const promoted = true;\n',
+  );
+  // A newly added unreachable file the obsolete exclusion would otherwise hide.
+  writeFileSync(
+    join(sourceRoot, 'src', 'orphan.ts'),
+    'export const orphan = true;\n',
+  );
+
+  deepEqual(findStaleSourceExclusions(sourceRoot, ['src/main.tsx'], ['src/build']), [
+    'src/build',
+  ]);
+
+  // Both problems are reported together rather than one masking the other.
+  throws(
+    () => validateSourceReachability(sourceRoot, ['src/main.tsx'], ['src/build']),
+    /1 non-UI application source file\(s\) are not reachable from the browser entry point; 1 configured build-time source exclusion\(s\) no longer name an unreachable path/,
+  );
+});
+
+test('the checked-in build-time source exclusions are all still needed', () => {
+  deepEqual(findStaleSourceExclusions(), []);
 });
 
 test('the checked-in UI directory has no unreachable components', () => {
