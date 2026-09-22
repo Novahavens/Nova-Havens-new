@@ -15,7 +15,7 @@
  */
 
 import { readdirSync, statSync } from 'node:fs';
-import { dirname, join, normalize, relative } from 'node:path';
+import { dirname, join, normalize, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -24,32 +24,97 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_SOURCE_ROOT = join(__dirname, '..', '..');
 
 /**
- * Files and directories (relative to the artifact root) whose contents end up
- * in dist/public. If any of them is newer than the build output, whatever is
- * in dist/public was produced by a different build and nothing that reads it
- * — bundle sizes, prerendered HTML, structured data — describes the current
- * source.
+ * Paths (relative to the artifact root, '/'-separated) that cannot change what
+ * lands in dist/public, so touching them must not make an existing build look
+ * stale.
+ *
+ * This is deliberately an *exclude* list rather than the include list it
+ * replaced. An include list drifts silently: add a fourth vite plugin, a new
+ * root config file, or a codegen step whose output vite reads, forget to list
+ * it, and edits to it never register as staling the build — the guard keeps
+ * reporting "fresh" over output that no longer matches its source. With an
+ * exclude list the same forgetfulness fails the safe way instead: an
+ * unrecognised new entry counts as a build input, and the worst case is being
+ * told to rebuild when strictly you didn't have to.
+ *
+ * Only add an entry here when it genuinely cannot affect build output, and
+ * keep entries as specific as possible: excluding a whole directory reopens
+ * the same drift hole for anything added inside it later.
  */
-export const SOURCE_PATHS = [
-  'index.html',
-  'src',
-  'public',
-  'package.json',
-  'vite.config.ts',
-  'vitePluginMetaInject.ts',
-  'vitePluginValidateColors.ts',
-  'vitePluginValidateTokens.ts',
-];
+export const NON_BUILD_INPUTS: ReadonlySet<string> = new Set([
+  // The build output itself, plus generated caches.
+  'dist',
+  'node_modules',
+  '.vite',
+  '.cache',
+  '.turbo',
+  'coverage',
+  'tsconfig.tsbuildinfo',
+  // Test-only surfaces: they read the build, they never produce it.
+  'tests',
+  'test-results',
+  'playwright-report',
+  'playwright.config.ts',
+  'scripts/with-nix-chromium-libs.sh',
+  // Build *consumers*. These run after the build and date themselves against
+  // it; tracking them would mean editing a staleness check declares every
+  // build stale — including, circularly, this file and its own callers.
+  // Everything else under scripts/ stays tracked: generators like the OG
+  // image script and the sync scripts genuinely shape what gets built.
+  'scripts/validate-bundle-budget.ts',
+  'scripts/validate-prerender.ts',
+  'scripts/lib/buildFreshness.ts',
+  // Documentation and repo metadata. Named individually rather than matched
+  // by extension so a future Markdown file that the build actually imports is
+  // tracked by default.
+  'SCHEDULED_DEPLOYMENT.md',
+  'TESTING.md',
+  '.gitignore',
+  '.replit-artifact',
+]);
+
+/** Whether an artifact-root-relative path counts as a build input. */
+export function isBuildInput(relativePath: string): boolean {
+  return !NON_BUILD_INPUTS.has(relativePath.split(sep).join('/'));
+}
+
+/**
+ * Artifact-root entries whose contents end up in dist/public — everything in
+ * the root that is not excluded above. If any of them is newer than the build
+ * output, whatever is in dist/public was produced by a different build and
+ * nothing that reads it (bundle sizes, prerendered HTML, structured data)
+ * describes the current source.
+ */
+export function resolveSourcePaths(
+  sourceRoot: string = DEFAULT_SOURCE_ROOT,
+): string[] {
+  let entries: string[];
+
+  try {
+    entries = readdirSync(sourceRoot);
+  } catch {
+    return [];
+  }
+
+  return entries.filter((entry) => isBuildInput(entry)).sort();
+}
 
 /** Newest modification time (ms) across the tracked source paths, or 0. */
 export function newestSourceMtime(
   sourceRoot: string,
-  sourcePaths: readonly string[] = SOURCE_PATHS,
+  sourcePaths: readonly string[] = resolveSourcePaths(sourceRoot),
 ): { mtimeMs: number; path: string | null } {
   let newest = 0;
   let newestPath: string | null = null;
 
   const visit = (path: string): void => {
+    const relativePath = relative(sourceRoot, path);
+
+    // Exclusions are checked at every depth, not just at the root, so a
+    // nested entry (e.g. a validator that reads the build it would otherwise
+    // stale) can be excluded without excluding its whole directory.
+    if (relativePath !== '' && !isBuildInput(relativePath)) return;
+
     let stats;
 
     try {
@@ -65,7 +130,7 @@ export function newestSourceMtime(
 
     if (stats.mtimeMs > newest) {
       newest = stats.mtimeMs;
-      newestPath = relative(sourceRoot, path);
+      newestPath = relativePath;
     }
   };
 
@@ -119,7 +184,10 @@ export type AssertBuildFreshOptions = {
   sourceRoot: string;
   /** Directory holding the build output (dist/public). */
   distDir: string;
-  /** Source paths (relative to sourceRoot) to check; defaults to SOURCE_PATHS. */
+  /**
+   * Source paths (relative to sourceRoot) to check; defaults to every tracked
+   * entry resolved from sourceRoot (see resolveSourcePaths).
+   */
   sourcePaths?: readonly string[];
   /** Short name of the caller, shown before "SKIPPED — stale build output". */
   label: string;

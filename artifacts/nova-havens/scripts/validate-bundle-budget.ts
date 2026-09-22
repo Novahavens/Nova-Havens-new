@@ -21,12 +21,18 @@ import { fileURLToPath } from 'node:url';
 
 import {
   DEFAULT_SOURCE_ROOT,
-  SOURCE_PATHS,
+  NON_BUILD_INPUTS,
   StaleBuildOutputError,
   assertBuildFresh,
+  resolveSourcePaths,
 } from './lib/buildFreshness.ts';
 
-export { DEFAULT_SOURCE_ROOT, SOURCE_PATHS, StaleBuildOutputError };
+export {
+  DEFAULT_SOURCE_ROOT,
+  NON_BUILD_INPUTS,
+  StaleBuildOutputError,
+  resolveSourcePaths,
+};
 
 export const ENTRY_BUDGET_BYTES = 500_000;
 

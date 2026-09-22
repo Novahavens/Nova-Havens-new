@@ -23,7 +23,7 @@ import {
   DEFAULT_SOURCE_ROOT,
   ENTRY_BUDGET_BYTES,
   ROUTE_BUDGET_BYTES,
-  SOURCE_PATHS,
+  resolveSourcePaths,
   validateBundleBudget,
 } from '../scripts/validate-bundle-budget.ts';
 
@@ -331,10 +331,10 @@ test('the stale check can be skipped for output the caller just built', () => {
 });
 
 test('the tracked source paths exist in the artifact', () => {
-  for (const entry of SOURCE_PATHS) {
+  for (const entry of resolveSourcePaths(DEFAULT_SOURCE_ROOT)) {
     assert.ok(
       existsSync(join(DEFAULT_SOURCE_ROOT, entry)),
-      `${entry} is listed as a build input but does not exist`,
+      `${entry} is tracked as a build input but does not exist`,
     );
   }
 });

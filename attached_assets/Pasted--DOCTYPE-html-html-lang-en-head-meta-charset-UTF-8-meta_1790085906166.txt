@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaHavens Map - 60k Dots with State Lines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0d10; /* Deep dark theme background */
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .map-card {
+            background-color: #15181e; /* Slightly lighter dark for the card */
+            border: 1px solid #2a2d35;
+        }
+
+        .golden-accent {
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-12 items-center">
+        
+        <!-- Left text content -->
+        <div class="w-full md:w-1/3 flex flex-col">
+            <div class="w-14 h-14 rounded-full border border-gray-700 bg-[#15181e] flex items-center justify-center mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                    <path d="M9 22v-4h6v4"></path>
+                    <path d="M8 6h.01"></path>
+                    <path d="M16 6h.01"></path>
+                    <path d="M12 6h.01"></path>
+                    <path d="M12 10h.01"></path>
+                    <path d="M12 14h.01"></path>
+                    <path d="M16 10h.01"></path>
+                    <path d="M16 14h.01"></path>
+                    <path d="M8 10h.01"></path>
+                    <path d="M8 14h.01"></path>
+                </svg>
+            </div>
+            
+            <h1 class="text-7xl font-bold text-white mb-2 tracking-tighter">60,000+</h1>
+            <h2 class="text-gray-400 text-sm font-semibold uppercase tracking-widest mb-6">Verified Homes Nationwide</h2>
+            
+            <p class="text-gray-400 text-base leading-relaxed mb-8">
+                Nova Havens maintains 60,000+ verified furnished homes across the 48 contiguous US states, as of 2026.
+            </p>
+        </div>
+
+        <!-- Right map section -->
+        <div class="w-full md:w-2/3">
+            <div class="map-card rounded-[2rem] p-6 shadow-2xl relative">
+                
+                <!-- Map Header inside card -->
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#d4af37]"></span>
+                    <span class="golden-accent text-sm font-bold tracking-widest uppercase">Network Coverage</span>
+                </div>
+
+                <!-- Aspect ratio wrapper for perfect alignment of SVG and Canvas -->
+                <div class="relative w-full aspect-[975/610] bg-transparent rounded-xl overflow-hidden" id="map-wrapper">
+                    <!-- Loading state -->
+                    <div id="loading" class="absolute inset-0 flex items-center justify-center bg-[#15181e] z-30 transition-opacity duration-500">
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="w-8 h-8 border-4 border-[#333] border-t-[#d4af37] rounded-full animate-spin"></div>
+                            <span class="text-gray-400 text-sm tracking-widest uppercase">Rendering Data...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG for states and state lines (bottom layer) -->
+                    <svg id="map-svg" viewBox="0 0 975 610" class="absolute inset-0 w-full h-full z-10"></svg>
+                    
+                    <!-- Canvas for 60,000 red dots (top layer) -->
+                    <canvas id="map-canvas" width="975" height="610" class="absolute inset-0 w-full h-full z-20 pointer-events-none"></canvas>
+                </div>
+
+                <!-- Map Footer -->
+                <div class="mt-8 flex justify-center items-center gap-3">
+                    <span class="w-2 h-2 rounded-full bg-[#d4af37]"></span>
+                    <span class="text-gray-400 text-sm">60,000+ available homes</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function renderMap() {
+            try {
+                // Fetch pre-projected US map data (Albers USA projection mapped to 975x610)
+                const us = await d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json");
+                
+                // Exclude Alaska (02), Hawaii (15), and territories to only show the contiguous US
+                const nonContiguousIds = new Set(["02", "15", "60", "66", "69", "72", "78"]);
+                const contiguousStates = topojson.feature(us, us.objects.states).features.filter(d => !nonContiguousIds.has(d.id));
+
+                const svg = d3.select("#map-svg");
+                const path = d3.geoPath(); // Uses identical pixel coordinates as the pre-projected JSON
+
+                // Draw states with base fill and visible state lines
+                svg.append("g")
+                    .selectAll("path")
+                    .data(contiguousStates)
+                    .join("path")
+                    .attr("d", path)
+                    .attr("fill", "#1c1f26") // Dark slate background for land
+                    .attr("stroke", "rgba(255, 255, 255, 0.15)") // Clear but subtle state borders
+                    .attr("stroke-width", 1)
+                    .attr("stroke-linejoin", "round");
+
+                // Offscreen canvas logic ensures dots only spawn on valid land masses
+                const offscreen = document.createElement("canvas");
+                offscreen.width = 975;
+                offscreen.height = 610;
+                const offCtx = offscreen.getContext("2d", { willReadFrequently: true });
+                const offPath = d3.geoPath().context(offCtx);
+
+                // Draw ONLY the contiguous states onto the hidden canvas in solid white
+                offCtx.fillStyle = "#ffffff";
+                offCtx.beginPath();
+                contiguousStates.forEach(feature => offPath(feature));
+                offCtx.fill();
+
+                // Extract pixel data to test x/y coordinates against state boundaries
+                const imgData = offCtx.getImageData(0, 0, 975, 610).data;
+
+                const canvas = document.getElementById("map-canvas");
+                const ctx = canvas.getContext("2d");
+                
+                const targetDots = 60000;
+                let dotsPlaced = 0;
+                const dotRadius = 0.7; // Tiny radius to allow for heavy density without clumping entirely
+                
+                // Color configuration for dots: vibrant red with slight transparency for overlapping density effects
+                ctx.fillStyle = "rgba(255, 40, 40, 0.5)"; 
+                
+                // Use a single path to render all dots simultaneously for maximum performance
+                ctx.beginPath();
+
+                // Rejection sampling: Pick a random coordinate, verify it's over a state, then keep it.
+                while (dotsPlaced < targetDots) {
+                    const x = Math.floor(Math.random() * 975);
+                    const y = Math.floor(Math.random() * 610);
+                    
+                    // Check alpha channel of the offscreen canvas (index format: r, g, b, a)
+                    const alphaIndex = (y * 975 + x) * 4 + 3;
+                    
+                    if (imgData[alphaIndex] > 0) {
+                        // Point is inside a state boundary
+                        ctx.moveTo(x, y);
+                        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                        dotsPlaced++;
+                    }
+                }
+                
+                ctx.fill();
+
+                // Fade out loading screen once generation is complete
+                const loader = document.getElementById('loading');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+
+            } catch (error) {
+                console.error("Error loading map data:", error);
+                document.getElementById('loading').innerHTML = "<span class='text-red-500'>Failed to load map data.</span>";
+            }
+        }
+
+        // Initialize rendering on load
+        window.addEventListener("DOMContentLoaded", renderMap);
+    </script>
+</body>
+</html>
