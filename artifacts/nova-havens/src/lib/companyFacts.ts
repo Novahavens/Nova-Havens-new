@@ -20,6 +20,28 @@ export const SERVICE_AREA_US_NAME = `${SERVICE_AREA_STATE_COUNT} contiguous US s
 export const SERVICE_AREA_COVERAGE_SENTENCE =
   `Nova Havens operates across the ${SERVICE_AREA_NAME}.`;
 
+/**
+ * Verified property count, synced daily from the Monday.com PROPERTY
+ * DATABASE board into public/property-stats.json (see
+ * scripts/sync-property-stats.ts). Every surface that states this figure —
+ * the homepage stats, the Contact page CTA, and the prerendered crawler
+ * copy — must derive it from the same snapshot through this function so a
+ * day-to-day fluctuation in the live count never leaves two pages
+ * disagreeing, and floor it to the nearest thousand so the "+" claim is
+ * always literally true between syncs.
+ */
+export function formatVerifiedPropertyCount(totalProperties: number): string {
+  const flooredToThousand = Math.max(0, Math.floor(totalProperties / 1000) * 1000);
+  return `${flooredToThousand.toLocaleString('en-US')}+`;
+}
+
+/**
+ * Conservative default shown only before the live property-stats snapshot
+ * has loaded, or if it can't be read at all. Kept in sync with reality
+ * manually; must never exceed the last known-good verified figure.
+ */
+export const FALLBACK_TOTAL_PROPERTIES = 12_000;
+
 export const COMPANY_FACTS: { term: string; definition: string }[] = [
   {
     term: 'Who Nova Havens serves',

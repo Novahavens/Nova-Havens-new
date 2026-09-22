@@ -12,16 +12,44 @@
  *    list items, and article text must appear so crawlers can index them.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { BLOG_POSTS } from '../data/blogPosts.ts';
 import { HOME_FAQ_GROUPS } from '../data/homeFaqs.ts';
 import { HOW_IT_WORKS_TRACKS } from '../data/howItWorks.ts';
 import { renderLlmsTxtPrerenderHtml } from '../data/llmsContent.ts';
 import { TEAM_MEMBERS, type TeamMemberProfile } from '../data/teamMembers.ts';
 import {
+  FALLBACK_TOTAL_PROPERTIES,
+  formatVerifiedPropertyCount,
   SERVICE_AREA_COVERAGE_SENTENCE,
   SERVICE_AREA_STATE_COUNT,
 } from './companyFacts.ts';
 import { INTAKE_FORMS } from './intakeForms.ts';
+
+/**
+ * Reads the same public/property-stats.json snapshot the browser fetches at
+ * runtime, so prerendered crawler HTML and the live React page always state
+ * the same verified property count. Falls back to the conservative default
+ * if the file is missing or malformed — this must never crash the build.
+ */
+function readVerifiedPropertyCount(): number {
+  try {
+    const statsPath = resolve(dirname(fileURLToPath(import.meta.url)), '../../public/property-stats.json');
+    const parsed = JSON.parse(readFileSync(statsPath, 'utf8')) as { totalProperties?: unknown };
+    if (typeof parsed.totalProperties === 'number' && parsed.totalProperties > 0) {
+      return parsed.totalProperties;
+    }
+  } catch {
+    // Fall through to the fallback below — prerendering must never fail
+    // over a missing or not-yet-synced stats snapshot.
+  }
+  return FALLBACK_TOTAL_PROPERTIES;
+}
+
+const VERIFIED_PROPERTY_COUNT = formatVerifiedPropertyCount(readVerifiedPropertyCount());
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -139,7 +167,7 @@ const HOME_HTML = `
     <h1>A safe place to land, fast.</h1>
     <p>Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.</p>
     <ul>
-      <li>60,000+ verified homes nationwide</li>
+      <li>${VERIFIED_PROPERTY_COUNT} verified homes nationwide</li>
       <li>531+ families assisted this year</li>
       <li>Average placement in under 5 days</li>
     </ul>
@@ -192,7 +220,7 @@ const HOME_HTML = `
     <h2>Where We Operate</h2>
     <p>${esc(SERVICE_AREA_COVERAGE_SENTENCE)}</p>
     <ul>
-      <li>12,000+ active properties</li>
+      <li>${VERIFIED_PROPERTY_COUNT} active properties</li>
       <li>${SERVICE_AREA_STATE_COUNT} states covered</li>
       <li>Average placement in under 5 days</li>
     </ul>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { Zap, Users, Globe, Heart, BedDouble, Tv, MoveRight, PawPrint, PhoneCall, Map, Phone, ChevronDown, Building2, HeartHandshake, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/nova-havens-design-system/components/ui/tabs';
@@ -11,11 +11,14 @@ import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
 import { HOW_IT_WORKS_TRACKS } from '@/data/howItWorks';
 import { trackEvent } from '@/lib/analytics';
 import {
+  FALLBACK_TOTAL_PROPERTIES,
+  formatVerifiedPropertyCount,
   SERVICE_AREA_COVERAGE_SENTENCE,
   SERVICE_AREA_NAME,
   SERVICE_AREA_STATE_COUNT,
   SERVICE_AREA_US_NAME,
 } from '@/lib/companyFacts';
+import { usePropertyStats, type PropertyCity } from '@/lib/propertyStats';
 
 type PartnerLogo = { name: string; websiteUrl: string; logo?: string; logoClass?: string; showName: boolean };
 
@@ -67,10 +70,10 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
   },
   {
     title: 'Home Exteriors',
-    subtitle: 'Part of a 60,000+ Network',
+    subtitle: 'Part of Our Verified Network',
     description: `Comfortable, well-kept homes in real neighborhoods — nationwide coverage across ${SERVICE_AREA_US_NAME}.`,
     imageUrl: '/property-6.webp',
-    imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens 60,000+ property network',
+    imageAlt: 'Comfortable furnished home exterior — part of the Nova Havens verified property network',
   },
   {
     title: 'Fenced-In Yards',
@@ -94,14 +97,6 @@ const SHOWCASE_SLIDES: ElegantSlide[] = [
     imageAlt: 'Family relaxing with their dog in a bright Nova Havens furnished home',
   },
 ];
-
-type PropertyCity = { city: string; lat: number; lng: number; count: number };
-type PropertyStats = {
-  totalProperties: number;
-  statesCovered: number;
-  byState: Record<string, number>;
-  cities: PropertyCity[];
-};
 
 type StateCentroid = { name: string; lat: number; lng: number };
 
@@ -210,7 +205,7 @@ const FEATURED_PROPERTY_PINS = [
 const US_MAP_PATH =
   'M 42 101 L 54 88 L 74 78 L 96 81 L 117 69 L 147 72 L 169 61 L 201 67 L 224 60 L 253 66 L 279 76 L 301 81 L 319 75 L 338 88 L 365 89 L 387 99 L 410 107 L 433 108 L 455 103 L 472 112 L 496 113 L 517 123 L 545 124 L 567 130 L 591 137 L 614 143 L 640 154 L 665 164 L 688 170 L 706 180 L 726 182 L 735 198 L 724 208 L 708 204 L 699 215 L 689 224 L 675 219 L 666 231 L 651 231 L 641 243 L 623 244 L 617 257 L 606 258 L 601 273 L 593 276 L 586 291 L 579 302 L 571 316 L 561 337 L 549 351 L 542 371 L 531 380 L 521 365 L 516 349 L 506 340 L 499 322 L 492 306 L 480 296 L 465 289 L 451 288 L 439 278 L 424 277 L 411 282 L 397 275 L 383 279 L 369 274 L 357 277 L 345 270 L 329 272 L 318 267 L 303 270 L 292 264 L 277 266 L 260 258 L 247 263 L 233 254 L 218 249 L 203 253 L 187 247 L 174 239 L 161 239 L 150 228 L 135 223 L 127 211 L 115 209 L 107 197 L 94 194 L 83 181 L 70 179 L 62 166 L 54 159 L 60 145 L 53 133 L 42 124 L 46 111 Z';
 
-function CoverageMapPlaceholder() {
+function CoverageMapPlaceholder({ verifiedPropertyCount }: { verifiedPropertyCount: string }) {
   return (
     <div
       className="relative w-full min-w-0 min-h-[var(--min-h-map)] md:min-h-[var(--min-h-map-md)] overflow-hidden rounded-xl border border-primary/20 bg-surface-2"
@@ -286,7 +281,7 @@ function CoverageMapPlaceholder() {
       </svg>
       <div className="absolute bottom-3 right-4 flex items-center gap-2 text-xs font-medium text-muted-foreground md:bottom-4 md:right-5">
         <span className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-        60,000+ available homes
+        {verifiedPropertyCount} available homes
       </div>
     </div>
   );
@@ -322,37 +317,19 @@ export default function HomePage() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const petCounts = getPetPlacementCounts();
-  const [propertyStats, setPropertyStats] = useState<PropertyStats>({
-    totalProperties: 12000,
+  const propertyStats = usePropertyStats({
+    totalProperties: FALLBACK_TOTAL_PROPERTIES,
     statesCovered: 48,
-  byState: {},
+    byState: {},
     cities: FALLBACK_CITIES,
   });
+  // The single verified property count — every on-page mention must render
+  // this value (or its live source, propertyStats.totalProperties), never a
+  // separately hardcoded number, so the site can't show conflicting figures.
+  const verifiedPropertyCount = formatVerifiedPropertyCount(propertyStats.totalProperties);
   // The map represents Nova Havens' service footprint, not only the states
   // that happen to have a property count in the latest stats snapshot.
   const coveredStates = new Set(CONTIGUOUS_STATE_CODES);
-
-  useEffect(() => {
-    fetch('/property-stats.json', { cache: 'no-cache' })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Stats request failed: ${response.status}`);
-        return response.json() as Promise<PropertyStats>;
-      })
-      .then((stats) => {
-        if (
-          typeof stats.totalProperties !== 'number' ||
-          typeof stats.statesCovered !== 'number' ||
-          !stats.byState ||
-          !Array.isArray(stats.cities) ||
-          stats.totalProperties === 0
-        ) throw new Error('Invalid or not-yet-synced property stats');
-        setPropertyStats(stats);
-      })
-      .catch(() => {
-        // Keep the established sample map and safe fallback values if the
-        // daily sync has not produced a file yet or the request is unavailable.
-      });
-  }, []);
 
   const scrollPrev = React.useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -403,12 +380,12 @@ export default function HomePage() {
                   <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">60,000+</span>
+                  <span className="block text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">{verifiedPropertyCount}</span>
                   <span className="mt-3 block text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified homes nationwide</span>
-                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains 60,000+ verified furnished homes across {SERVICE_AREA_US_NAME}, as of 2026.</span>
+                  <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">Nova Havens maintains {verifiedPropertyCount} verified furnished homes across {SERVICE_AREA_US_NAME}.</span>
                 </div>
               </div>
-              <CoverageMapPlaceholder />
+              <CoverageMapPlaceholder verifiedPropertyCount={verifiedPropertyCount} />
             </div>
             {/* Stacked pair */}
             <div className="md:col-span-2 grid grid-cols-1 gap-4 md:gap-5">
@@ -465,7 +442,7 @@ export default function HomePage() {
               <Globe className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-foreground">Vetted Nationwide Network</h3>
-            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with 60,000+ verified properties across {SERVICE_AREA_STATE_COUNT} states — each ready for immediate placement.</p>
+            <p className="text-muted-foreground leading-relaxed">Nova Havens' housing network is purpose-built for insurance workflows, with {verifiedPropertyCount} verified properties across {SERVICE_AREA_STATE_COUNT} states — each ready for immediate placement.</p>
           </div>
           <div className="bg-card rounded-lg border border-white/10 p-8 md:p-10 flex flex-col items-start gap-4" data-testid="card-why-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -524,7 +501,7 @@ export default function HomePage() {
           <div className="bg-card rounded-lg border border-white/5 p-8 flex flex-col gap-4" data-testid="card-exp-6">
             <Map className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-bold text-foreground">Nationwide Network</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">With 60,000+ verified homes across every major metro and many rural areas in {SERVICE_AREA_STATE_COUNT} states, Nova Havens places families close to their schools, workplaces, and community.</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">With {verifiedPropertyCount} verified homes across every major metro and many rural areas in {SERVICE_AREA_STATE_COUNT} states, Nova Havens places families close to their schools, workplaces, and community.</p>
           </div>
         </div>
       </section>
@@ -611,7 +588,7 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="grid-stats">
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center" data-testid="stat-card-properties">
-            <div className="text-4xl font-extrabold text-foreground mb-2">20 000+</div>
+            <div className="text-4xl font-extrabold text-foreground mb-2">{verifiedPropertyCount}</div>
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">Active Properties</div>
             <div className="text-xs text-tertiary leading-relaxed">Live property count from the Nova Havens PROPERTY DATABASE board.</div>
           </div>
