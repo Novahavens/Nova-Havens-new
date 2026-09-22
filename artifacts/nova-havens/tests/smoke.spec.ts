@@ -790,6 +790,129 @@ test.describe('Reduced-motion carousel behavior', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Normal-motion carousel autoplay contract
+// ---------------------------------------------------------------------------
+//
+// elegant-carousel.tsx documents a 6s autoplay interval that pauses on
+// hover. These checks pin that contract behaviorally so a timer refactor
+// that breaks the interval or the hover pause fails a test instead of only
+// showing up as a subtle drift in a full-page screenshot.
+
+test.describe('Normal-motion carousel autoplay contract', () => {
+  test('advances to the next slide after the documented interval', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioral timing check — one viewport is enough; other projects cover layout.',
+    );
+
+    await page.goto('/');
+
+    const carousel = page.getByTestId('carousel-showcase');
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'false');
+    await expect(carousel.getByRole('heading', { name: 'Living Spaces' })).toBeVisible();
+
+    // Bracket the documented 6s interval on both sides. Timers only fire
+    // late under load, never early, so this "before" check has no CI-flake
+    // risk and still catches a shortened interval (e.g. 5s) that the
+    // "after" check alone would miss, since that would already be visible.
+    await page.waitForTimeout(5_500);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'Autoplay must not advance before the documented 6s interval has elapsed',
+    ).toBeVisible();
+
+    // Wait well past the documented 6s interval without touching the page.
+    await page.waitForTimeout(6_800 - 5_500);
+    await expect(
+      carousel.getByRole('heading', { name: 'Walk in showers' }),
+      'Autoplay should advance to the next slide after the documented 6s interval',
+    ).toBeVisible();
+  });
+
+  test('pauses slide advancement and progress on hover, then resumes once the pointer leaves', async ({ page }) => {
+    test.skip(
+      test.info().project.name !== 'chromium',
+      'Behavioral timing check — one viewport is enough; other projects cover layout.',
+    );
+
+    await page.goto('/');
+
+    const carousel = page.getByTestId('carousel-showcase');
+    await expect(carousel).toHaveAttribute('data-reduced-motion', 'false');
+    await expect(carousel.getByRole('heading', { name: 'Living Spaces' })).toBeVisible();
+
+    // Let autoplay run for a moment so there is real progress to freeze.
+    await page.waitForTimeout(1_500);
+    const progressWhileRunning = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      parseFloat(progressWhileRunning),
+      'Autoplay should already be advancing progress before hovering',
+    ).toBeGreaterThan(0);
+
+    await carousel.hover();
+    // Let the pause take effect (React state update + interval teardown)
+    // before sampling the frozen baseline, so a tick that was already
+    // in-flight when the pointer landed can't sneak into the comparison.
+    await page.waitForTimeout(200);
+    const progressAtHover = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+
+    // Wait well past a full slide duration -- hovering must pause the slide
+    // AND freeze its progress, not merely slow both down.
+    await page.waitForTimeout(6_800);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'Hovering the carousel must pause slide advancement',
+    ).toBeVisible();
+    const progressWhileHovered = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      progressWhileHovered,
+      'Progress must stay frozen while hovered, not merely slow down',
+    ).toBe(progressAtHover);
+
+    // The pointer leaves the carousel for an unrelated, stable element.
+    await page.getByRole('banner').getByTestId('link-logo').hover();
+
+    // Progress must resume climbing promptly -- not just the slide timer --
+    // or a regression that restarts one interval but not the other would
+    // still pass a check that only waits for the next slide.
+    await page.waitForTimeout(1_500);
+    const progressAfterLeaving = await page
+      .getByTestId('carousel-progress-1')
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(
+      parseFloat(progressAfterLeaving),
+      'Progress should resume climbing once the pointer leaves the carousel',
+    ).toBeGreaterThan(parseFloat(progressWhileHovered));
+
+    // Resuming restarts a full, fresh 6s interval rather than crediting the
+    // ~1.5s that had already elapsed before the pause -- confirm the slide
+    // has NOT advanced at the point where an elapsed-preserving resume
+    // would already have fired (remaining ~4.5s), before separately
+    // confirming it does advance once the fresh interval completes. Timers
+    // only fire late under load, so this "before" check has no flake risk.
+    await page.waitForTimeout(5_500 - 1_500);
+    await expect(
+      carousel.getByRole('heading', { name: 'Living Spaces' }),
+      'Resuming must restart a full 6s interval, not credit time elapsed before the pause',
+    ).toBeVisible();
+
+    // The fresh post-resume interval should still complete the advance --
+    // resumed, not stuck, and not skipping ahead of a single slide.
+    await page.waitForTimeout(6_800 - 5_500);
+    await expect(
+      carousel.getByRole('heading', { name: 'Walk in showers' }),
+      'Autoplay should resume automatically once the pointer leaves the carousel',
+    ).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Compact-navigation breakpoint regressions
 // ---------------------------------------------------------------------------
 
