@@ -92,13 +92,17 @@ export function metaInjectPlugin(): Plugin {
             `<link rel="canonical" href="${escapeAttr(meta.canonicalUrl)}" />`,
           );
 
+        // The transform may run repeatedly in dev, so remove every prior
+        // route-owned block before inserting the current route's graph.
+        result = result.replace(
+          /<script type="application\/ld\+json" id="jsonld-route">[\s\S]*?<\/script>\n?/g,
+          '',
+        );
+
         // Inject per-route JSON-LD (BlogPosting etc.) before </head>
         if (meta.jsonLd) {
           const scriptTag = `<script type="application/ld+json" id="jsonld-route">\n${JSON.stringify(meta.jsonLd, null, 2)}\n</script>`;
           result = result.replace('</head>', `${scriptTag}\n</head>`);
-        } else {
-          // Remove any stale route JSON-LD from a previous navigation (dev HMR edge case)
-          result = result.replace(/<script type="application\/ld\+json" id="jsonld-route">[\s\S]*?<\/script>\n?/, '');
         }
 
         return result;

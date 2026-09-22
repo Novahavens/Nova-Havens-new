@@ -4,8 +4,8 @@
  * Iterates over every route in ALL_ROUTE_META, walks each page's JSON-LD
  * graph, and verifies that every `@id` referenced anywhere (isPartOf, about,
  * publisher, worksFor, …) resolves to a node emitted on that same page —
- * or is a known cross-page entity (e.g. the canonical `#organization` node,
- * which search engines resolve site-wide).
+ * and verifies that the canonical business entity is emitted exactly once
+ * with the same type and verified facts in every structured-data graph.
  *
  * Run with: node --experimental-strip-types scripts/validate-jsonld.ts
  * Exits non-zero (with a per-route report) if any reference is unresolved.
@@ -15,11 +15,7 @@ import { ALL_ROUTE_META } from '../src/lib/routeMeta.ts';
 
 const BASE_URL = 'https://novahavens.com';
 
-/**
- * Entities that are allowed to be referenced without being emitted on the
- * same page: search engines treat these as site-wide canonical entities.
- */
-const KNOWN_CROSS_PAGE_IDS = new Set<string>([`${BASE_URL}/#organization`]);
+const BUSINESS_ID = `${BASE_URL}/#organization`;
 
 interface Analysis {
   defined: Set<string>;
@@ -58,6 +54,21 @@ function walk(value: unknown, acc: Analysis): void {
   }
 }
 
+function collectNodesById(value: unknown, id: string): Record<string, unknown>[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectNodesById(item, id));
+  }
+  if (!isPlainObject(value)) return [];
+
+  const matches =
+    value['@id'] === id && Object.keys(value).length > 1 ? [value] : [];
+  return matches.concat(
+    Object.entries(value)
+      .filter(([key]) => key !== '@id')
+      .flatMap(([, child]) => collectNodesById(child, id)),
+  );
+}
+
 let failures = 0;
 const routes = Object.keys(ALL_ROUTE_META);
 
@@ -69,13 +80,31 @@ for (const route of routes) {
   walk(meta.jsonLd, acc);
 
   const unresolved = [...acc.referenced].filter(
-    (id) => !acc.defined.has(id) && !KNOWN_CROSS_PAGE_IDS.has(id),
+    (id) => !acc.defined.has(id),
   );
 
   if (unresolved.length > 0) {
     failures++;
     console.error(`✗ ${route} — unresolved @id reference(s):`);
     for (const id of unresolved) console.error(`    ${id}`);
+  }
+
+  const businessNodes = collectNodesById(meta.jsonLd, BUSINESS_ID);
+  if (businessNodes.length !== 1) {
+    failures++;
+    console.error(
+      `✗ ${route} — expected exactly one canonical business node; found ${businessNodes.length}.`,
+    );
+  } else {
+    const business = businessNodes[0];
+    if (
+      business['@type'] !== 'LocalBusiness' ||
+      business.name !== 'Nova Havens' ||
+      business.url !== `${BASE_URL}/`
+    ) {
+      failures++;
+      console.error(`✗ ${route} — canonical business type or identity facts differ.`);
+    }
   }
 }
 

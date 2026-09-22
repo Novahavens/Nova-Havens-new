@@ -113,6 +113,8 @@ if (!existsSync(join(distDir, 'index.html'))) {
 
 const SCRIPT_RE =
   /<script type="application\/ld\+json" id="jsonld-route">([\s\S]*?)<\/script>/g;
+const ANY_JSONLD_SCRIPT_RE =
+  /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi;
 
 function decodeHtmlEntities(value: string): string {
   return value
@@ -253,6 +255,14 @@ for (const [route, meta] of Object.entries(ALL_ROUTE_META)) {
   }
 
   checked++;
+
+  const allJsonLdScripts = [...html.matchAll(ANY_JSONLD_SCRIPT_RE)];
+  if (allJsonLdScripts.length !== 1) {
+    fail(
+      route,
+      `${allJsonLdScripts.length} total JSON-LD blocks found in ${relPath} (expected 1)`,
+    );
+  }
 
   if (matches.length === 0) {
     fail(route, `no <script type="application/ld+json" id="jsonld-route"> in ${relPath}`);

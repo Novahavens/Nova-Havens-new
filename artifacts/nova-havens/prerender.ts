@@ -135,7 +135,7 @@ function injectMeta(html: string, pathname: string): string {
   // schema into the SPA shell). prerender.ts owns the per-route block, so we
   // strip the template copy first, then inject the correct one.
   result = result.replace(
-    /<script type="application\/ld\+json" id="jsonld-route">[\s\S]*?<\/script>\n?/,
+    /<script type="application\/ld\+json" id="jsonld-route">[\s\S]*?<\/script>\n?/g,
     '',
   );
 

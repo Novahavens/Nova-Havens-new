@@ -31,24 +31,13 @@ export interface RouteMeta {
 
 const SITE_NAME = 'Nova Havens';
 const BASE_URL = 'https://novahavens.com';
-/** Official social profiles — used in Organization schema `sameAs`. */
+/** Official profiles linked from the public site footer. */
 const SOCIAL_PROFILE_URLS = [
   'https://www.linkedin.com/company/novahavenshousing',
   'https://www.instagram.com/novahavenshousing/',
   'https://www.facebook.com/novahavenshousing',
 ];
-/**
- * sameAs profiles for the About-page Organization schema.
- * TODO: replace the placeholder entries below with the real URLs —
- *   - Google Business Profile: placeholder, needs the real g.page/maps share URL
- *   - LinkedIn / Facebook: currently the known profiles; confirm before launch
- */
-const ABOUT_SAMEAS_URLS = [
-  'https://www.google.com/maps?cid=PLACEHOLDER_GOOGLE_BUSINESS_PROFILE', // TODO: real Google Business Profile URL
-  'https://www.linkedin.com/company/novahavenshousing', // TODO: confirm this is the official LinkedIn URL
-  'https://www.facebook.com/novahavenshousing', // TODO: confirm this is the official Facebook URL
-];
-/** Single canonical entity @id — every Organization/LocalBusiness block must reference this. */
+/** Single canonical business @id — every business reference resolves to this node. */
 const BUSINESS_ID = `${BASE_URL}/#organization`;
 /** Canonical WebSite node @id — referenced via `isPartOf` on page schemas. */
 const WEBSITE_ID = `${BASE_URL}/#website`;
@@ -75,6 +64,23 @@ const BUSINESS_AREA_SERVED = {
   '@type': 'Country',
   name: 'United States',
 };
+const BUSINESS_SCHEMA = {
+  '@type': 'LocalBusiness',
+  '@id': BUSINESS_ID,
+  name: SITE_NAME,
+  url: `${BASE_URL}/`,
+  logo: {
+    '@type': 'ImageObject',
+    url: `${BASE_URL}/og-image.png`,
+  },
+  description: COMPANY_DEFINITION,
+  telephone: BUSINESS_PHONE,
+  email: BUSINESS_EMAIL,
+  address: BUSINESS_ADDRESS,
+  areaServed: BUSINESS_AREA_SERVED,
+  sameAs: SOCIAL_PROFILE_URLS,
+  serviceType: 'Insurance Housing Coordination',
+};
 
 /**
  * Person schema for each real team member. Members without a confirmed role
@@ -89,9 +95,7 @@ const TEAM_PERSON_SCHEMAS = TEAM_MEMBERS.map((member) => ({
     ? { jobTitle: member.role }
     : {}),
   worksFor: {
-    '@type': 'Organization',
     '@id': BUSINESS_ID,
-    name: SITE_NAME,
   },
 }));
 export const DEFAULT_DESCRIPTION =
@@ -145,20 +149,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@context': 'https://schema.org',
       '@graph': [
         WEBSITE_SCHEMA,
-        {
-          '@type': 'LocalBusiness',
-          '@id': BUSINESS_ID,
-          name: SITE_NAME,
-          url: `${BASE_URL}/`,
-          telephone: BUSINESS_PHONE,
-          email: BUSINESS_EMAIL,
-          address: BUSINESS_ADDRESS,
-          areaServed: BUSINESS_AREA_SERVED,
-          sameAs: SOCIAL_PROFILE_URLS,
-          serviceType: 'Insurance Housing Coordination',
-          description:
-            'Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.',
-        },
+        BUSINESS_SCHEMA,
         ...HOW_IT_WORKS_TRACKS.map((track) => ({
           '@type': 'HowTo',
           name: track.schemaName,
@@ -194,6 +185,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@context': 'https://schema.org',
       '@graph': [
         WEBSITE_SCHEMA,
+        BUSINESS_SCHEMA,
         {
           '@type': 'ItemList',
           name: 'Nova Havens Blog & Resources',
@@ -236,6 +228,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@context': 'https://schema.org',
       '@graph': [
         WEBSITE_SCHEMA,
+        BUSINESS_SCHEMA,
         {
           '@type': 'AboutPage',
           '@id': `${BASE_URL}/meet-the-team`,
@@ -259,35 +252,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@context': 'https://schema.org',
       '@graph': [
         WEBSITE_SCHEMA,
-        {
-          '@type': 'Organization',
-          '@id': BUSINESS_ID,
-          name: 'Nova Havens Temporary Housing',
-          alternateName: SITE_NAME,
-          url: BASE_URL,
-          logo: {
-            '@type': 'ImageObject',
-            url: `${BASE_URL}/og-image.png`,
-          },
-          sameAs: ABOUT_SAMEAS_URLS,
-          // description matches the canonical definition on the About page verbatim.
-          description: COMPANY_DEFINITION,
-          address: BUSINESS_ADDRESS,
-          telephone: BUSINESS_PHONE,
-          email: BUSINESS_EMAIL,
-          areaServed: BUSINESS_AREA_SERVED,
-          foundingLocation: {
-            '@type': 'Place',
-            name: 'Nashville, Tennessee',
-          },
-          knowsAbout: [
-            'Insurance housing coordination',
-            'Additional Living Expenses (ALE) coverage',
-            'Temporary furnished housing',
-            'Insurance claims management',
-            'Displaced family housing placement',
-          ],
-        },
+        BUSINESS_SCHEMA,
         {
           '@type': 'AboutPage',
           '@id': `${BASE_URL}/about-us`,
@@ -322,57 +287,7 @@ const STATIC_META: Record<string, RouteMeta> = {
       '@context': 'https://schema.org',
       '@graph': [
         WEBSITE_SCHEMA,
-        {
-          '@type': 'LocalBusiness',
-          '@id': BUSINESS_ID,
-          name: SITE_NAME,
-          url: BASE_URL,
-          logo: {
-            '@type': 'ImageObject',
-            url: `${BASE_URL}/og-image.png`,
-          },
-          description:
-            'Nova Havens coordinates furnished temporary housing for insurance-displaced families across all 48 contiguous US states, billed directly to carriers.',
-          telephone: BUSINESS_PHONE,
-          email: BUSINESS_EMAIL,
-          address: BUSINESS_ADDRESS,
-          areaServed: BUSINESS_AREA_SERVED,
-          openingHoursSpecification: {
-            '@type': 'OpeningHoursSpecification',
-            dayOfWeek: [
-              'Monday',
-              'Tuesday',
-              'Wednesday',
-              'Thursday',
-              'Friday',
-              'Saturday',
-              'Sunday',
-            ],
-            opens: '00:00',
-            closes: '23:59',
-          },
-          contactPoint: {
-            '@type': 'ContactPoint',
-            telephone: BUSINESS_PHONE,
-            contactType: 'customer service',
-            email: BUSINESS_EMAIL,
-            availableLanguage: 'English',
-            hoursAvailable: {
-              '@type': 'OpeningHoursSpecification',
-              dayOfWeek: [
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday',
-                'Sunday',
-              ],
-              opens: '00:00',
-              closes: '23:59',
-            },
-          },
-        },
+        BUSINESS_SCHEMA,
         {
           '@type': 'ContactPage',
           '@id': `${BASE_URL}/contact`,
@@ -434,17 +349,9 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
           '@type': 'Person',
           name: post.author.name,
           jobTitle: post.author.role,
-          worksFor: {
-            '@type': 'Organization',
-            '@id': BUSINESS_ID,
-            name: SITE_NAME,
-          },
+          worksFor: { '@id': BUSINESS_ID },
         }
-      : {
-          '@type': 'Organization',
-          '@id': BUSINESS_ID,
-          name: SITE_NAME,
-        };
+      : { '@id': BUSINESS_ID };
 
     const postOgImage = post.image ?? `${BASE_URL}/og-image.png`;
 
@@ -458,14 +365,7 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
       url: `${BASE_URL}/blog/${post.slug}`,
       author: authorSchema,
       publisher: {
-        '@type': 'Organization',
         '@id': BUSINESS_ID,
-        name: SITE_NAME,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${BASE_URL}/og-image.png`,
-        },
-        sameAs: SOCIAL_PROFILE_URLS,
       },
       mainEntityOfPage: {
         '@type': 'WebPage',
@@ -478,7 +378,11 @@ const BLOG_POST_META: Record<string, RouteMeta> = Object.fromEntries(
       },
     };
 
-    const graph: Record<string, unknown>[] = [WEBSITE_SCHEMA, blogPostingSchema];
+    const graph: Record<string, unknown>[] = [
+      WEBSITE_SCHEMA,
+      BUSINESS_SCHEMA,
+      blogPostingSchema,
+    ];
     if (faqSchema) graph.push(faqSchema);
 
     return [
