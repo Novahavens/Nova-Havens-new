@@ -29,7 +29,7 @@
     "jsdom": "^30.0.1",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.5",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.4",
     "simple-git-hooks": "^2.13.1",
     "typescript": "~5.9.3",
     "vitest": "^5.0.0"
