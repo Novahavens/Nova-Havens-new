@@ -78,7 +78,12 @@ const MIME_EXT = {
   'image/webp': '.webp',
 };
 
-const storage = new Client();
+let storage;
+
+function getStorage() {
+  storage ??= new Client();
+  return storage;
+}
 
 export function normalizeText(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ');
@@ -200,11 +205,99 @@ async function syncPhoto(name, slug, photoUrl) {
   }
   const key = `${TEAM_PREFIX}${slug}${ext}`;
   const bytes = Buffer.from(await response.arrayBuffer());
-  const result = await storage.uploadFromBytes(key, bytes);
+  const result = await getStorage().uploadFromBytes(key, bytes);
   if (!result.ok) {
     throw new Error(`Object Storage upload failed for ${name}: ${result.error.message}`);
   }
   return key;
+}
+
+export async function transformTeamRow(
+  row,
+  {
+    rowIndex = 0,
+    syncPhotoForMember = syncPhoto,
+  } = {},
+) {
+  const get = makeColumnGetter(row);
+  const name = normalizeText(get(COL.name));
+  if (!name) return null;
+
+  const slug = slugify(name);
+  const firstName = normalizeName(name).split(' ')[0];
+  const answers = {};
+  for (const key of ANSWER_KEYS) {
+    answers[key] = cleanAnswer(get(COL[key]), COL[key]);
+  }
+
+  let photo = null;
+  const photoUrl = normalizeText(get(COL.photo));
+  if (photoUrl) {
+    try {
+      photo = await syncPhotoForMember(name, slug, photoUrl);
+    } catch (error) {
+      console.warn(`[sync-team] WARNING: ${name} — ${error.message} Photo set to null; continuing.`);
+    }
+  }
+
+  const timestamp = Date.parse(get(COL.timestamp));
+  return {
+    name,
+    slug,
+    role: ROLE_BY_FIRST_NAME[firstName] ?? '',
+    initials: initialsOf(name),
+    photo,
+    ...answers,
+    _sortKey: Number.isNaN(timestamp) ? Number.MAX_SAFE_INTEGER : timestamp,
+    _rowIndex: rowIndex,
+  };
+}
+
+export async function transformTeamRows(
+  rows,
+  {
+    syncPhotoForMember = syncPhoto,
+    generatedAt = new Date().toISOString(),
+  } = {},
+) {
+  const firstRow = rows[0] ?? {};
+  const headerLookup = new Set(
+    Object.keys(firstRow).map((key) => normalizeText(key).toLowerCase()),
+  );
+  const missingHeaders = Object.values(COL).filter(
+    (header) => !headerLookup.has(normalizeText(header).toLowerCase()),
+  );
+  if (rows.length === 0 || missingHeaders.length > 0) {
+    throw new Error(
+      `sheet is missing required column(s): ${missingHeaders.join(', ') || '(no data rows)'}`,
+    );
+  }
+
+  const members = [];
+  let skippedBlank = 0;
+  for (const [index, row] of rows.entries()) {
+    const member = await transformTeamRow(row, {
+      rowIndex: index,
+      syncPhotoForMember,
+    });
+    if (!member) {
+      skippedBlank += 1;
+      continue;
+    }
+    members.push(member);
+  }
+
+  if (members.length === 0) {
+    throw new Error('parsed zero valid members from the sheet');
+  }
+
+  members.sort((a, b) => a._sortKey - b._sortKey || a._rowIndex - b._rowIndex);
+  return {
+    generatedAt,
+    count: members.length,
+    members: members.map(({ _sortKey, _rowIndex, ...member }) => member),
+    skippedBlank,
+  };
 }
 
 async function main() {
@@ -238,89 +331,19 @@ async function main() {
     process.exit(1);
   }
 
-  // Validate the complete required header set BEFORE any photo work or JSON
-  // write: a renamed/deleted form question must fail the run, not publish
-  // blank profiles over the last good team.json.
-  const firstRow = rows[0] ?? {};
-  const headerLookup = new Set(
-    Object.keys(firstRow).map((key) => normalizeText(key).toLowerCase()),
-  );
-  const missingHeaders = Object.values(COL).filter(
-    (header) => !headerLookup.has(normalizeText(header).toLowerCase()),
-  );
-  if (rows.length === 0 || missingHeaders.length > 0) {
-    console.error(
-      `[sync-team] ERROR: sheet is missing required column(s): ${missingHeaders.join(', ') || '(no data rows)'}. ` +
-        'Leaving existing team.json untouched.',
-    );
+  let transformed;
+  try {
+    transformed = await transformTeamRows(rows);
+  } catch (error) {
+    console.error(`[sync-team] ERROR: ${error.message}. Leaving existing team.json untouched.`);
     process.exit(1);
   }
-
-  const members = [];
-  let skippedBlank = 0;
-  for (const [index, row] of rows.entries()) {
-    const get = makeColumnGetter(row);
-    const name = normalizeText(get(COL.name));
-    if (!name) {
-      skippedBlank += 1; // the sheet contains empty test submissions — skip silently-ish
-      continue;
-    }
-
-    const slug = slugify(name);
-    const firstName = normalizeName(name).split(' ')[0];
-
-    const answers = {};
-    for (const key of ANSWER_KEYS) {
-      answers[key] = cleanAnswer(get(COL[key]), COL[key]);
-    }
-
-    let photo = null;
-    const photoUrl = normalizeText(get(COL.photo));
-    if (photoUrl) {
-      try {
-        photo = await syncPhoto(name, slug, photoUrl);
-      } catch (error) {
-        console.warn(`[sync-team] WARNING: ${name} — ${error.message} Photo set to null; continuing.`);
-      }
-    }
-
-    const timestamp = Date.parse(get(COL.timestamp));
-    members.push({
-      name,
-      slug,
-      role: ROLE_BY_FIRST_NAME[firstName] ?? '',
-      initials: initialsOf(name),
-      photo,
-      ...answers,
-      _sortKey: Number.isNaN(timestamp) ? Number.MAX_SAFE_INTEGER : timestamp,
-      _rowIndex: index,
-    });
-  }
-
+  const { skippedBlank, ...payload } = transformed;
   if (skippedBlank > 0) {
     console.log(`[sync-team] Skipped ${skippedBlank} row(s) with a blank Name.`);
   }
 
-  // Critical safeguard: never overwrite a good team.json with an empty or
-  // partial one. A transient Google outage must not blank the team page.
-  if (members.length === 0) {
-    console.error(
-      '[sync-team] ERROR: parsed zero valid members from the sheet. ' +
-        'Leaving existing team.json untouched.',
-    );
-    process.exit(1);
-  }
-
-  // Earliest responders first; stable as new people are added.
-  members.sort((a, b) => a._sortKey - b._sortKey || a._rowIndex - b._rowIndex);
-
-  const payload = {
-    generatedAt: new Date().toISOString(),
-    count: members.length,
-    members: members.map(({ _sortKey, _rowIndex, ...member }) => member),
-  };
-
-  const upload = await storage.uploadFromText(TEAM_JSON_KEY, JSON.stringify(payload, null, 2));
+  const upload = await getStorage().uploadFromText(TEAM_JSON_KEY, JSON.stringify(payload, null, 2));
   if (!upload.ok) {
     console.error(`[sync-team] ERROR: failed to write ${TEAM_JSON_KEY}: ${upload.error.message}`);
     process.exit(1);

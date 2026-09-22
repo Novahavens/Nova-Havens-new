@@ -15,6 +15,7 @@ import {
   type TeamStorage,
 } from "../src/routes/team.ts";
 import { teamPhotoUrl } from "../../nova-havens/src/lib/teamPhoto.ts";
+import { transformTeamRows } from "../../nova-havens/scripts/sync-team.js";
 
 const TEAM_PAGE_PATH = fileURLToPath(
   new URL("../../nova-havens/src/pages/TeamPage.tsx", import.meta.url),
@@ -48,6 +49,20 @@ const storedTeamResponse = {
       spareTime: "Hiking",
     },
   ],
+};
+
+const representativeSheetRow = {
+  Timestamp: "2026-09-22T09:00:00.000Z",
+  Name: "Dana Ellis",
+  "How I help our Nova Havens clients":
+    "I help families settle into temporary homes.",
+  "My favorite part of working at Nova Havens is":
+    "Helping families feel supported.",
+  "My favorite foods are": "Tacos",
+  "This is guaranteed to make me laugh": "Bad puns",
+  "I like to spend my spare time doing": "Hiking",
+  "Upload your favorite picture of yourself":
+    "https://drive.google.com/file/d/representative-photo/view",
 };
 
 function assertMatchesTeamPageConsumer(body: unknown): void {
@@ -118,6 +133,55 @@ test("the real handler returns the shape the Team page consumes", async () => {
   assert.equal(response.status, 200);
   assertMatchesTeamPageConsumer(response.body);
   assert.deepEqual(response.body, storedTeamResponse);
+});
+
+test("the sync producer emits the exact member shape consumed by the Team page", async () => {
+  const photoCalls: unknown[][] = [];
+  const payload = await transformTeamRows([representativeSheetRow], {
+    generatedAt: "2026-09-22T10:00:00.000Z",
+    async syncPhotoForMember(...args: unknown[]) {
+      photoCalls.push(args);
+      return "team/dana-ellis.jpg";
+    },
+  });
+
+  assert.equal(payload.count, 1);
+  assert.equal(payload.skippedBlank, 0);
+  assertMatchesTeamPageConsumer(payload);
+  assert.deepEqual(Object.keys(payload.members[0]).sort(), [
+    "favouritePart",
+    "foods",
+    "help",
+    "initials",
+    "laugh",
+    "name",
+    "photo",
+    "role",
+    "slug",
+    "spareTime",
+  ]);
+  assert.deepEqual(photoCalls, [
+    [
+      "Dana Ellis",
+      "dana-ellis",
+      representativeSheetRow["Upload your favorite picture of yourself"],
+    ],
+  ]);
+});
+
+test("a renamed sync-producer field fails the Team page contract", async () => {
+  const payload = await transformTeamRows([representativeSheetRow], {
+    syncPhotoForMember: async () => null,
+  });
+  const { favouritePart, ...renamedMember } = payload.members[0];
+
+  assert.throws(
+    () =>
+      assertMatchesTeamPageConsumer({
+        members: [{ ...renamedMember, favoritePart: favouritePart }],
+      }),
+    /member\.favouritePart/,
+  );
 });
 
 test("a synced photo key reaches the real image handler with renderable bytes", async () => {
