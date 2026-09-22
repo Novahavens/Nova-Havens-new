@@ -1,7 +1,5 @@
 # Toast family
 
-- **Source:** `toast.tsx:1-125`, `toaster.tsx:1-32`, and `hooks/use-toast.ts`
-  in `artifacts/nova-havens/src/`.
 - **Public exports:** Toast primitives plus `Toaster`; provider-backed
   notifications are grouped as one family.
 - **Behavior:** transient feedback, one-visible-toast limit, action/close

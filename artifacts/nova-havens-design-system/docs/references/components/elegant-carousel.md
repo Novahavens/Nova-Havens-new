@@ -1,6 +1,5 @@
 # ElegantCarousel family
 
-- **Source:** `artifacts/nova-havens/src/components/ui/elegant-carousel.tsx:1-190`
 - **Public exports:** default `ElegantCarousel` and `ElegantSlide` type.
 - **Behavior:** autoplay advances every 6 seconds and pauses on hover; timed
   800ms transitions, previous/next controls, progress indicators, touch
