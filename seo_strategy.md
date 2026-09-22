@@ -1,11 +1,12 @@
 # SEO Strategy
 
 ## In scope
-- All public-facing pages of the Nova Havens web app (`/`, `/blog`, `/contact`, `/privacy-policy`, `/terms-of-service`)
+- All public-facing Nova Havens pages: `/`, `/about-us`, `/meet-the-team`, `/blog`, public blog articles, `/contact`, `/privacy-policy`, and `/terms-of-service`
+- Machine-readable public resources including `/robots.txt`, `/sitemap.xml`, and `/llms.txt`
 
 ## Out of scope
 - API server (backend only, no public-facing HTML pages)
-- Mockup sandbox (internal design tool)
+- Mockup sandbox and design-system previews (internal tools)
 
 ## Target audience
 - Insurance adjusters and carriers needing a temporary housing coordinator
@@ -19,7 +20,12 @@
 - Insurance housing coordinator
 
 ## Rendering mode
-- Pure React SPA (Wouter router, Vite build). No SSR. All page content, per-route titles, and descriptions are client-rendered.
+- React/Vite application with a build-time prerender step.
+- Public routes receive route-specific static body content, metadata, canonicals, and JSON-LD in generated HTML; React replaces the static body after client startup.
+
+## Crawler assumptions
+- Search, social, and AI crawlers can consume the generated static HTML without executing JavaScript.
+- AI crawlers are explicitly allowed by `robots.txt`, and `/llms.txt` is maintained as a public machine-readable resource.
 
 ## Dismissed categories
 - (None yet)
