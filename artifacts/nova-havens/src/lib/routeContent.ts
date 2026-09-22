@@ -14,6 +14,7 @@
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
 import { HOME_FAQ_GROUPS } from '../data/homeFaqs.ts';
+import { HOW_IT_WORKS_TRACKS } from '../data/howItWorks.ts';
 import { renderLlmsTxtPrerenderHtml } from '../data/llmsContent.ts';
 import { TEAM_MEMBERS, type TeamMemberProfile } from '../data/teamMembers.ts';
 import {
@@ -199,20 +200,11 @@ const HOME_HTML = `
 
   <section>
     <h2>How It Works</h2>
-
-    <h3>For Carriers &amp; Specialists</h3>
+${HOW_IT_WORKS_TRACKS.map((track) => `
+    <h3>${esc(track.htmlHeading)}</h3>
     <ol>
-      <li><strong>Submit a Claim</strong> — Within the hour.</li>
-      <li><strong>Approve and coordinate</strong> — Keeps carriers and specialists updated.</li>
-      <li><strong>Move in</strong> — Nova Havens coordinates all move-in logistics with one point of contact.</li>
-    </ol>
-
-    <h3>For Displaced Families</h3>
-    <ol>
-      <li><strong>Receive Your Options</strong> — Your adjuster or carrier connects you with Nova Havens.</li>
-      <li><strong>Choose Your Home</strong> — Browse furnished options matched to your family's needs.</li>
-      <li><strong>Move In</strong> — We coordinate move-in logistics so you can focus on what matters.</li>
-    </ol>
+${track.steps.map((step) => `      <li><strong>${esc(step.name)}</strong> — ${esc(step.text)}</li>`).join('\n')}
+    </ol>`).join('\n')}
   </section>
 
   <section>

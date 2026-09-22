@@ -11,6 +11,7 @@
 
 import { BLOG_POSTS } from '../data/blogPosts.ts';
 import { HOME_FAQS } from '../data/homeFaqs.ts';
+import { HOW_IT_WORKS_TRACKS } from '../data/howItWorks.ts';
 import { COMPANY_DEFINITION } from './companyFacts.ts';
 import { TEAM_MEMBERS } from '../data/teamMembers.ts';
 
@@ -158,58 +159,17 @@ const STATIC_META: Record<string, RouteMeta> = {
           description:
             'Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.',
         },
-        {
+        ...HOW_IT_WORKS_TRACKS.map((track) => ({
           '@type': 'HowTo',
-          name: 'How Carriers & Specialists Work with Nova Havens',
-          description:
-            'The step-by-step process for carriers and specialists to coordinate temporary housing placements through Nova Havens.',
-          step: [
-            {
-              '@type': 'HowToStep',
-              position: 1,
-              name: 'Submit a Claim',
-              text: 'Within the hour.',
-            },
-            {
-              '@type': 'HowToStep',
-              position: 2,
-              name: 'Approve and coordinate',
-              text: 'Keeps carriers and specialists updated',
-            },
-            {
-              '@type': 'HowToStep',
-              position: 3,
-              name: 'Move in',
-              text: 'Nova Havens coordinates all move-in logistics with one point of contact.',
-            },
-          ],
-        },
-        {
-          '@type': 'HowTo',
-          name: 'How Displaced Families Get Placed with Nova Havens',
-          description:
-            'The step-by-step process for displaced families to move into temporary furnished housing through Nova Havens.',
-          step: [
-            {
-              '@type': 'HowToStep',
-              position: 1,
-              name: 'Receive Your Options',
-              text: 'Your adjuster or carrier connects you with Nova Havens.',
-            },
-            {
-              '@type': 'HowToStep',
-              position: 2,
-              name: 'Choose Your Home',
-              text: "Browse furnished options matched to your family's needs.",
-            },
-            {
-              '@type': 'HowToStep',
-              position: 3,
-              name: 'Move In',
-              text: 'We coordinate move-in logistics so you can focus on what matters.',
-            },
-          ],
-        },
+          name: track.schemaName,
+          description: track.schemaDescription,
+          step: track.steps.map((step, index) => ({
+            '@type': 'HowToStep',
+            position: index + 1,
+            name: step.name,
+            text: step.text,
+          })),
+        })),
         {
           '@type': 'FAQPage',
           mainEntity: HOME_FAQS.map((faq) => ({

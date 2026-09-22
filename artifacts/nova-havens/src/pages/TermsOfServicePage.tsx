@@ -9,10 +9,8 @@ export default function TermsOfServicePage() {
           <strong>DRAFT</strong> — This document is a working draft for internal review only. It has not been reviewed by an attorney and must not be published or distributed until legal review is complete.
         </p>
       </div>
-
       <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4" data-testid="heading-terms">Terms of Service</h1>
-      <p className="text-muted-foreground mb-12" data-testid="text-effective-date">Effective date: [Draft — Not for publication]</p>
-
+      <p className="text-muted-foreground mb-12" data-testid="text-effective-date">Effective date: 2026</p>
       <div className="prose prose-invert prose-p:text-muted-foreground prose-p:leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-12 prose-h2:mb-6 max-w-none">
         
         <h2 data-testid="heading-acceptance">1. Acceptance of Terms</h2>

@@ -8,6 +8,7 @@ import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import ElegantCarousel, { type ElegantSlide } from '@workspace/nova-havens-design-system/components/ui/elegant-carousel';
 import GoogleRating from '@/components/GoogleRating';
 import { HOME_FAQ_GROUPS } from '@/data/homeFaqs';
+import { HOW_IT_WORKS_TRACKS } from '@/data/howItWorks';
 import { trackEvent } from '@/lib/analytics';
 import {
   SERVICE_AREA_COVERAGE_SENTENCE,
@@ -682,53 +683,26 @@ export default function HomePage() {
         
         <Tabs defaultValue="adjusters" className="w-full flex flex-col items-center">
           <TabsList className="bg-card border border-white/10 p-1 rounded-full h-auto flex flex-col sm:flex-row w-full sm:w-auto mb-12" data-testid="tabs-how-it-works">
-            <TabsTrigger value="adjusters" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-adjusters">Carriers & Specialists</TabsTrigger>
-            <TabsTrigger value="families" className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid="tab-families">Displaced Families</TabsTrigger>
+            {HOW_IT_WORKS_TRACKS.map((track) => (
+              <TabsTrigger key={track.id} value={track.id} className="rounded-full px-6 py-3 text-sm sm:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground w-full sm:w-auto" data-testid={`tab-${track.id}`}>{track.tabLabel}</TabsTrigger>
+            ))}
           </TabsList>
-          
-          <TabsContent value="adjusters" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
-              
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-1">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Submit a Claim</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Within the hour.</p>
+
+          {HOW_IT_WORKS_TRACKS.map((track) => (
+            <TabsContent key={track.id} value={track.id} className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
+
+                {track.steps.map((step, idx) => (
+                  <div key={step.name} className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid={`step-${track.id}-${idx + 1}`}>
+                    <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">{idx + 1}</div>
+                    <h3 className="text-xl font-bold mb-3 text-foreground">{step.name}</h3>
+                    <p className="text-muted-foreground leading-relaxed text-sm md:text-base">{step.text}</p>
+                  </div>
+                ))}
               </div>
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-2">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Approve and coordinate</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Keeps carriers and specialists updated</p>
-              </div>
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-adjusters-3">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Move in</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens coordinates all move-in logistics with one point of contact.</p>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="families" className="w-full mt-0 focus-visible:outline-none focus-visible:ring-0">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              <div className="hidden md:block absolute top-6 left-[16.66%] right-[16.66%] h-px bg-primary/30 z-0"></div>
-              
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-families-1">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">1</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Receive Your Options</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Your adjuster or carrier connects you with Nova Havens — typically within hours of your ALE coverage being confirmed</p>
-              </div>
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-families-2">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">2</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Choose Your Home</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Browse furnished options matched to your family's size, location, school district, pet needs, and accessibility requirements</p>
-              </div>
-              <div className="flex flex-col items-center text-center relative z-10 bg-background pt-0 px-4" data-testid="step-families-3">
-                <div className="w-12 h-12 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary font-bold text-xl mb-6 shadow-[var(--shadow-glow-sm)]">3</div>
-                <h3 className="text-xl font-bold mb-3 text-foreground">Move In</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">Nova Havens coordinates move-in logistics with your carrier and the property owner — you get the keys and a direct line to your coordinator</p>
-              </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
+          ))}
         </Tabs>
 
         <div className="flex justify-center mt-12">
