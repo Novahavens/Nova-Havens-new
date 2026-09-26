@@ -14,6 +14,7 @@ import { FALLBACK_TOTAL_PROPERTIES } from './companyFacts';
 export type PropertyCity = { city: string; lat: number; lng: number; count: number };
 
 export type PropertyStats = {
+  generatedAt?: string;
   totalProperties: number;
   statesCovered: number;
   byState: Record<string, number>;

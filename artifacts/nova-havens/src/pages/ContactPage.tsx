@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { EXTERNAL_FORM_LINK_PROPS, INTAKE_FORMS } from '@/lib/intakeForms';
 import { trackEvent } from '@/lib/analytics';
-import { formatVerifiedPropertyCount } from '@/lib/companyFacts';
+import { formatVerifiedPropertyCount, propertyCountSnapshotNote } from '@/lib/companyFacts';
 import { usePropertyStats } from '@/lib/propertyStats';
 
 /** Nova Havens' Jotform contact form, embedded directly rather than re-implemented. */
@@ -114,7 +114,7 @@ export default function ContactPage() {
           <div className="bg-card rounded-lg border border-white/10 p-8 flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-3 text-foreground">Own a Furnished Property?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Join the Nova Havens network of {verifiedPropertyCount} verified furnished homes and start hosting displaced families — with carrier billing handled entirely by Nova Havens.
+              Join the Nova Havens network of {verifiedPropertyCount} verified furnished property records ({propertyCountSnapshotNote(propertyStats.generatedAt).toLowerCase()}). Availability is confirmed for each request; carrier billing is handled by Nova Havens.
             </p>
             <a href={INTAKE_FORMS.property} {...EXTERNAL_FORM_LINK_PROPS} onClick={() => trackEvent('intake_form_click', { form: 'property', location: 'contact_quick_action' })} className="inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:brightness-105 rounded-full px-8 py-3.5 w-full md:w-auto" data-testid="btn-action-submit-property">
               Submit Your Property

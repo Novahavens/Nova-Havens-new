@@ -24,6 +24,7 @@ import { TEAM_MEMBERS, type TeamMemberProfile } from '../data/teamMembers.ts';
 import {
   FALLBACK_TOTAL_PROPERTIES,
   formatVerifiedPropertyCount,
+  propertyCountSnapshotNote,
   SERVICE_AREA_COVERAGE_SENTENCE,
   SERVICE_AREA_STATE_COUNT,
 } from './companyFacts.ts';
@@ -35,21 +36,34 @@ import { INTAKE_FORMS } from './intakeForms.ts';
  * the same verified property count. Falls back to the conservative default
  * if the file is missing or malformed — this must never crash the build.
  */
-function readVerifiedPropertyCount(): number {
+type PropertyCountSnapshot = {
+  totalProperties: number;
+  generatedAt?: string;
+};
+
+function readPropertyCountSnapshot(): PropertyCountSnapshot {
   try {
     const statsPath = resolve(dirname(fileURLToPath(import.meta.url)), '../../public/property-stats.json');
-    const parsed = JSON.parse(readFileSync(statsPath, 'utf8')) as { totalProperties?: unknown };
+    const parsed = JSON.parse(readFileSync(statsPath, 'utf8')) as {
+      totalProperties?: unknown;
+      generatedAt?: unknown;
+    };
     if (typeof parsed.totalProperties === 'number' && parsed.totalProperties > 0) {
-      return parsed.totalProperties;
+      return {
+        totalProperties: parsed.totalProperties,
+        generatedAt: typeof parsed.generatedAt === 'string' ? parsed.generatedAt : undefined,
+      };
     }
   } catch {
     // Fall through to the fallback below — prerendering must never fail
     // over a missing or not-yet-synced stats snapshot.
   }
-  return FALLBACK_TOTAL_PROPERTIES;
+  return { totalProperties: FALLBACK_TOTAL_PROPERTIES };
 }
 
-const VERIFIED_PROPERTY_COUNT = formatVerifiedPropertyCount(readVerifiedPropertyCount());
+const PROPERTY_COUNT_SNAPSHOT = readPropertyCountSnapshot();
+const VERIFIED_PROPERTY_COUNT = formatVerifiedPropertyCount(PROPERTY_COUNT_SNAPSHOT.totalProperties);
+const PROPERTY_STATS_NOTE = propertyCountSnapshotNote(PROPERTY_COUNT_SNAPSHOT.generatedAt);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -167,7 +181,7 @@ const HOME_HTML = `
     <h1>A safe place to land, fast.</h1>
     <p>Nova Havens places displaced families into fully furnished homes nationwide — coordinated with insurance carriers and relocation specialists from the first call.</p>
     <ul>
-      <li>${VERIFIED_PROPERTY_COUNT} verified homes nationwide</li>
+      <li>${VERIFIED_PROPERTY_COUNT} verified network property records — ${esc(PROPERTY_STATS_NOTE)}</li>
       <li>531+ families assisted this year</li>
       <li>Average placement in under 5 days</li>
     </ul>
@@ -185,7 +199,7 @@ const HOME_HTML = `
     </article>
     <article>
       <h3>Vetted Nationwide Network</h3>
-      <p>Our housing network is purpose-built for insurance workflows, with verified furnished properties across the country ready for immediate placement.</p>
+      <p>Our housing network is purpose-built for insurance workflows. Property availability is confirmed for each placement.</p>
     </article>
     <article>
       <h3>Care, Not Just Logistics</h3>
@@ -220,7 +234,7 @@ const HOME_HTML = `
     <h2>Where We Operate</h2>
     <p>${esc(SERVICE_AREA_COVERAGE_SENTENCE)}</p>
     <ul>
-      <li>${VERIFIED_PROPERTY_COUNT} active properties</li>
+      <li>${VERIFIED_PROPERTY_COUNT} verified network property records — ${esc(PROPERTY_STATS_NOTE)}</li>
       <li>${SERVICE_AREA_STATE_COUNT} states covered</li>
       <li>Average placement in under 5 days</li>
     </ul>

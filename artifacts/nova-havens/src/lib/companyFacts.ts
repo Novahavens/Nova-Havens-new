@@ -35,6 +35,21 @@ export function formatVerifiedPropertyCount(totalProperties: number): string {
   return `${flooredToThousand.toLocaleString('en-US')}+`;
 }
 
+/** A network-record snapshot does not establish current housing availability. */
+export function propertyCountSnapshotNote(generatedAt?: string): string {
+  const date = generatedAt ? new Date(generatedAt) : null;
+  if (!date || Number.isNaN(date.getTime())) {
+    return 'Last known network baseline; snapshot date unavailable';
+  }
+  const formatted = date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+  return `Network snapshot as of ${formatted}`;
+}
+
 /**
  * Conservative default shown only before the live property-stats snapshot
  * has loaded, or if it can't be read at all. Kept in sync with reality
