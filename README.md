@@ -55,6 +55,7 @@ Copy `apps/web/.env.example` to `apps/web/.env.local` for optional settings
 │   │   ├── privacy-policy/, terms-of-service/, llms-txt/
 │   │   ├── sitemap/page.tsx       /sitemap          human-readable site map
 │   │   ├── llms.txt/route.ts      /llms.txt         plain-text AI index
+│   │   ├── maps/coverage-*.svg/   /maps/coverage-{compact,detailed}.svg  US coverage maps built from Census geometry
 │   │   ├── sitemap.ts             /sitemap.xml
 │   │   ├── robots.ts              /robots.txt
 │   │   └── not-found.tsx          branded 404
@@ -70,7 +71,7 @@ Copy `apps/web/.env.example` to `apps/web/.env.local` for optional settings
 │   ├── src/config/routes.ts       Page registry → sitemap.xml, /sitemap, tests
 │   ├── src/content/               ★ Site content: blog posts, FAQs, how-it-works, team, llms.txt
 │   │   └── source.ts              Content access layer — swap for a CMS here (docs/CMS.md)
-│   ├── src/lib/                   seo.ts (metadata + JSON-LD), property-stats, team loader, analytics
+│   ├── src/lib/                   seo.ts (metadata + JSON-LD), property-stats, team loader, us-map (SVG maps), analytics
 │   ├── src/styles/                globals.css (Tailwind) + tokens.css (design tokens)
 │   ├── data/                      Synced data: property-stats.json, team.json (written by scripts)
 │   ├── scripts/                   sync-property-stats.ts (Monday.com), sync-team.mjs (Google Form)
@@ -160,6 +161,7 @@ The React Compiler (`reactCompiler: true`) auto-memoises those islands.
 src/config/site.ts ───────────────► every page, JSON-LD, llms.txt, sitemap
 src/content/*.ts ──► source.ts ───► blog pages, FAQ, team fallback, llms.txt
 data/property-stats.json ─────────► lib/property-stats.ts ──► home + contact figures
+                                 └► lib/us-map.ts ──► /maps/coverage-*.svg (state shading + metro pins)
 data/team.json (optional) ────────► lib/team.ts (merged over content/team.ts) ──► team page
 ```
 

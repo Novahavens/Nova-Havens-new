@@ -10,11 +10,15 @@ import snapshot from '@data/property-stats.json';
  * the Monday.com PROPERTY DATABASE board. It is imported at build time, so
  * every page states the same figure and a rebuild publishes a new one.
  */
+export type PropertyCity = { city: string; lat: number; lng: number; count: number };
+
 export type PropertyStats = {
   generatedAt?: string;
   totalProperties: number;
   statesCovered: number;
   byState: Record<string, number>;
+  /** Largest metros with coordinates, for the coverage map pins. */
+  cities: PropertyCity[];
 };
 
 function readSnapshot(): PropertyStats {
@@ -25,9 +29,15 @@ function readSnapshot(): PropertyStats {
       totalProperties: data.totalProperties,
       statesCovered: typeof data.statesCovered === 'number' ? data.statesCovered : SERVICE_AREA.stateCount,
       byState: data.byState ?? {},
+      cities: Array.isArray(data.cities) ? data.cities : [],
     };
   }
-  return { totalProperties: FALLBACK_TOTAL_PROPERTIES, statesCovered: SERVICE_AREA.stateCount, byState: {} };
+  return {
+    totalProperties: FALLBACK_TOTAL_PROPERTIES,
+    statesCovered: SERVICE_AREA.stateCount,
+    byState: {},
+    cities: [],
+  };
 }
 
 export const PROPERTY_STATS: PropertyStats = readSnapshot();

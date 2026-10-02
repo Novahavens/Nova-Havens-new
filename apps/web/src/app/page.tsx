@@ -18,13 +18,12 @@ import {
   Zap,
 } from 'lucide-react';
 
-import { CoverageMap } from '@/components/home/coverage-map';
 import { HowItWorksTabs } from '@/components/home/how-it-works-tabs';
 import { PartnersMarquee } from '@/components/home/partners-marquee';
 import { PetCounters } from '@/components/home/pet-counters';
 import { ReviewsCarousel, type Review } from '@/components/home/reviews-carousel';
 import { ShowcaseCarousel, type ShowcaseSlide } from '@/components/home/showcase-carousel';
-import { StateTileGrid } from '@/components/home/state-tile-grid';
+import { UsCoverageMap } from '@/components/home/us-coverage-map';
 import { IntakeCta } from '@/components/shared/cta-button';
 import { FaqAccordion } from '@/components/shared/faq-accordion';
 import { GoogleRating } from '@/components/shared/google-rating';
@@ -281,7 +280,7 @@ export default function HomePage() {
                   </span>
                 </div>
               </div>
-              <CoverageMap />
+              <UsCoverageMap variant="compact" priority />
             </div>
             <div className="md:col-span-2 grid grid-cols-1 gap-4 md:gap-5">
               <div
@@ -429,7 +428,9 @@ export default function HomePage() {
         <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
           {SERVICE_AREA.coverageSentence}
         </p>
-        <StateTileGrid />
+        <div className="mb-8">
+          <UsCoverageMap variant="detailed" />
+        </div>
         <GoogleRating />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="grid-stats">
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center">
