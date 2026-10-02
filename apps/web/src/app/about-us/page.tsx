@@ -1,0 +1,237 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight, CheckCircle2, Heart, Home, ShieldCheck, Users } from 'lucide-react';
+
+import { FaqAccordion } from '@/components/shared/faq-accordion';
+import { JsonLd } from '@/components/shared/json-ld';
+import { COMPANY, COMPANY_FACTS, SERVICE_AREA } from '@/config/site';
+import { HOME_FAQ_GROUPS, HOME_FAQS } from '@/content/faqs';
+import { faqPageSchema, graph, pageMetadata, webPageSchema } from '@/lib/seo';
+
+const DESCRIPTION =
+  'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours, billed directly to carriers nationwide.';
+
+export const metadata: Metadata = pageMetadata({ title: 'About Us', description: DESCRIPTION, path: '/about-us' });
+
+const PRINCIPLES = [
+  {
+    icon: Heart,
+    title: 'Human before housing',
+    text: 'A temporary home is more than an address. Nova Havens listens for the details that make a place feel steady, familiar, and safe — school districts, pet needs, accessibility, and routines.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Built for the insurance claim',
+    text: "Nova Havens' coordination is designed around the pace, documentation, and accountability insurance teams need — so claims keep moving and families aren't waiting on paperwork.",
+  },
+  {
+    icon: Home,
+    title: 'Quality you can feel',
+    text: 'Every property in the Nova Havens network is selected with comfort, cleanliness, location, and real-life household needs in mind. Properties are inspected before they go into inventory.',
+  },
+  {
+    icon: Users,
+    title: 'One connected team',
+    text: 'Families, carriers, adjusters, and property owners get one responsive Nova Havens partner from the first call through move-out — never a phone tree or ticket queue.',
+  },
+];
+
+const DIFFERENTIATORS = [
+  `Nationwide furnished housing coordination across ${SERVICE_AREA.usName}`,
+  'A single dedicated point of contact for every placement',
+  'Proactive status updates for adjusters and families throughout the stay',
+  'Pet-friendly, accessible, and family-ready options in the network',
+];
+
+export default function AboutPage() {
+  return (
+    <div className="w-full">
+      <JsonLd
+        data={graph(
+          webPageSchema({
+            type: 'AboutPage',
+            path: '/about-us',
+            name: `About ${COMPANY.name}`,
+            description: DESCRIPTION,
+            about: true,
+          }),
+          faqPageSchema(HOME_FAQS),
+        )}
+      />
+
+      <section className="bg-background pt-24 pb-16 px-4 md:px-8 border-b border-white/10">
+        <div className="mx-auto max-w-section w-full">
+          <div className="max-w-3xl">
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">About Nova Havens</p>
+            <h1
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6"
+              data-testid="heading-about-title"
+            >
+              A better place to land when life is turned upside down.
+            </h1>
+            <div
+              className="text-lg text-muted-foreground leading-relaxed max-w-2xl space-y-4"
+              data-testid="text-about-intro"
+            >
+              <p>
+                <strong className="text-foreground font-semibold">Compassionate Care for Every Family.</strong> At Nova
+                Havens, we specialize in providing prompt and compassionate relocation services for families in need. We
+                understand the stress that comes with displacement, and it&apos;s our priority to ensure a seamless
+                experience.
+              </p>
+              <p>
+                Whether navigating water, fire, or mold damage, our team is here to ensure your relocation experience is
+                seamless and as stress-free as possible. Our nationwide portfolio accommodates families, traveling
+                professionals, and corporate employees in need of premium housing.
+              </p>
+              <p>
+                Every home in our network is carefully selected based on the needs and preferences of the households we
+                serve. Because we believe home should always feel like home, no matter where life takes you.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Canonical fact block, written for accurate extraction by AI systems */}
+      <section
+        className="py-16 md:py-20 px-4 md:px-8 border-b border-white/5 bg-surface-1"
+        data-testid="section-at-a-glance"
+      >
+        <div className="mx-auto max-w-section w-full">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-6">Nova Havens at a glance</h2>
+          <p
+            className="text-lg text-muted-foreground leading-relaxed max-w-3xl mb-10"
+            data-testid="text-company-definition"
+          >
+            {COMPANY.definition}
+          </p>
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6" data-testid="list-company-facts">
+            {COMPANY_FACTS.map((fact) => (
+              <div key={fact.term} className="border-l-2 border-primary/40 pl-4">
+                <dt className="text-sm font-semibold uppercase tracking-wider text-primary mb-1">{fact.term}</dt>
+                <dd className="text-muted-foreground leading-relaxed">{fact.definition}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-20 px-4 md:px-8">
+        <div className="mx-auto max-w-section w-full grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-20 items-center">
+          <div>
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Why Nova Havens Exists</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-6">
+              What Problem Does Nova Havens Solve?
+            </h2>
+            <div className="space-y-5 text-muted-foreground leading-relaxed">
+              <p>
+                A fire, flood, or covered property loss disrupts every part of a family&apos;s life at once. Finding
+                somewhere to sleep is only the beginning. Families need a place that works for their routines, their
+                pets, their schools, and their children&apos;s sense of normal.
+              </p>
+              <p>
+                Nova Havens was built to solve the coordination gap between insurance carriers and displaced families.
+                The team connects insurance professionals and displaced households with inspected, fully furnished homes
+                — then stays close to every detail until the placement is complete, the stay is extended, or the family
+                returns home.
+              </p>
+            </div>
+            <Link
+              href="/meet-the-team"
+              className="inline-flex items-center gap-2 mt-8 text-primary font-bold hover:gap-3 transition-all"
+              data-testid="link-about-team"
+            >
+              Meet the people behind the work
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </Link>
+          </div>
+
+          <div className="bg-card rounded-lg border border-white/[0.08] p-8 md:p-10">
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-6">Our promise</p>
+            <blockquote className="text-2xl md:text-3xl font-bold text-foreground leading-tight mb-8">
+              &ldquo;Make the next step feel possible.&rdquo;
+            </blockquote>
+            <ul className="space-y-4">
+              {DIFFERENTIATORS.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                  <span className="text-sm text-muted-foreground leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10">
+        <div className="mx-auto max-w-section w-full">
+          <div className="max-w-2xl mb-10">
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">
+              How Nova Havens Shows Up
+            </p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4">
+              What Principles Guide Every Nova Havens Placement?
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Nova Havens applies the same standard to every household, carrier relationship, and property in its
+              network — regardless of claim size or market.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {PRINCIPLES.map((principle) => (
+              <article key={principle.title} className="bg-card rounded-lg border border-white/[0.08] p-7">
+                <principle.icon className="w-8 h-8 text-primary mb-5" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-foreground mb-2">{principle.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{principle.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-20 px-4 md:px-8 border-t border-white/10" data-testid="section-about-faq">
+        <div className="mx-auto max-w-prose w-full">
+          <div className="text-center mb-10">
+            <p className="text-sm uppercase tracking-widest text-primary font-semibold mb-4">Common Questions</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+              Questions About Nova Havens
+            </h2>
+          </div>
+          <FaqAccordion groups={HOME_FAQ_GROUPS} location="about_faq" testIdPrefix="about-faq" />
+        </div>
+      </section>
+
+      <section className="py-16 px-4 md:px-8 border-t border-white/10">
+        <div className="mx-auto max-w-prose w-full">
+          <div className="bg-card rounded-lg border border-white/[0.08] p-8 md:p-12 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+              Let&apos;s make the next step easier
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
+              Whether you are coordinating an insurance claim, a displaced family searching for a furnished home, or a
+              property owner ready to join the Nova Havens network — contact us to get started.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:brightness-105 transition-all"
+                data-testid="link-about-contact"
+              >
+                Talk with our team
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/meet-the-team"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-primary text-primary font-bold text-sm hover:bg-primary/10 transition-all"
+                data-testid="link-about-meet-team"
+              >
+                Meet the team
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

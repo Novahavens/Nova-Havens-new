@@ -1,0 +1,99 @@
+/*
+ * Nova Havens design tokens.
+ *
+ * Source of truth: design/tokens.json (DTCG format). This file is the CSS
+ * projection of those tokens. Dark mode is the brand (source-faithful);
+ * light mode is an accessible counterpart kept for future use. The site
+ * forces `.dark` on <html> in src/app/layout.tsx.
+ *
+ * Rule: only ONE gold exists in the system (--primary). Components must not
+ * hardcode hex values — ESLint enforces this (see eslint.config.mjs).
+ */
+
+:root {
+  --button-outline: rgba(0, 0, 0, 0.1);
+  --badge-outline: rgba(0, 0, 0, 0.05);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
+
+  --background: 60 11.1% 96.5%;
+  --foreground: 223 14.3% 9.6%;
+  --border: 217 11.8% 86.7%;
+  --card: 0 0% 100%;
+  --card-foreground: 223 14.3% 9.6%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 223 14.3% 9.6%;
+  --primary: 38 61.3% 56.5%;
+  --primary-foreground: 227 29% 6.1%;
+  --secondary: 216 15.2% 93.5%;
+  --secondary-foreground: 223 14.3% 9.6%;
+  --muted: 216 15.2% 93.5%;
+  --muted-foreground: 214 10.1% 40.6%;
+  --accent: 220 14.3% 91.8%;
+  --accent-foreground: 223 14.3% 9.6%;
+  --destructive: 4 76.5% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 217 11.8% 86.7%;
+  --ring: 38 61.3% 56.5%;
+
+  /* App-specific surfaces (compositions, not theme tokens). */
+  --surface-1: #f0f1f3;
+  --surface-2: #e9ebee;
+  --surface-3: #e2e4e8;
+  --tertiary: #5d6672;
+
+  --radius: 1rem;
+
+  /* Architectural heights — use as min-h-[var(--min-h-*)]. */
+  --min-h-map: 18.75rem;
+  --min-h-map-md: 21.875rem;
+  --min-h-map-lg: 31.25rem;
+  --min-h-contact-embed: 40rem;
+  --max-h-modal: 85dvh;
+
+  /* Hero heading fluid size. */
+  --text-hero: clamp(3rem, 6vw, 5rem);
+
+  /* Glow shadows reference the shared primary token. */
+  --shadow-glow-lg: 0 0 22px hsl(var(--primary) / 0.42);
+  --shadow-glow-md: 0 0 18px hsl(var(--primary) / 0.45);
+  --shadow-glow-sm: 0 0 15px hsl(var(--primary) / 0.15);
+
+  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+}
+
+.dark {
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --badge-outline: rgba(255, 255, 255, 0.05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
+
+  --background: 220 23.1% 5.1%;
+  --foreground: 60 13% 95.5%;
+  --border: 231 19.4% 14.1%;
+  --card: 223 17.1% 8%;
+  --card-foreground: 60 13% 95.5%;
+  --popover: 223 17.1% 8%;
+  --popover-foreground: 60 13% 95.5%;
+  --primary: 38 61.3% 56.5%;
+  --primary-foreground: 227 29% 6.1%;
+  --secondary: 226 21.3% 12%;
+  --secondary-foreground: 60 13% 95.5%;
+  --muted: 226 21.3% 12%;
+  --muted-foreground: 216 11.1% 64.7%;
+  --accent: 231 19.4% 14.1%;
+  --accent-foreground: 60 13% 95.5%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 60 13% 95.5%;
+  --input: 231 19.4% 14.1%;
+  --ring: 38 61.3% 56.5%;
+
+  --surface-1: #0d0f14;
+  --surface-2: #151820;
+  --surface-3: #1a1d24;
+  --tertiary: #7a828f;
+}

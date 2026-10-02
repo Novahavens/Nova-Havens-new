@@ -1,0 +1,49 @@
+# Daily data sync: refreshes the verified property count (Monday.com) and the
+# team roster (Google Form sheet), commits any changes, and lets the Vercel
+# Git integration redeploy the site. See docs/DEPLOYMENT.md.
+name: Sync site data
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 06:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Sync property stats from Monday.com
+        env:
+          MONDAY_API_TOKEN: ${{ secrets.MONDAY_API_TOKEN }}
+        run: pnpm --filter @nova-havens/web sync:property-stats
+
+      - name: Sync team roster from Google Form sheet
+        continue-on-error: true
+        run: pnpm --filter @nova-havens/web sync:team
+
+      - name: Commit changes
+        run: |
+          git config user.name "nova-havens-bot"
+          git config user.email "bot@novahavens.com"
+          git add apps/web/data apps/web/public/team
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "chore(data): daily property-stats and team sync"
+            git push
+          fi

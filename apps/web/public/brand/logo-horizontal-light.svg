@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="64" viewBox="0 0 320 64" role="img" aria-label="Nova Havens placeholder logo (for light backgrounds)">
+  <!-- PLACEHOLDER — replace with the approved horizontal logo for light backgrounds. Keep the same filename. -->
+  <rect width="320" height="64" fill="none"/>
+  <text x="8" y="44" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="36" font-weight="800" fill="#15171C">Nova<tspan fill="#D4A24C">Havens</tspan></text>
+  <text x="200" y="60" font-family="Arial, sans-serif" font-size="9" fill="#5D6672">placeholder</text>
+</svg>

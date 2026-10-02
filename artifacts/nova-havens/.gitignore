@@ -1,7 +1,0 @@
-# Vite build output
-dist/
-
-# Playwright test artefacts (results and report are ephemeral;
-# baselines in tests/__snapshots__ ARE committed)
-playwright-report/
-test-results/

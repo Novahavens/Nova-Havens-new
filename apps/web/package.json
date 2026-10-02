@@ -1,0 +1,48 @@
+{
+  "name": "@nova-havens/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "playwright test",
+    "test:smoke:ui": "playwright test --ui",
+    "sync:property-stats": "node --experimental-strip-types scripts/sync-property-stats.ts",
+    "sync:team": "node scripts/sync-team.mjs",
+    "analyze": "ANALYZE=true next build"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.0",
+    "@radix-ui/react-slot": "^1.0.0",
+    "@radix-ui/react-tabs": "^1.0.0",
+    "@vercel/analytics": "^1.0.0",
+    "@vercel/speed-insights": "^1.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.0.0",
+    "csv-parse": "^7.0.0",
+    "embla-carousel-react": "^8.0.0",
+    "lucide-react": "^1.0.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "tailwindcss": "^4.0.0",
+    "tw-animate-css": "^1.0.0",
+    "typescript": "^5.0.0"
+  }
+}

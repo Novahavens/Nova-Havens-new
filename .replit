@@ -1,172 +1,28 @@
-modules = ["nodejs-24", "python-base-3.13", "postgresql-16"]
+# Replit configuration — kept so the site can still be previewed/deployed on
+# Replit. Vercel is the recommended production host (docs/DEPLOYMENT.md).
+modules = ["nodejs-22"]
+run = "pnpm start"
 
 [deployment]
-router = "application"
 deploymentTarget = "autoscale"
+build = ["sh", "-c", "pnpm install --frozen-lockfile && pnpm build"]
+run = ["sh", "-c", "pnpm start"]
 
-[deployment.postBuild]
-args = ["pnpm", "store", "prune"]
-env = { "CI" = "true" }
+[[ports]]
+localPort = 3000
+externalPort = 80
 
 [workflows]
-runButton = "Project"
+runButton = "Web"
 
 [[workflows.workflow]]
-name = "smoke-tests"
+name = "Web"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/nova-havens exec playwright install chromium && pnpm --filter @workspace/nova-havens test:smoke"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[[workflows.workflow]]
-name = "jsonld"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/nova-havens run validate:jsonld"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[[workflows.workflow]]
-name = "prerender-jsonld"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/nova-havens run validate:prerender"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[[workflows.workflow]]
-name = "artifacts/nova-havens: web"
-author = "agent"
-mode = "sequential"
+args = "pnpm dev"
+waitForPort = 3000
 
 [workflows.workflow.metadata]
 outputType = "webview"
-artifactId = "artifacts/nova-havens"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/nova-havens run dev"
-cwd = "./artifacts/nova-havens"
-waitForPort = 22035
-ensurePreviewReachable = "/"
-router = "path"
-
-[workflows.workflow.tasks.env]
-PORT = "22035"
-BASE_PATH = "/"
-
-[[workflows.workflow]]
-name = "artifacts/api-server: API Server"
-author = "agent"
-mode = "parallel"
-
-[workflows.workflow.metadata]
-outputType = "webview"
-artifactId = "3B4_FFSkEVBkAeYMFRJ2e"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/api-server run dev"
-cwd = "./artifacts/api-server"
-waitForPort = 8080
-ensurePreviewReachable = "/"
-router = "path"
-
-[workflows.workflow.tasks.env]
-PORT = "8080"
-
-[[workflows.workflow]]
-name = "artifacts/mockup-sandbox: Component Preview Server"
-author = "agent"
-mode = "sequential"
-
-[workflows.workflow.metadata]
-outputType = "webview"
-artifactId = "XegfDyZt7HqfW2Bb8Ghoy"
-isCanvasWorkflow = true
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/mockup-sandbox run dev"
-cwd = "./artifacts/mockup-sandbox"
-waitForPort = 8081
-ensurePreviewReachable = "/"
-router = "path"
-
-[workflows.workflow.tasks.env]
-PORT = "8081"
-BASE_PATH = "/__mockup"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "token-rule"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "team-contract"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "prerender-freshness-guard"
-
-[[workflows.workflow]]
-name = "token-rule"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/nova-havens run test:token-rule"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[[workflows.workflow]]
-name = "team-contract"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/api-server run test:team-contract"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[[workflows.workflow]]
-name = "prerender-freshness-guard"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/nova-havens run test:prerender-freshness-guard"
-
-[workflows.workflow.metadata]
-isValidation = true
-
-[agent]
-stack = "PNPM_WORKSPACE"
-expertMode = true
-
-[postMerge]
-path = "scripts/post-merge.sh"
-timeoutMs = 20000
-
-[objectStorage]
-defaultBucketID = "replit-objstore-350550e0-2948-49e2-8166-521c7ca6d283"
-
-[nix]
-channel = "stable-25_05"
