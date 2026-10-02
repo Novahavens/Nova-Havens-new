@@ -10,6 +10,7 @@ const ROUTES: { path: string; heading: RegExp; title: RegExp }[] = [
   { path: '/privacy-policy', heading: /Privacy Policy/, title: /Privacy Policy \| Nova Havens/ },
   { path: '/terms-of-service', heading: /Terms of Service/, title: /Terms of Service \| Nova Havens/ },
   { path: '/llms-txt', heading: /llms\.txt/, title: /llms\.txt/ },
+  { path: '/sitemap', heading: /Every page on novahavens\.com/, title: /Site Map \| Nova Havens/ },
 ];
 
 function collectErrors(page: Page): string[] {
@@ -65,6 +66,7 @@ test.describe('Page smoke tests', () => {
     const xml = await sitemap.text();
     expect(xml).toContain('<loc>https://novahavens.com/</loc>');
     expect(xml).toContain('<loc>https://novahavens.com/blog/hotel-or-furnished-home-what-to-expect</loc>');
+    expect(xml).toContain('<loc>https://novahavens.com/sitemap</loc>');
 
     const llms = await request.get('/llms.txt');
     expect(llms.ok()).toBeTruthy();

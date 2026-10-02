@@ -182,4 +182,5 @@ export const FOOTER_LINKS = [
   { href: '/privacy-policy', label: 'Privacy Policy' },
   { href: '/terms-of-service', label: 'Terms of Service' },
   { href: '/llms-txt', label: 'llms.txt' },
+  { href: '/sitemap', label: 'Site Map' },
 ] as const;

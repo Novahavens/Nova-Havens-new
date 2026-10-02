@@ -64,13 +64,23 @@ also feeds DuckDuckGo and Yahoo. Optionally set
 
 ### 3.1 How it works
 
+There are two site maps:
+
+- **`/sitemap.xml`** — for search engines (this section).
+- **`/sitemap`** — a human-readable page listing every URL, linked from the
+  footer. It gives visitors an index and gives crawlers one more internal
+  link to every page.
+
+Both are generated from the same registry, `apps/web/src/config/routes.ts`.
+
 `apps/web/src/app/sitemap.ts` generates `https://novahavens.com/sitemap.xml`
-at build time from the list of static routes plus every blog post in
+at build time from `SITE_PAGES` in `config/routes.ts` plus every blog post in
 `src/content/blog.ts`. Each entry has a `lastmod` date. Adding a post or a
 page updates the sitemap on the next deploy — there is nothing to upload.
 
-When you add a **new page**, add one line to the `staticRoutes` array in
-`sitemap.ts`. Blog posts need nothing.
+When you add a **new page**, add one entry to `SITE_PAGES` in
+`config/routes.ts`; `sitemap.xml` and `/sitemap` both pick it up. Blog posts
+need nothing.
 
 Verify it any time:
 
@@ -83,7 +93,7 @@ curl -s https://novahavens.com/robots.txt
 
 GSC → **Sitemaps** (left menu) → enter `sitemap.xml` → **Submit**. Status
 should read _Success_ within a day and show the number of discovered URLs
-(currently 11). You never need to resubmit: Google re-reads the sitemap on its
+(currently 12). You never need to resubmit: Google re-reads the sitemap on its
 own schedule, and `robots.txt` also advertises it. (The old "ping" endpoint
 was retired in 2023 — ignore any guide that tells you to call it.)
 
@@ -243,3 +253,20 @@ Google carry signals across.
   dropdowns and breadcrumbs.
 - **Core Web Vitals** — Google's page-speed metrics (LCP, INP, CLS). A
   ranking factor and a usability one.
+
+## 8. GEO and AEO: appearing in AI answers
+
+Answer Engine Optimisation (featured snippets, People Also Ask, Google AI
+Overviews) and Generative Engine Optimisation (ChatGPT, Claude, Perplexity,
+Gemini citing the site) reward the same things: a direct answer first,
+consistent facts tied to a clearly identified entity, and HTML that crawlers
+can read without JavaScript. The site implements this through question-phrased
+headings, FAQ/HowTo schema generated from the content files, one canonical
+company definition, `/llms.txt`, and an AI-crawler-friendly `robots.txt`.
+
+The working rules for editors and the extension points for developers are in
+the README under _Growing the content → GEO and AEO_. The monthly audit is
+simple: click the three "Ask an AI assistant about us" buttons in the footer,
+read what each assistant says, and if a fact is wrong, fix the page that
+states it (usually `config/site.ts` or the FAQ) — the assistants re-crawl
+within days.

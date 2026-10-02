@@ -53,6 +53,7 @@ Copy `apps/web/.env.example` to `apps/web/.env.local` for optional settings
 │   │   ├── blog/[slug]/page.tsx   /blog/<slug>      pre-rendered for every post
 │   │   ├── blog/[slug]/opengraph-image.tsx          generated social card per post
 │   │   ├── privacy-policy/, terms-of-service/, llms-txt/
+│   │   ├── sitemap/page.tsx       /sitemap          human-readable site map
 │   │   ├── llms.txt/route.ts      /llms.txt         plain-text AI index
 │   │   ├── sitemap.ts             /sitemap.xml
 │   │   ├── robots.ts              /robots.txt
@@ -66,6 +67,7 @@ Copy `apps/web/.env.example` to `apps/web/.env.local` for optional settings
 │   │   ├── shared/                JSON-LD, tracked links, CTAs, FAQ, icons
 │   │   └── ui/                    Button, Sheet, Tabs, Card (shadcn-style primitives)
 │   ├── src/config/site.ts         ★ Single source of truth for company facts, URLs, brand
+│   ├── src/config/routes.ts       Page registry → sitemap.xml, /sitemap, tests
 │   ├── src/content/               ★ Site content: blog posts, FAQs, how-it-works, team, llms.txt
 │   │   └── source.ts              Content access layer — swap for a CMS here (docs/CMS.md)
 │   ├── src/lib/                   seo.ts (metadata + JSON-LD), property-stats, team loader, analytics
@@ -84,6 +86,48 @@ Copy `apps/web/.env.example` to `apps/web/.env.local` for optional settings
 ```
 
 ★ = the two places most edits happen.
+
+## Site map
+
+Every public URL, as a visitor sees it. The same list drives
+`/sitemap.xml` (for search engines), the human-readable `/sitemap` page, and
+the smoke tests — all read `apps/web/src/config/routes.ts`, so adding a page
+there updates all three.
+
+```mermaid
+flowchart TD
+  H["/ Home"] --> A["/about-us"]
+  H --> T["/meet-the-team"]
+  H --> C["/contact"]
+  H --> B["/blog"]
+  B --> P1["/blog/details-that-speed-up-housing-placement"]
+  B --> P2["/blog/hotel-or-furnished-home-adjusters-guide"]
+  B --> P3["/blog/hotel-or-furnished-home-what-to-expect"]
+  H --> S["/sitemap (HTML site map)"]
+  H --> L["/llms-txt (readable)"]
+  H --> PP["/privacy-policy"]
+  H --> TS["/terms-of-service"]
+  H -. machine-readable .-> X["/sitemap.xml · /robots.txt · /llms.txt"]
+  P1 -. og:image .-> O["/blog/&lt;slug&gt;/opengraph-image"]
+  C -. external .-> J["Jotform: housing request · property submission · contact form"]
+```
+
+| URL                                        | Purpose                                                                                                        | Rendered from                                              |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `/`                                        | Home: hero, trust figures, coverage, amenities, showcase, partners, how it works, reviews, FAQ, emergency line | `app/page.tsx`                                             |
+| `/about-us`                                | Company definition and facts, principles, FAQ                                                                  | `app/about-us/page.tsx`                                    |
+| `/meet-the-team`                           | Team roster with profile dialogs, values                                                                       | `app/meet-the-team/page.tsx` + `data/team.json`            |
+| `/contact`                                 | Phone lines, email, HQ, embedded contact form, intake CTAs                                                     | `app/contact/page.tsx`                                     |
+| `/blog`                                    | Filterable article list                                                                                        | `app/blog/page.tsx` + `content/blog.ts`                    |
+| `/blog/<slug>`                             | Article with FAQ schema and generated social card                                                              | `app/blog/[slug]/page.tsx`                                 |
+| `/sitemap`                                 | Human-readable site map (this list)                                                                            | `app/sitemap/page.tsx` + `config/routes.ts`                |
+| `/llms-txt`                                | Readable version of `/llms.txt`                                                                                | `app/llms-txt/page.tsx` + `content/llms.ts`                |
+| `/privacy-policy`, `/terms-of-service`     | Legal drafts (banner until reviewed)                                                                           | `app/*/page.tsx`                                           |
+| `/sitemap.xml`, `/robots.txt`, `/llms.txt` | Crawler and AI-assistant resources                                                                             | `app/sitemap.ts`, `app/robots.ts`, `app/llms.txt/route.ts` |
+
+Old URLs from the previous build (`/<page>/index.html`, trailing slashes,
+`www.`) 301/308-redirect to the canonical form. Anything else returns the
+branded 404.
 
 ## How the site works
 
@@ -130,8 +174,9 @@ browser, yet the figures stay current.
   Open Graph, Twitter) and the JSON-LD graph. One `LocalBusiness` entity
   (`https://novahavens.com/#organization`) and one `WebSite` node are
   referenced from every page.
-- `app/sitemap.ts`, `app/robots.ts` and `app/llms.txt/route.ts` are generated
-  from the same content, so they can never disagree with the pages.
+- `app/sitemap.ts`, the `/sitemap` page, `app/robots.ts` and `app/llms.txt/route.ts`
+  are generated from the same registry and content, so they can never
+  disagree with the pages.
 - `app/blog/[slug]/opengraph-image.tsx` renders a branded 1200×630 social
   card for each post at build time using `next/og`.
 - Fonts are self-hosted via `next/font` (no third-party request, no layout
@@ -163,6 +208,138 @@ appears in a component — use `bg-primary`, `text-foreground`, etc.
 | Update "families assisted" / "days to place"                 | `PUBLIC_STATS` in `site.ts`                                                                                                                                                                                        |
 | Replace the logo / favicon / social image                    | Drop files into `apps/web/public/brand` and `public/` (see `docs/BRAND.md`)                                                                                                                                        |
 | Add a page                                                   | Create `apps/web/src/app/<route>/page.tsx`, export `metadata` via `pageMetadata()`, add it to `app/sitemap.ts` and (if navigational) `NAV_LINKS` in `site.ts`                                                      |
+
+## Growing the content
+
+### Programmatic blog and landing pages
+
+"Programmatic" means generating many pages from structured data plus a
+template instead of writing each one by hand — for example a page per state
+or metro ("Temporary furnished housing in Phoenix, AZ for insurance claims")
+or a page per claim type ("Housing after a house fire"). The building blocks
+are already here; this is the recipe.
+
+1. **Model the data.** Add a typed array in `apps/web/src/content/`, e.g.
+   `markets.ts`:
+   ```ts
+   export interface Market {
+     slug: string;
+     city: string;
+     state: string;
+     stateCode: string;
+     intro: string;
+     faqs: Faq[];
+   }
+   export const MARKETS: Market[] = [/* one entry per city you can genuinely serve */];
+   ```
+   You can also derive candidates from `data/property-stats.json` (`byState`
+   and `cities` give the states and metros with real inventory) — only
+   publish pages for places with verified properties.
+2. **Expose it through the content layer.** Add `getAllMarkets()` /
+   `getMarketBySlug()` to `src/content/source.ts`. When a CMS arrives these
+   become CMS queries; pages do not change.
+3. **Add a dynamic route** at `apps/web/src/app/housing/[market]/page.tsx`:
+   ```tsx
+   export const dynamicParams = false; // unknown slugs 404
+   export async function generateStaticParams() {
+     // one static HTML file per market at build
+     return (await getAllMarkets()).map((m) => ({ market: m.slug }));
+   }
+   export async function generateMetadata({ params }) {
+     const m = await getMarketBySlug((await params).market);
+     return pageMetadata({
+       title: `Temporary Furnished Housing in ${m.city}, ${m.state}`,
+       description: m.intro,
+       path: `/housing/${m.slug}`,
+     });
+   }
+   export default async function MarketPage({ params }) {
+     /* template: H1, intro, local facts, FAQ, intake CTAs, JSON-LD via graph() */
+   }
+   ```
+   Reuse `IntakeCta`, `FaqAccordion`, `JsonLd` and `faqPageSchema` so every
+   generated page carries the same CTAs and structured data as the rest of
+   the site. Add a `Service` + `areaServed` node per market in the JSON-LD.
+4. **Register it everywhere once.** In `app/sitemap.ts` append the market
+   URLs (same pattern as posts). Add an index page (`/housing`) that links to
+   every market — programmatic pages must be reachable by internal links,
+   not only from the sitemap. Add the index to `config/routes.ts`.
+5. **Scale safely.** The site builds all pages at `next build`; a few hundred
+   is fine. Past ~5k pages, keep `generateStaticParams` for the top pages and
+   set `dynamicParams = true` so the long tail renders on first request and
+   is cached (ISR). Past 50k URLs, split the sitemap with
+   `generateSitemaps()`.
+6. **Quality bar (this is what keeps programmatic pages from being treated
+   as spam).** Every page must have content that is _specific to that
+   entity_: real property counts from the data file, local FAQ answers,
+   partner carriers active there, a human-written intro of 150+ words. Pages
+   that would be identical except for the city name should not exist. Keep
+   one canonical per page, never `noindex` published pages, and never state a
+   property count other than the verified floored figure.
+
+For **programmatic blog posts** (e.g. a weekly data post from Monday.com
+figures, or AI-drafted articles): generate the `BlogPost` objects in a
+script that writes into `content/blog.ts` (or the CMS), run it from a
+GitHub Action like `sync-data.yml`, and keep a human in the loop on the pull
+request. Posts must follow the body conventions in `content/blog.ts` —
+opening summary callout, question-phrased H2s, and a closing
+_Frequently Asked Questions_ section — because the FAQ schema, the social
+card and the answer-engine optimisation below all depend on them.
+
+### GEO and AEO: being the answer in Google AI Overviews, ChatGPT, Claude and Perplexity
+
+- **AEO (Answer Engine Optimisation)** targets featured snippets, "People
+  also ask", voice assistants and Google AI Overviews — surfaces that quote a
+  single short answer.
+- **GEO (Generative Engine Optimisation)** targets LLM-based assistants
+  (ChatGPT, Claude, Perplexity, Gemini) that synthesise an answer and cite
+  sources. They favour pages that state facts plainly, consistently and with
+  a clear entity behind them.
+
+What the site already does, and the rule to keep doing it:
+
+| Technique                                                                                 | Where                                                                 | Keep in mind                                                                                             |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Every H2 on a blog post is a question; the first sentence under it answers it completely  | `content/blog.ts` conventions                                         | Write the direct answer first, then elaborate. 40–60 words is the snippet sweet spot.                    |
+| `FAQPage` schema on home, about, blog index and every post                                | `lib/seo.ts` generates it from the FAQ data and the post FAQ sections | Never hand-write schema; add Q&As to the content files instead.                                          |
+| `HowTo` schema for the placement process                                                  | `content/how-it-works.ts`                                             |                                                                                                          |
+| One canonical, verbatim company definition used in JSON-LD, the About page and `llms.txt` | `COMPANY.definition` in `config/site.ts`                              | Entity consistency is what lets models attribute facts to Nova Havens. Change it in one place only.      |
+| Single `LocalBusiness` entity with `sameAs` social links, phone, address, hours           | `lib/seo.ts`                                                          | Add `founded`, street address and any awards/certifications to `site.ts` as they are confirmed.          |
+| `/llms.txt` + readable `/llms-txt`                                                        | `content/llms.ts`                                                     | Add each new article with a one-line _"Answers …"_ description.                                          |
+| AI crawlers explicitly allowed (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, …)     | `app/robots.ts`                                                       | Removing them removes the site from those assistants' retrieval.                                         |
+| "Ask an AI assistant about us" buttons with one canonical question                        | `content/ask-ai.ts`                                                   | Use the same buttons monthly to audit what assistants say and fix the source page if an answer is wrong. |
+| Fast, fully server-rendered HTML                                                          | Static generation                                                     | LLM crawlers rarely execute JavaScript; everything important is in the HTML.                             |
+
+How to extend it when writing new content:
+
+1. **Lead with the answer.** Title or H2 as the question users ask
+   ("How quickly can a displaced family move into a furnished home?"), then
+   a one-paragraph direct answer, then detail. Add the Q&A to the page FAQ
+   so it is also emitted as schema.
+2. **Use the entity's name, not pronouns**, in key sentences ("Nova Havens
+   coordinates…" rather than "We coordinate…"). Models extract subject-verb-
+   object facts.
+3. **Publish verifiable numbers with dates and sources** (the property count
+   with its snapshot date, "531+ families in 2025"). Dated facts are cited;
+   vague superlatives are not.
+4. **Add `speakable` for voice** on pages with a short canonical answer:
+   add `speakable: { '@type': 'SpeakableSpecification', cssSelector: ['[data-speakable]'] }`
+   to the page's `WebPage` node in `lib/seo.ts` and put `data-speakable` on
+   the answer paragraph.
+5. **Keep definitions stable across surfaces.** If a fact changes (phone,
+   coverage, figures), change `site.ts` — the pages, JSON-LD and `llms.txt`
+   update together. Conflicting facts across pages is the fastest way to be
+   dropped as a source.
+6. **Earn mentions off-site.** Partner carrier pages, LinkedIn posts,
+   industry directories and press that use the same company definition
+   reinforce the entity. Link them in `SOCIAL`/`sameAs` where appropriate.
+7. **Measure.** GSC → Performance → filter _Search appearance_ for rich
+   results; Bing Webmaster for Copilot; and the monthly "Ask AI" audit above.
+   Track `ask_ai_click` and `faq_expanded` events to see which questions
+   people actually open.
+
+The fuller playbook, including Search Console and launch steps, is in
+[docs/SEO.md](docs/SEO.md).
 
 ## Scripts
 

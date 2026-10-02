@@ -1,31 +1,33 @@
 import type { MetadataRoute } from 'next';
 
+import { SITE_PAGES } from '@/config/routes';
 import { SITE_URL } from '@/config/site';
 import { getAllPosts } from '@/content/source';
 
 /**
- * /sitemap.xml — generated at build time from the route list and blog posts.
- * Google reads <lastmod>; <changefreq>/<priority> are ignored by Google but
- * harmless for other engines. See docs/SEO.md for submitting it.
+ * /sitemap.xml — generated at build time from the route registry
+ * (src/config/routes.ts) and every blog post. Google reads <lastmod>;
+ * <changefreq>/<priority> are ignored by Google but harmless elsewhere.
+ * See docs/SEO.md for submitting it. For sites beyond ~50k URLs, switch to
+ * `generateSitemaps()` to emit an index of chunked sitemaps.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts();
-  const newestPost =
-    posts
-      .map((p) => p.dateISO)
-      .sort()
-      .at(-1) ?? '2026-08-13';
+  const newestPost = posts
+    .map((p) => p.dateISO)
+    .sort()
+    .at(-1);
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`, lastModified: newestPost, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${SITE_URL}/blog`, lastModified: newestPost, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${SITE_URL}/meet-the-team`, lastModified: '2026-07-27', changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${SITE_URL}/about-us`, lastModified: '2026-07-27', changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${SITE_URL}/contact`, lastModified: '2026-07-27', changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${SITE_URL}/llms-txt`, lastModified: newestPost, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${SITE_URL}/privacy-policy`, lastModified: '2026-07-27', changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${SITE_URL}/terms-of-service`, lastModified: '2026-07-27', changeFrequency: 'yearly', priority: 0.3 },
-  ];
+  const staticRoutes: MetadataRoute.Sitemap = SITE_PAGES.map((page) => ({
+    url: page.path === '/' ? `${SITE_URL}/` : `${SITE_URL}${page.path}`,
+    // Pages that list posts move whenever a post is published.
+    lastModified:
+      (page.path === '/blog' || page.path === '/') && newestPost && newestPost > page.lastModified
+        ? newestPost
+        : page.lastModified,
+    changeFrequency: page.changeFrequency,
+    priority: page.priority,
+  }));
 
   const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
