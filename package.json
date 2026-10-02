@@ -1,37 +1,25 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "prepare": "simple-git-hooks",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
-  },
-  "lint-staged": {
-    "artifacts/nova-havens/src/{pages,components}/**/*.{ts,tsx,css}": [
-      "pnpm --filter @workspace/nova-havens run validate:colors:staged --",
-      "pnpm --filter @workspace/nova-havens run validate:tokens:staged --"
-    ]
-  },
+  "name": "nova-havens",
+  "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "@replit/connectors-sdk": "^0.4.1"
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @nova-havens/web dev",
+    "build": "pnpm --filter @nova-havens/web build",
+    "start": "pnpm --filter @nova-havens/web start",
+    "lint": "pnpm --filter @nova-havens/web lint",
+    "typecheck": "pnpm --filter @nova-havens/web typecheck",
+    "test:smoke": "pnpm --filter @nova-havens/web test:smoke",
+    "sync:property-stats": "pnpm --filter @nova-havens/web sync:property-stats",
+    "sync:team": "pnpm --filter @nova-havens/web sync:team",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.2",
-    "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.7",
-    "jsdom": "^30.0.1",
-    "lint-staged": "^17.3.0",
-    "prettier": "^3.9.5",
-    "sharp": "^0.35.4",
-    "simple-git-hooks": "^2.13.1",
-    "typescript": "~5.9.3",
-    "vitest": "^5.0.0"
+    "prettier": "^3.9.5"
   }
 }
