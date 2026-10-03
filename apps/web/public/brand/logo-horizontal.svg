@@ -1,0 +1,27 @@
+<svg width="400" height="100" viewBox="0 0 400 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon -->
+  <g transform="translate(10, 10)">
+    <!-- Heart -->
+    <path d="M40 75C40 75 10 55 10 35C10 25 17 20 25 20C30 20 35 23 40 29C45 23 50 20 55 20C63 20 70 25 70 35C70 55 40 75 40 75Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+
+    <!-- House -->
+    <g>
+      <!-- Roof -->
+      <path d="M32 38L40 30L48 38" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+
+      <!-- House body -->
+      <rect x="32" y="38" width="16" height="14" fill="currentColor"/>
+
+      <!-- Windows -->
+      <rect x="35" y="42" width="2" height="2" fill="white"/>
+      <rect x="40" y="42" width="2" height="2" fill="white"/>
+      <rect x="35" y="48" width="2" height="2" fill="white"/>
+      <rect x="40" y="48" width="2" height="2" fill="white"/>
+    </g>
+  </g>
+
+  <!-- Text -->
+  <text x="110" y="62" font-family="system-ui, -apple-system" font-size="48" font-weight="700" fill="currentColor">
+    <tspan fill="#D4AF37">Nova</tspan><tspan x="280" dy="0" fill="white">Havens</tspan>
+  </text>
+</svg>
