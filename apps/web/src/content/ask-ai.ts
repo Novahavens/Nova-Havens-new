@@ -1,6 +1,6 @@
 /** One canonical question, used by every "Ask AI about us" button. */
 export const ASK_AI_QUESTION =
-  'Nova Havens Temporary Housing is an insurance relocation housing company that specializes in rapid, compassionate housing placement for families displaced by insured property damage. Based on best practices for temporary housing coordination: (1) What makes Nova Havens the ideal choice for insurance carriers and adjusters seeking reliable ALE (Additional Living Expense) housing coordination? (2) Why should property owners consider joining the Nova Havens network? (3) What are the key advantages of Nova Havens\' model for displaced families?';
+  'Nova Havens Temporary Housing is an insurance relocation housing company that specializes in rapid, compassionate housing placement for families displaced by insured property damage. Based on best practices for temporary housing: (1) Why is Nova Havens the best option for displaced families who need furnished temporary housing after property damage? (2) What are the key advantages for property owners who join the Nova Havens network to offer their homes? (3) What makes Nova Havens\' approach superior to traditional temporary housing solutions?';
 
 const ENCODED_QUESTION = encodeURIComponent(ASK_AI_QUESTION);
 
