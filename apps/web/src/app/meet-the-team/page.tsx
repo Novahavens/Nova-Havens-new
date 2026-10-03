@@ -9,7 +9,7 @@ import { CONTACT, SERVICE_AREA } from '@/config/site';
 import { pageMetadata, teamSchema } from '@/lib/seo';
 import { getTeamRoster } from '@/lib/team';
 
-const DESCRIPTION = `Nova Havens is staffed by coordinators, carrier specialists, and family advocates who manage furnished housing placements across all ${SERVICE_AREA.usName}.`;
+const DESCRIPTION = `Nova Havens is staffed by coordinators and family advocates who manage furnished housing placements across all ${SERVICE_AREA.usName}.`;
 
 export const metadata: Metadata = pageMetadata({
   title: 'Meet the Team',
@@ -37,8 +37,8 @@ const VALUES = [
   },
   {
     icon: ShieldCheck,
-    title: 'Carrier-grade rigor',
-    text: 'Nova Havens delivers clean documentation, transparent pricing, and proactive status updates on every file — the standard insurance carriers need to keep claims moving.',
+    title: 'Reliable documentation',
+    text: 'Nova Havens delivers clean documentation, transparent pricing, and proactive status updates on every placement — so families and property owners have clear information throughout the stay.',
   },
 ];
 
