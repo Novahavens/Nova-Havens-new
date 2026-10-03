@@ -7,7 +7,7 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata: Metadata = pageMetadata({
   title: 'Terms of Service',
   description:
-    'Nova Havens terms of service — the agreements governing use of our furnished housing coordination services for families, carriers, and property owners.',
+    'Nova Havens terms of service — the agreements governing use of our furnished housing coordination services for families and property owners.',
   path: '/terms-of-service',
 });
 
@@ -26,9 +26,8 @@ export default function TermsOfServicePage() {
       </p>
       <h2>2. Service Description</h2>
       <p>
-        Nova Havens coordinates temporary furnished housing placements for displaced families on behalf of insurance
-        carriers, adjusters, and relocation specialists. We act as a facilitator to connect housing providers with
-        individuals and families in need of short-term accommodations.
+        Nova Havens coordinates temporary furnished housing placements for displaced families. We act as a facilitator to
+        connect housing providers with individuals and families in need of short-term accommodations.
       </p>
       <h2>3. Property Owner Obligations</h2>
       <p>
@@ -36,11 +35,10 @@ export default function TermsOfServicePage() {
         confirmed placements; comply with all applicable local laws, regulations, and zoning ordinances; and notify Nova
         Havens promptly of any property issues that could affect the occupant&apos;s safety or comfort.
       </p>
-      <h2>4. Insurance Partner Relationships</h2>
+      <h2>4. Limitations of Liability</h2>
       <p>
-        Nova Havens acts as a coordinator between insurance carriers and housing providers. Carriers and adjusters
-        remain responsible for their coverage determinations, limits, and policy interpretations. Nova Havens does not
-        provide insurance advice, adjust claims, or interpret policy coverage.
+        Nova Havens does not provide insurance advice, adjust claims, or interpret policy coverage. Families should
+        consult with their insurance provider regarding coverage determinations, limits, and policy interpretations.
       </p>
       <h2>5. Housing Request and Placement Terms</h2>
       <p>
@@ -50,9 +48,8 @@ export default function TermsOfServicePage() {
       </p>
       <h2>6. Payments and Billing</h2>
       <p>
-        Billing arrangements are governed by separate agreements with insurance carriers or relocation specialists. Nova
-        Havens generally invoices the insurance carrier or third-party administrator directly. We do not collect payment
-        directly from displaced families unless specifically authorized and agreed upon in writing.
+        Billing arrangements are governed by separate agreements. We do not collect payment directly from displaced
+        families unless specifically authorized and agreed upon in writing.
       </p>
       <h2>7. Limitation of Liability</h2>
       <p>

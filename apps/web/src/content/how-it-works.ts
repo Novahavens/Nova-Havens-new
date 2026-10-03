@@ -17,19 +17,6 @@ export interface HowItWorksTrack {
 
 export const HOW_IT_WORKS_TRACKS: HowItWorksTrack[] = [
   {
-    id: 'adjusters',
-    tabLabel: 'Carriers & Specialists',
-    heading: 'For Carriers & Specialists',
-    schemaName: 'How Carriers & Specialists Work with Nova Havens',
-    schemaDescription:
-      'The step-by-step process for carriers and specialists to coordinate temporary housing placements through Nova Havens.',
-    steps: [
-      { name: 'Submit a Claim', text: 'Within the hour.' },
-      { name: 'Approve and coordinate', text: 'Keeps carriers and specialists updated' },
-      { name: 'Move in', text: 'Nova Havens coordinates all move-in logistics with one point of contact.' },
-    ],
-  },
-  {
     id: 'families',
     tabLabel: 'Displaced Families',
     heading: 'For Displaced Families',
@@ -39,15 +26,15 @@ export const HOW_IT_WORKS_TRACKS: HowItWorksTrack[] = [
     steps: [
       {
         name: 'Receive Your Options',
-        text: 'Your adjuster or carrier connects you with Nova Havens — typically within hours of your ALE coverage being confirmed',
+        text: 'Once your claim is processed, Nova Havens connects you with housing options — typically within 24–48 hours of coverage confirmation.',
       },
       {
         name: 'Choose Your Home',
-        text: "Browse furnished options matched to your family's size, location, school district, pet needs, and accessibility requirements",
+        text: "Browse furnished options matched to your family's size, location, school district, pet needs, and accessibility requirements.",
       },
       {
         name: 'Move In',
-        text: 'Nova Havens coordinates move-in logistics with your carrier and the property owner — you get the keys and a direct line to your coordinator',
+        text: 'Nova Havens coordinates move-in logistics with the property owner — you get the keys and a direct line to your coordinator.',
       },
     ],
   },

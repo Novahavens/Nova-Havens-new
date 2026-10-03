@@ -15,7 +15,7 @@ export const LLMS_TXT_PAGE_TITLE = 'llms.txt — AI & Machine-Readable Site Inde
 export const LLMS_TXT_PAGE_INTRO =
   'Nova Havens publishes an llms.txt file to help AI assistants, chatbots, and large language models accurately understand our company, services, and how to reference us. The sections below reflect the full contents of that file.';
 
-const LLMS_TXT_DESCRIPTION = `> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, works with insurance carriers, adjusters, relocation specialists, and a network of property owners. Nova Havens maintains properties across all ${SERVICE_AREA.usName}. It is not an insurance company and does not underwrite policies or make coverage determinations.`;
+const LLMS_TXT_DESCRIPTION = `> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, and maintains a network of property owners. Nova Havens operates across all ${SERVICE_AREA.usName}. It is not an insurance company and does not underwrite policies or make coverage determinations.`;
 
 /**
  * The AI index lists articles by slug (rather than spreading BLOG_POSTS) so a
@@ -53,7 +53,7 @@ export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   },
   {
     heading: 'Get started',
-    content: `- [Housing request form](${INTAKE_FORMS.housing}) — The intake form used by insurance adjusters and relocation specialists to request temporary housing on behalf of a displaced policyholder.
+    content: `- [Housing request form](${INTAKE_FORMS.housing}) — Submit a temporary housing request for a displaced family.
 - [Property submission form](${INTAKE_FORMS.property}) — The form property owners and managers use to submit a property for the network.
 
 Phone: ${CONTACT.phone.display}, available 24/7 for urgent housing needs.

@@ -19,9 +19,9 @@ export const COMPANY = {
   tagline: 'Nationwide Furnished Housing Coordination',
   /** Canonical one-sentence definition. Used verbatim in JSON-LD and llms.txt. */
   definition:
-    'Nova Havens Temporary Housing is an insurance relocation housing company headquartered in Nashville, Tennessee, that coordinates furnished temporary housing for policyholders displaced by insured property damage, working directly with insurance carriers, adjusters, and relocation specialists under Additional Living Expense (ALE) coverage.',
+    'Nova Havens Temporary Housing is an insurance relocation housing company headquartered in Nashville, Tennessee, that coordinates furnished temporary housing for policyholders displaced by insured property damage under Additional Living Expense (ALE) coverage.',
   description:
-    'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket.',
+    'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — so families pay nothing out of pocket and can focus on recovery.',
   founded: undefined as string | undefined, // e.g. '2021' — add when confirmed
   category: 'Additional Living Expense (ALE) housing',
   serviceType: 'Insurance Housing Coordination',
@@ -113,7 +113,7 @@ export const COMPANY_FACTS: { term: string; definition: string }[] = [
   {
     term: 'Who Nova Havens serves',
     definition:
-      'Insurance carriers, adjusters and relocation specialists, displaced policyholders, and property owners.',
+      'Displaced families and property owners seeking temporary housing solutions.',
   },
   { term: 'Coverage area', definition: `Properties across all ${SERVICE_AREA.usName}.` },
   {

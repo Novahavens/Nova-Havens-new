@@ -123,9 +123,9 @@ const REVIEWS: Review[] = [
   },
   {
     quote:
-      "As an adjuster, I rely on vendors who deliver. Nova Havens is the most reliable housing coordinator I've worked with.",
-    name: 'James T.',
-    role: 'Independent Adjuster',
+      "After losing everything in a flood, Nova Havens gave us stability when we needed it most. The home felt welcoming from day one.",
+    name: 'Maria L.',
+    role: 'Water Damage Displacement',
   },
   {
     quote: "The team checked in on us every step of the way. We didn't feel like a case number — we felt cared for.",
@@ -149,7 +149,7 @@ const WHY_CARDS = [
   {
     icon: Users,
     title: 'One Team, One Point of Contact',
-    text: 'Nova Havens handles every step in-house — from processing the claim to delivering housing options and managing the stay. Families, carriers, and adjusters always have a single dedicated contact.',
+    text: 'Nova Havens handles every step in-house — from processing the claim to delivering housing options and managing the stay. Families always have a single dedicated contact.',
   },
   {
     icon: Globe,
@@ -177,7 +177,7 @@ const AMENITIES = [
   {
     icon: MoveRight,
     title: 'Seamless Transition',
-    text: 'Nova Havens coordinates move-in logistics directly with carriers and adjusters — so families focus on recovery, not paperwork or scheduling.',
+    text: 'Nova Havens coordinates move-in logistics seamlessly — so families can focus on recovery, not paperwork or scheduling.',
   },
   {
     icon: PawPrint,
@@ -480,9 +480,9 @@ export default function HomePage() {
         <div className="max-w-site mx-auto">
           <div className="mb-12">
             <h2 className="text-3xl font-extrabold mb-3" data-testid="heading-partners">
-              Our trusted industry partners.
+              Our trusted network.
             </h2>
-            <p className="text-muted-foreground">Nova Havens works with leading insurance carriers nationwide.</p>
+            <p className="text-muted-foreground">Nova Havens partners with leading housing companies and platforms nationwide.</p>
           </div>
           <PartnersMarquee />
         </div>
