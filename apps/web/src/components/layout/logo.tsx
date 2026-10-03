@@ -1,19 +1,28 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
-/**
- * Wordmark. Swap for an <Image> of /brand/logo-horizontal-dark.svg once the
- * final brand asset lands (see public/brand/README.md).
- */
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <Link
       href="/"
-      className={`text-xl md:text-2xl tracking-tight no-underline ${className}`}
+      className={`flex items-center gap-2 no-underline ${className}`}
       aria-label="Nova Havens home"
       data-testid="link-logo"
     >
-      <span className="font-extrabold text-foreground">Nova</span>
-      <span className="font-extrabold text-primary">Havens</span>
+      <div className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
+        <Image
+          src="/brand/logo-icon.svg"
+          alt="Nova Havens"
+          width={48}
+          height={48}
+          className="w-full h-full text-primary"
+          priority
+        />
+      </div>
+      <span className="hidden sm:inline font-extrabold text-sm md:text-base tracking-tight">
+        <span className="text-foreground">Nova</span>
+        <span className="text-primary">Havens</span>
+      </span>
     </Link>
   );
 }

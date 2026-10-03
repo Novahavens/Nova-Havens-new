@@ -46,7 +46,7 @@ export function ReviewsCarousel({ reviews }: { reviews: Review[] }) {
     <div className="max-w-site mx-auto px-4 md:px-8">
       <div className="flex justify-between items-end mb-12">
         <h2 className="text-3xl md:text-4xl font-extrabold" data-testid="heading-reviews">
-          What displaced families say
+          What insured families say
         </h2>
         {controls('hidden md:flex gap-3')}
       </div>

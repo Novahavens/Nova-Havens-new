@@ -89,7 +89,7 @@ export const PUBLIC_STATS = {
  * Conservative default property count shown only if data/property-stats.json
  * is missing or malformed. Must never exceed the last known-good figure.
  */
-export const FALLBACK_TOTAL_PROPERTIES = 12_000;
+export const FALLBACK_TOTAL_PROPERTIES = 60_000;
 
 export const BRAND = {
   /** The only gold in the system. Mirrors --primary in src/styles/tokens.css. */
