@@ -1,28 +1,32 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { BRAND } from '@/config/site';
+
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <Link
       href="/"
-      className={`flex items-center gap-2 no-underline ${className}`}
+      className={`flex items-center no-underline ${className}`}
       aria-label="Nova Havens home"
       data-testid="link-logo"
     >
-      <div className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
-        <Image
-          src="/brand/logo-icon.svg"
-          alt="Nova Havens"
-          width={48}
-          height={48}
-          className="w-full h-full text-primary"
-          priority
-        />
-      </div>
-      <span className="hidden sm:inline font-extrabold text-sm md:text-base tracking-tight">
-        <span className="text-foreground">Nova</span>
-        <span className="text-primary">Havens</span>
-      </span>
+      <Image
+        src={BRAND.assets.logoMark}
+        alt="Nova Havens"
+        width={320}
+        height={320}
+        priority
+        className="h-10 w-10 sm:hidden"
+      />
+      <Image
+        src={BRAND.assets.logoHorizontal}
+        alt="Nova Havens Home Rentals"
+        width={1955}
+        height={784}
+        priority
+        className="hidden h-14 w-auto sm:block md:h-16"
+      />
     </Link>
   );
 }

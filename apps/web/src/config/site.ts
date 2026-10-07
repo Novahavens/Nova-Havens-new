@@ -96,12 +96,13 @@ export const BRAND = {
   cardHex: '#111318',
   mutedHex: '#9BA3AF',
   fontFamily: 'Plus Jakarta Sans',
-  /** Brand asset placeholders — see public/brand/README.md and docs/BRAND.md. */
+  /** Brand assets — see public/brand/README.md and docs/BRAND.md. */
   assets: {
-    logoHorizontalDark: '/brand/logo-horizontal-dark.svg',
-    logoHorizontalLight: '/brand/logo-horizontal-light.svg',
-    logoMark: '/brand/logo-mark.svg',
-    favicon: '/favicon.svg',
+    /** Heart-house mark + "Nova Havens Home Rentals" wordmark, transparent background. */
+    logoHorizontal: '/brand/logo-horizontal.png',
+    /** Square heart-house mark, transparent background. */
+    logoMark: '/brand/logo-mark.png',
+    favicon: '/favicon.ico',
     ogImage: '/og-image.png',
   },
 } as const;

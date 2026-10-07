@@ -1,25 +1,14 @@
 # Brand assets
 
-## Logo files (implemented)
+Approved Nova Havens artwork. Paths are referenced from `BRAND.assets` in
+`src/config/site.ts`; keep the filenames when replacing a file.
 
-The Nova Havens heart-house logo is implemented in the following files:
-
-| File | Usage | Spec |
+| File | Used for | Spec |
 | --- | --- | --- |
-| `logo-icon.svg` | Large icon version | Scalable SVG, used in Hero sections |
-| `logo-horizontal.svg` | Logo + text wordmark | Scalable SVG, ~4:1 aspect ratio |
-| `logo-mark.svg` | Compact app icon | SVG, 1:1, legible at 32px+ |
+| `logo-horizontal.png` | Header wordmark (`components/layout/logo.tsx`, ≥ 640 px) | Heart-house mark + "Nova Havens Home Rentals", 1955×784, transparent |
+| `logo-mark.png` | Header on phones, source for the favicon set | Heart-house mark, 320×320, transparent |
+| `../favicon.ico`, `../favicon.png`, `../apple-touch-icon.png` | Browser tab and home-screen icons (`app/layout.tsx` `icons`) | Generated from `logo-mark.png` at 48/32/16, 64 and 180 px |
+| `../og-image.png` | Default social sharing card | PNG, 1200×630 — still a placeholder |
 
-## Additional files (placeholders)
-
-| File | Status | Spec |
-| --- | --- | --- |
-| `logo-horizontal-dark.svg` | Placeholder | Horizontal wordmark for dark backgrounds |
-| `logo-horizontal-light.svg` | Placeholder | Horizontal wordmark for light backgrounds |
-| `../favicon.svg` | Placeholder | Favicon SVG (also need `favicon.ico` 48×48 and `apple-touch-icon.png` 180×180) |
-| `../og-image.png` | Placeholder | Default social sharing card (1200×630, under 300 KB) |
-
-## Brand values
-
-Colours: gold `#D4A24C` (primary accent), background `#0A0C10`, foreground `#F5F5F2`.  
+Colours: gold `#D4A24C`, background `#0A0C10`, foreground `#F5F5F2`.
 Typeface: Plus Jakarta Sans.
