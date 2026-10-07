@@ -220,7 +220,7 @@ export default function HomePage() {
             style={{ fontSize: 'var(--text-hero)', lineHeight: 1.1 }}
             data-testid="heading-hero"
           >
-            A safe place to land, fast.
+            Welcome to Nova Havens
           </h1>
           <p
             className="text-lg md:text-xl max-w-2xl mb-10 mx-auto text-muted-foreground"
