@@ -32,7 +32,7 @@ import { TrackedAnchor } from '@/components/shared/tracked-link';
 import { COMPANY, CONTACT, PUBLIC_STATS, SERVICE_AREA } from '@/config/site';
 import { HOME_FAQ_GROUPS } from '@/content/faqs';
 import { HOW_IT_WORKS_TRACKS } from '@/content/how-it-works';
-import { PROPERTY_STATS_NOTE, VERIFIED_PROPERTY_COUNT } from '@/lib/property-stats';
+import { VERIFIED_PROPERTY_COUNT } from '@/lib/property-stats';
 import { HOME_SCHEMA, pageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = pageMetadata({
@@ -275,8 +275,8 @@ export default function HomePage() {
                     Verified network property records
                   </span>
                   <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">
-                    {PROPERTY_STATS_NOTE}. Nova Havens coordinates furnished housing across {SERVICE_AREA.usName};
-                    availability is confirmed for each request.
+                    Nova Havens coordinates furnished housing across {SERVICE_AREA.usName}; availability is confirmed
+                    for each request.
                   </span>
                 </div>
               </div>
@@ -438,7 +438,9 @@ export default function HomePage() {
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">
               Verified Network Property Records
             </div>
-            <div className="text-xs text-tertiary leading-relaxed">{PROPERTY_STATS_NOTE}.</div>
+            <div className="text-xs text-tertiary leading-relaxed">
+              Furnished homes in the network across {SERVICE_AREA.usName}.
+            </div>
           </div>
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center">
             <div className="text-4xl font-extrabold text-foreground mb-2">{SERVICE_AREA.stateCount}</div>

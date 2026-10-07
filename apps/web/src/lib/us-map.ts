@@ -8,7 +8,25 @@ import type { GeometryCollection, Topology } from 'topojson-specification';
 import statesTopology from 'us-atlas/states-10m.json';
 
 import { BRAND, SERVICE_AREA } from '@/config/site';
-import { PROPERTY_STATS } from './property-stats';
+
+/** The metros pinned on the coverage map. Order is only used for label placement. */
+export const FEATURED_METROS: { city: string; state: string; lat: number; lng: number }[] = [
+  { city: 'San Francisco', state: 'CA', lat: 37.7749, lng: -122.4194 },
+  { city: 'Los Angeles', state: 'CA', lat: 34.0522, lng: -118.2437 },
+  { city: 'Seattle', state: 'WA', lat: 47.6062, lng: -122.3321 },
+  { city: 'Portland', state: 'OR', lat: 45.5152, lng: -122.6784 },
+  { city: 'Phoenix', state: 'AZ', lat: 33.4484, lng: -112.074 },
+  { city: 'Denver', state: 'CO', lat: 39.7392, lng: -104.9903 },
+  { city: 'Dallas', state: 'TX', lat: 32.7767, lng: -96.797 },
+  { city: 'Houston', state: 'TX', lat: 29.7604, lng: -95.3698 },
+  { city: 'Chicago', state: 'IL', lat: 41.8781, lng: -87.6298 },
+  { city: 'Nashville', state: 'TN', lat: 36.1627, lng: -86.7816 },
+  { city: 'Memphis', state: 'TN', lat: 35.1495, lng: -90.049 },
+  { city: 'Atlanta', state: 'GA', lat: 33.749, lng: -84.388 },
+  { city: 'Charlotte', state: 'NC', lat: 35.2271, lng: -80.8431 },
+  { city: 'Washington', state: 'DC', lat: 38.9072, lng: -77.0369 },
+  { city: 'New York', state: 'NY', lat: 40.7128, lng: -74.006 },
+];
 
 /**
  * us-map.ts — real US geometry and the two coverage-map SVGs.
@@ -153,31 +171,6 @@ function getUsMapGeometry(): UsMapGeometry {
 
 export type CoverageMapVariant = 'compact' | 'detailed';
 
-export interface CoverageMapSummary {
-  statesWithRecords: number;
-  topStates: { code: string; name: string; count: number }[];
-  topCities: { city: string; count: number }[];
-}
-
-/** Facts the page prints next to the map (and uses for alt text). */
-export function getCoverageSummary(): CoverageMapSummary {
-  const { states } = getUsMapGeometry();
-  const counts = PROPERTY_STATS.byState;
-  const topStates = states
-    .filter((s) => (counts[s.code] ?? 0) > 0)
-    .map((s) => ({ code: s.code, name: s.name, count: counts[s.code] ?? 0 }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 6);
-  return {
-    statesWithRecords: Object.values(counts).filter((n) => n > 0).length,
-    topStates,
-    topCities: [...PROPERTY_STATS.cities]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5)
-      .map((c) => ({ city: c.city, count: c.count })),
-  };
-}
-
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const hexAlpha = (hex: string, alpha: number) =>
   `${hex}${Math.round(Math.max(0, Math.min(1, alpha)) * 255)
@@ -196,33 +189,19 @@ export function buildCoverageMapSvg(variant: CoverageMapVariant): string {
   const fg = BRAND.foregroundHex;
   const muted = BRAND.mutedHex;
 
-  const counts = PROPERTY_STATS.byState;
-  const maxCount = Math.max(1, ...Object.values(counts));
-  const cities = PROPERTY_STATS.cities
-    .map((c) => ({ ...c, point: project([c.lng, c.lat]) }))
-    .filter((c): c is typeof c & { point: [number, number] } => c.point !== null)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, detailed ? 10 : 8);
-  const topCityCount = Math.max(1, cities[0]?.count ?? 1);
-  const labelledCities = detailed ? cities.slice(0, 6) : [];
+  const metros = FEATURED_METROS.map((c) => ({ ...c, point: project([c.lng, c.lat]) })).filter(
+    (c): c is typeof c & { point: [number, number] } => c.point !== null,
+  );
   const collides = (c: [number, number]) =>
-    labelledCities.some((l) => Math.abs(l.point[0] - c[0]) < 70 && Math.abs(l.point[1] - c[1]) < 34);
+    metros.some((m) => Math.abs(m.point[0] - c[0]) < 70 && Math.abs(m.point[1] - c[1]) < 34);
 
-  const fillFor = (code: string, contiguous: boolean) => {
-    const n = counts[code] ?? 0;
-    if (!contiguous) return n > 0 ? hexAlpha(gold, 0.14) : hexAlpha(fg, 0.05);
-    return hexAlpha(gold, n > 0 ? 0.18 + 0.42 * Math.sqrt(n / maxCount) : 0.12);
-  };
+  const fillFor = (contiguous: boolean) => (contiguous ? hexAlpha(gold, 0.3) : hexAlpha(fg, 0.05));
 
   const statePaths = states
     .map(
       (s) =>
-        `<path d="${s.d}" fill="${fillFor(s.code, s.contiguous)}" stroke="${bg}" stroke-width="${detailed ? 1.4 : 1.1}" stroke-linejoin="round"><title>${esc(
-          `${s.name}${s.contiguous ? ' — served by Nova Havens' : ' — outside the contiguous service area'}${
-            (counts[s.code] ?? 0) > 0
-              ? ` · ${(counts[s.code] ?? 0).toLocaleString('en-US')} verified property records`
-              : ''
-          }`,
+        `<path d="${s.d}" fill="${fillFor(s.contiguous)}" stroke="${bg}" stroke-width="${detailed ? 1.4 : 1.1}" stroke-linejoin="round"><title>${esc(
+          `${s.name}${s.contiguous ? ' — served by Nova Havens' : ' — outside the contiguous service area'}`,
         )}</title></path>`,
     )
     .join('');
@@ -232,33 +211,29 @@ export function buildCoverageMapSvg(variant: CoverageMapVariant): string {
         .filter((s) => s.contiguous && !collides(s.centroid))
         .map(
           (s) =>
-            `<text x="${s.centroid[0]}" y="${s.centroid[1]}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="${
-              (counts[s.code] ?? 0) > 0 ? hexAlpha(fg, 0.85) : hexAlpha(muted, 0.7)
-            }">${s.code}</text>`,
+            `<text x="${s.centroid[0]}" y="${s.centroid[1]}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="${hexAlpha(muted, 0.7)}">${s.code}</text>`,
         )
         .join('')
     : '';
 
-  const pins = cities
-    .map((c) => {
-      const r = detailed ? 5 + 9 * Math.sqrt(c.count / topCityCount) : 4 + 5 * Math.sqrt(c.count / topCityCount);
-      return `<g transform="translate(${c.point[0]} ${c.point[1]})"><circle r="${r.toFixed(1)}" fill="${hexAlpha(gold, 0.28)}"/><circle r="${Math.max(
-        2.5,
-        r * 0.4,
-      ).toFixed(
-        1,
-      )}" fill="${gold}" stroke="${bg}" stroke-width="1.5"/><title>${esc(`${c.city} · ${c.count.toLocaleString('en-US')} verified property records`)}</title></g>`;
-    })
-    .join('');
-
-  const cityLabels = labelledCities
+  const r = detailed ? 9 : 6;
+  const pins = metros
     .map(
       (c) =>
-        `<text x="${c.point[0] + 12}" y="${c.point[1] - 8}" font-size="12" font-weight="600" fill="${fg}" stroke="${bg}" stroke-width="3" paint-order="stroke">${esc(
-          c.city.split(',')[0] ?? c.city,
-        )}</text>`,
+        `<g transform="translate(${c.point[0]} ${c.point[1]})"><circle r="${r}" fill="${hexAlpha(gold, 0.28)}"/><circle r="${(r * 0.4).toFixed(1)}" fill="${gold}" stroke="${bg}" stroke-width="1.5"/><title>${esc(`${c.city}, ${c.state}`)}</title></g>`,
     )
     .join('');
+
+  // Label on the left for metros whose label would otherwise run off the East Coast or into a neighbour.
+  const labelLeft = new Set(['Washington', 'New York', 'Houston', 'Memphis', 'Los Angeles']);
+  const cityLabels = detailed
+    ? metros
+        .map((c) => {
+          const left = labelLeft.has(c.city);
+          return `<text x="${c.point[0] + (left ? -12 : 12)}" y="${c.point[1] + (left ? 14 : -8)}" text-anchor="${left ? 'end' : 'start'}" font-size="12" font-weight="600" fill="${fg}" stroke="${bg}" stroke-width="3" paint-order="stroke">${esc(c.city)}</text>`;
+        })
+        .join('')
+    : '';
 
   const title = `Map of the United States showing Nova Havens coverage across all ${SERVICE_AREA.usName}`;
 

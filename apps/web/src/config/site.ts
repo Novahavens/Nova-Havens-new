@@ -85,11 +85,8 @@ export const PUBLIC_STATS = {
   googleRating: { value: 4.8, outOf: 5 },
 } as const;
 
-/**
- * Conservative default property count shown only if data/property-stats.json
- * is missing or malformed. Must never exceed the last known-good figure.
- */
-export const FALLBACK_TOTAL_PROPERTIES = 60_000;
+/** The network property figure published site-wide (rendered as "60,000+"). */
+export const PUBLISHED_PROPERTY_COUNT = 60_000;
 
 export const BRAND = {
   /** The only gold in the system. Mirrors --primary in src/styles/tokens.css. */

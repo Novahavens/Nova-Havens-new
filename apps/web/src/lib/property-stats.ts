@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { FALLBACK_TOTAL_PROPERTIES, SERVICE_AREA } from '@/config/site';
+import { PUBLISHED_PROPERTY_COUNT, SERVICE_AREA } from '@/config/site';
 import snapshot from '@data/property-stats.json';
 
 /**
@@ -33,7 +33,7 @@ function readSnapshot(): PropertyStats {
     };
   }
   return {
-    totalProperties: FALLBACK_TOTAL_PROPERTIES,
+    totalProperties: PUBLISHED_PROPERTY_COUNT,
     statesCovered: SERVICE_AREA.stateCount,
     byState: {},
     cities: [],
@@ -61,5 +61,5 @@ export function propertyCountSnapshotNote(generatedAt?: string): string {
   return `Network snapshot as of ${formatted}`;
 }
 
-export const VERIFIED_PROPERTY_COUNT = formatVerifiedPropertyCount(PROPERTY_STATS.totalProperties);
+export const VERIFIED_PROPERTY_COUNT = formatVerifiedPropertyCount(PUBLISHED_PROPERTY_COUNT);
 export const PROPERTY_STATS_NOTE = propertyCountSnapshotNote(PROPERTY_STATS.generatedAt);
