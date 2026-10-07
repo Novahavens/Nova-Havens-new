@@ -9,7 +9,7 @@ import { HOME_FAQ_GROUPS, HOME_FAQS } from '@/content/faqs';
 import { faqPageSchema, graph, pageMetadata, webPageSchema } from '@/lib/seo';
 
 const DESCRIPTION =
-  'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours, billed directly to carriers nationwide.';
+  'Nova Havens coordinates furnished temporary housing for insurance-displaced families — placing them in verified homes within 24–48 hours.';
 
 export const metadata: Metadata = pageMetadata({ title: 'About Us', description: DESCRIPTION, path: '/about-us' });
 
@@ -32,14 +32,14 @@ const PRINCIPLES = [
   {
     icon: Users,
     title: 'One connected team',
-    text: 'Families, carriers, adjusters, and property owners get one responsive Nova Havens partner from the first call through move-out — never a phone tree or ticket queue.',
+    text: 'Families and property owners get one responsive Nova Havens partner from the first call through move-out — never a phone tree or ticket queue.',
   },
 ];
 
 const DIFFERENTIATORS = [
   `Nationwide furnished housing coordination across ${SERVICE_AREA.usName}`,
   'A single dedicated point of contact for every placement',
-  'Proactive status updates for adjusters and families throughout the stay',
+  'Proactive status updates for families throughout the stay',
   'Pet-friendly, accessible, and family-ready options in the network',
 ];
 
@@ -131,10 +131,9 @@ export default function AboutPage() {
                 pets, their schools, and their children&apos;s sense of normal.
               </p>
               <p>
-                Nova Havens was built to solve the coordination gap between insurance carriers and displaced families.
-                The team connects insurance professionals and displaced households with inspected, fully furnished homes
-                — then stays close to every detail until the placement is complete, the stay is extended, or the family
-                returns home.
+                Nova Havens was built to support displaced families through property loss. The team connects displaced
+                households with inspected, fully furnished homes — then stays close to every detail until the placement
+                is complete, the stay is extended, or the family returns home.
               </p>
             </div>
             <Link
@@ -174,8 +173,8 @@ export default function AboutPage() {
               What Principles Guide Every Nova Havens Placement?
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Nova Havens applies the same standard to every household, carrier relationship, and property in its
-              network — regardless of claim size or market.
+              Nova Havens applies the same standard to every household and property in its network — regardless of claim
+              size or market.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

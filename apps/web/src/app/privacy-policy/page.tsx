@@ -22,19 +22,18 @@ export default function PrivacyPolicyPage() {
       <h2>1. Information We Collect</h2>
       <p>
         We collect information to provide and improve our temporary housing coordination services. The types of personal
-        information we collect include contact info (name, phone, email, address), claim details provided by insurance
-        carriers, property details from property owners, usage data from site visits, and communications records.
+        information we collect include contact info (name, phone, email, address), property details from property owners,
+        usage data from site visits, and communications records.
       </p>
       <h2>2. How We Use Your Information</h2>
       <p>
-        We use your information to coordinate housing placements, communicate with families and carriers, verify and
-        manage properties in our network, improve our services, and comply with legal obligations.
+        We use your information to coordinate housing placements, communicate with families, verify and manage
+        properties in our network, improve our services, and comply with legal obligations.
       </p>
-      <h2>3. Sharing with Insurance and Property Partners</h2>
+      <h2>3. Sharing with Property Partners</h2>
       <p>
-        We share relevant information with insurance carriers, adjusters, and relocation specialists as necessary to
-        fulfill housing placements. We share property details with potential housing candidates. We do not sell personal
-        information.
+        We share property details with potential housing candidates as necessary to fulfill housing placements. We do
+        not sell personal information.
       </p>
       <h2>4. Automated Processing and AI</h2>
       <p>

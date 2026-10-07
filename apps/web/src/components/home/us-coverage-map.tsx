@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { SERVICE_AREA } from '@/config/site';
-import { getCoverageSummary, MAP_HEIGHT, MAP_WIDTH, type CoverageMapVariant } from '@/lib/us-map';
+import { FEATURED_METROS, MAP_HEIGHT, MAP_WIDTH, type CoverageMapVariant } from '@/lib/us-map';
 
 interface UsCoverageMapProps {
   /** `compact` = trust-strip tile; `detailed` = full "Where We Operate" map with labels, legend and top states. */
@@ -14,15 +14,16 @@ interface UsCoverageMapProps {
 /**
  * Real map of the United States (US Census shapes, Albers USA projection),
  * served as a cached SVG image from /maps/coverage-*.svg and generated at
- * build time from the latest property snapshot. Facts beside the map are
- * rendered as text so they are indexable and readable without the image.
+ * build time. The metro list beside the map is rendered as text so it is
+ * indexable and readable without the image.
  */
 export function UsCoverageMap({ variant = 'detailed', className = '', priority = false }: UsCoverageMapProps) {
   const detailed = variant === 'detailed';
-  const summary = getCoverageSummary();
-  const alt = `Map of the United States. Nova Havens serves all ${SERVICE_AREA.usName}; ${summary.statesWithRecords} states currently have verified property records, with the largest concentrations in ${summary.topCities
-    .slice(0, 3)
-    .map((c) => c.city)
+  const alt = `Map of the United States. Nova Havens serves all ${SERVICE_AREA.usName}, with major metros including ${FEATURED_METROS.slice(
+    0,
+    5,
+  )
+    .map((m) => m.city)
     .join(', ')}.`;
 
   return (
@@ -58,29 +59,22 @@ export function UsCoverageMap({ variant = 'detailed', className = '', priority =
             <span className="h-3 w-3 rounded-sm border border-primary/50 bg-primary/30" aria-hidden="true" />
             States served ({SERVICE_AREA.stateCount} contiguous)
           </span>
-          {detailed ? (
-            <span className="inline-flex items-center gap-2">
-              <span className="h-3 w-3 rounded-sm border border-primary/70 bg-primary/60" aria-hidden="true" />
-              Darker = more verified records
-            </span>
-          ) : null}
           <span className="inline-flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
-            {detailed ? 'Largest metros in the network' : 'Largest metros'}
+            {detailed ? 'Popular metros in the network' : 'Popular metros'}
           </span>
         </div>
         {detailed ? (
-          <dl
-            className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 border-t border-white/5 pt-4 sm:grid-cols-3 md:grid-cols-6"
-            data-testid="coverage-top-states"
+          <ul
+            className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 border-t border-white/5 pt-4 sm:grid-cols-3 md:grid-cols-5"
+            data-testid="coverage-metros"
           >
-            {summary.topStates.map((s) => (
-              <div key={s.code}>
-                <dt className="font-semibold text-foreground">{s.name}</dt>
-                <dd className="text-tertiary">{s.count.toLocaleString('en-US')} records</dd>
-              </div>
+            {FEATURED_METROS.map((m) => (
+              <li key={m.city} className="font-semibold text-foreground">
+                {m.city}, <span className="font-normal text-tertiary">{m.state}</span>
+              </li>
             ))}
-          </dl>
+          </ul>
         ) : null}
       </figcaption>
     </figure>

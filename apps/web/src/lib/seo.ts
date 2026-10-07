@@ -186,7 +186,7 @@ export function teamSchema(members: TeamMember[]): JsonLd {
       type: 'AboutPage',
       path: '/meet-the-team',
       name: 'Meet the Nova Havens Team',
-      description: `The coordinators, carrier specialists, and family advocates behind Nova Havens — managing furnished housing placements across all ${SERVICE_AREA.usName}.`,
+      description: `The coordinators and family advocates behind Nova Havens — managing furnished housing placements across all ${SERVICE_AREA.usName}.`,
     }),
     ...members.map((member) => ({
       '@type': 'Person',

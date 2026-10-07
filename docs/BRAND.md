@@ -1,30 +1,25 @@
 # Brand assets
 
-All brand assets live in `apps/web/public/`. The files under `public/brand/`
-are **generated placeholders** so the site builds today; swap each for the
-approved asset using the **same filename** and no code changes are needed.
-Paths are referenced from `BRAND.assets` in `apps/web/src/config/site.ts`.
+All brand assets live in `apps/web/public/`. The logo files under
+`public/brand/` are the approved artwork; keep the **same filename** when
+replacing one and no code changes are needed. Paths are referenced from
+`BRAND.assets` in `apps/web/src/config/site.ts`.
 
 ## 1. Asset inventory
 
 | File                                     | Status                   | Replace with                                                                      | Spec                                      | Used by                                                                                                                                                  |
 | ---------------------------------------- | ------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `public/brand/logo-horizontal-dark.svg`  | placeholder              | Horizontal wordmark for dark backgrounds                                          | SVG, transparent, ≈5:1, safe margin ≥ 10% | Not yet rendered — `components/layout/logo.tsx` draws a text wordmark; switch it to `<Image src={BRAND.assets.logoHorizontalDark}>` once the asset lands |
-| `public/brand/logo-horizontal-light.svg` | placeholder              | Horizontal wordmark for light backgrounds                                         | SVG                                       | Email signatures, light-mode future                                                                                                                      |
-| `public/brand/logo-mark.svg`             | placeholder              | Square mark                                                                       | SVG 1:1, legible at 32 px                 | App icon source, social avatars                                                                                                                          |
-| `public/favicon.svg`                     | current (gold "N" shape) | Final favicon                                                                     | SVG 1:1                                   | `app/layout.tsx` `icons`                                                                                                                                 |
-| `public/og-image.png`                    | current                  | Default social sharing card                                                       | PNG 1200×630, < 300 KB, text ≥ 48 px      | Every page without its own image; `LocalBusiness.logo` in JSON-LD                                                                                        |
+| `public/brand/logo-horizontal.png`       | approved                 | Heart-house mark + "Nova Havens Home Rentals" wordmark                            | PNG 1955×784, transparent                 | Header on screens ≥ 640 px (`components/layout/logo.tsx`)                                                                                                |
+| `public/brand/logo-mark.png`             | approved                 | Square heart-house mark                                                           | PNG 320×320, transparent                  | Header on phones; source of the favicon set                                                                                                              |
+| `public/favicon.ico`, `favicon.png`, `apple-touch-icon.png` | generated from mark | —                                                                    | 48/32/16, 64, 180 px                      | `app/layout.tsx` `icons`                                                                                                                                 |
+| `public/og-image.png`                    | approved                 | Default social sharing card                                                       | PNG 1200×630, < 300 KB, text ≥ 48 px      | Every page without its own image; `LocalBusiness.logo` in JSON-LD                                                                                        |
 | `public/logos/*.{svg,png}`               | current                  | Carrier partner logos (Allstate, Travelers, Farmers, State Farm, Lemonade, Chubb) | Monochrome-friendly; ≤ 40 px tall at 2×   | `home/partners-marquee.tsx`; list in `PARTNERS` in `site.ts`                                                                                             |
 | `public/*.webp`                          | current                  | Property/amenity photography                                                      | WebP, ≤ 1600 px wide, ≤ 250 KB            | Home showcase & pet section                                                                                                                              |
 | `public/team/*.jpg`                      | synced                   | Team portraits                                                                    | Square, ≥ 320 px                          | Team page (written by `scripts/sync-team.mjs`)                                                                                                           |
 
-Recommended additions when the brand kit is ready (drop in `public/`, then
-register in `app/layout.tsx` → `icons`):
-
-- `favicon.ico` 48×48 (legacy browsers)
-- `apple-touch-icon.png` 180×180
-- `icon-192.png`, `icon-512.png` (+ `manifest.webmanifest` if a PWA install
-  prompt is wanted)
+Optional additions: `icon-192.png`, `icon-512.png` (+ `manifest.webmanifest`)
+if a PWA install prompt is wanted, and a light-background wordmark for email
+signatures.
 
 ## 2. Colour
 

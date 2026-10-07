@@ -6,7 +6,7 @@ import { IntakeCta } from '@/components/shared/cta-button';
 import { JsonLd } from '@/components/shared/json-ld';
 import { TrackedAnchor } from '@/components/shared/tracked-link';
 import { COMPANY, CONTACT, SERVICE_AREA } from '@/config/site';
-import { PROPERTY_STATS, propertyCountSnapshotNote, VERIFIED_PROPERTY_COUNT } from '@/lib/property-stats';
+import { VERIFIED_PROPERTY_COUNT } from '@/lib/property-stats';
 import { graph, pageMetadata, webPageSchema } from '@/lib/seo';
 
 const DESCRIPTION = `Reach Nova Havens at ${CONTACT.phone.display} — available 24/7 for emergency claims and placements. Request housing, submit a property, or ask a general question.`;
@@ -36,7 +36,6 @@ function PhoneLink({
 }
 
 export default function ContactPage() {
-  const snapshotNote = propertyCountSnapshotNote(PROPERTY_STATS.generatedAt).toLowerCase();
   return (
     <div className="w-full">
       <JsonLd
@@ -77,7 +76,7 @@ export default function ContactPage() {
       <section className="py-16 md:py-24 px-4 md:px-8 max-w-site mx-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           <div className="bg-card rounded-lg border border-white/10 p-8 flex flex-col items-center text-center">
-            <h2 className="text-2xl font-bold mb-3 text-foreground">Displaced Family or Adjuster?</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">Displaced Family?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
               If you have an active insurance claim and need immediate furnished housing placement, Nova Havens responds
               24/7. Start your request here.
@@ -95,8 +94,8 @@ export default function ContactPage() {
           <div className="bg-card rounded-lg border border-white/10 p-8 flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-3 text-foreground">Own a Furnished Property?</h2>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Join the Nova Havens network of {VERIFIED_PROPERTY_COUNT} verified furnished property records (
-              {snapshotNote}). Availability is confirmed for each request; carrier billing is handled by Nova Havens.
+              Join the Nova Havens network of {VERIFIED_PROPERTY_COUNT} verified furnished property records.
+              Availability is confirmed for each request.
             </p>
             <IntakeCta
               form="property"

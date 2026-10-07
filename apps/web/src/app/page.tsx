@@ -32,7 +32,7 @@ import { TrackedAnchor } from '@/components/shared/tracked-link';
 import { COMPANY, CONTACT, PUBLIC_STATS, SERVICE_AREA } from '@/config/site';
 import { HOME_FAQ_GROUPS } from '@/content/faqs';
 import { HOW_IT_WORKS_TRACKS } from '@/content/how-it-works';
-import { PROPERTY_STATS_NOTE, VERIFIED_PROPERTY_COUNT } from '@/lib/property-stats';
+import { VERIFIED_PROPERTY_COUNT } from '@/lib/property-stats';
 import { HOME_SCHEMA, pageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = pageMetadata({
@@ -123,9 +123,9 @@ const REVIEWS: Review[] = [
   },
   {
     quote:
-      "As an adjuster, I rely on vendors who deliver. Nova Havens is the most reliable housing coordinator I've worked with.",
-    name: 'James T.',
-    role: 'Independent Adjuster',
+      "After losing everything in a flood, Nova Havens gave us stability when we needed it most. The home felt welcoming from day one.",
+    name: 'Maria L.',
+    role: 'Water Damage Displacement',
   },
   {
     quote: "The team checked in on us every step of the way. We didn't feel like a case number — we felt cared for.",
@@ -149,7 +149,7 @@ const WHY_CARDS = [
   {
     icon: Users,
     title: 'One Team, One Point of Contact',
-    text: 'Nova Havens handles every step in-house — from processing the claim to delivering housing options and managing the stay. Families, carriers, and adjusters always have a single dedicated contact.',
+    text: 'Nova Havens handles every step in-house — from processing the claim to delivering housing options and managing the stay. Families always have a single dedicated contact.',
   },
   {
     icon: Globe,
@@ -177,7 +177,7 @@ const AMENITIES = [
   {
     icon: MoveRight,
     title: 'Seamless Transition',
-    text: 'Nova Havens coordinates move-in logistics directly with carriers and adjusters — so families focus on recovery, not paperwork or scheduling.',
+    text: 'Nova Havens coordinates move-in logistics seamlessly — so families can focus on recovery, not paperwork or scheduling.',
   },
   {
     icon: PawPrint,
@@ -220,7 +220,7 @@ export default function HomePage() {
             style={{ fontSize: 'var(--text-hero)', lineHeight: 1.1 }}
             data-testid="heading-hero"
           >
-            A safe place to land, fast.
+            Welcome to Nova Havens
           </h1>
           <p
             className="text-lg md:text-xl max-w-2xl mb-10 mx-auto text-muted-foreground"
@@ -275,8 +275,8 @@ export default function HomePage() {
                     Verified network property records
                   </span>
                   <span className="mt-2 block text-sm leading-relaxed max-w-cta text-tertiary text-left">
-                    {PROPERTY_STATS_NOTE}. Nova Havens coordinates furnished housing across {SERVICE_AREA.usName};
-                    availability is confirmed for each request.
+                    Nova Havens coordinates furnished housing across {SERVICE_AREA.usName}; availability is confirmed
+                    for each request.
                   </span>
                 </div>
               </div>
@@ -438,7 +438,9 @@ export default function HomePage() {
             <div className="text-sm uppercase tracking-wider text-muted-foreground font-medium mb-2">
               Verified Network Property Records
             </div>
-            <div className="text-xs text-tertiary leading-relaxed">{PROPERTY_STATS_NOTE}.</div>
+            <div className="text-xs text-tertiary leading-relaxed">
+              Furnished homes in the network across {SERVICE_AREA.usName}.
+            </div>
           </div>
           <div className="bg-card border border-white/5 rounded-lg p-8 text-center">
             <div className="text-4xl font-extrabold text-foreground mb-2">{SERVICE_AREA.stateCount}</div>
@@ -480,9 +482,9 @@ export default function HomePage() {
         <div className="max-w-site mx-auto">
           <div className="mb-12">
             <h2 className="text-3xl font-extrabold mb-3" data-testid="heading-partners">
-              Our trusted industry partners.
+              Our trusted network.
             </h2>
-            <p className="text-muted-foreground">Nova Havens works with leading insurance carriers nationwide.</p>
+            <p className="text-muted-foreground">Nova Havens partners with leading housing companies and platforms nationwide.</p>
           </div>
           <PartnersMarquee />
         </div>

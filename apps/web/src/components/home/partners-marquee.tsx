@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { PARTNERS } from '@/config/site';
 
-/** CSS-only infinite marquee of carrier logos; pauses on hover and for reduced motion. */
+/** CSS-only infinite marquee of partner logos; pauses on hover and for reduced motion. */
 export function PartnersMarquee() {
   return (
     <div className="relative overflow-hidden" data-testid="marquee-partners">

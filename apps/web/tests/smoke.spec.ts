@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 const ROUTES: { path: string; heading: RegExp; title: RegExp }[] = [
-  { path: '/', heading: /A safe place to land/, title: /Nova Havens \| Nationwide Furnished Housing Coordination/ },
+  { path: '/', heading: /Welcome to Nova Havens/, title: /Nova Havens \| Nationwide Furnished Housing Coordination/ },
   { path: '/blog', heading: /Insights & Resources/, title: /Blog & Resources \| Nova Havens/ },
   { path: '/blog/details-that-speed-up-housing-placement', heading: /Seven Details/, title: /Seven Details/ },
   { path: '/meet-the-team', heading: /Meet the Nova Havens Team/, title: /Meet the Team \| Nova Havens/ },

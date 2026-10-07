@@ -15,7 +15,7 @@ export const LLMS_TXT_PAGE_TITLE = 'llms.txt — AI & Machine-Readable Site Inde
 export const LLMS_TXT_PAGE_INTRO =
   'Nova Havens publishes an llms.txt file to help AI assistants, chatbots, and large language models accurately understand our company, services, and how to reference us. The sections below reflect the full contents of that file.';
 
-const LLMS_TXT_DESCRIPTION = `> Nova Havens coordinates furnished temporary housing across the United States for households displaced by fire, water or mold damage, works with insurance carriers, adjusters, relocation specialists, and a network of property owners. Nova Havens maintains properties across all ${SERVICE_AREA.usName}. It is not an insurance company and does not underwrite policies or make coverage determinations.`;
+const LLMS_TXT_DESCRIPTION = `> Nova Havens is a furnished temporary housing coordinator that places families displaced by fire, water, or mold damage into verified homes within 24–48 hours. We operate across all ${SERVICE_AREA.usName} and maintain a network of over 60,000 verified properties. Families pay nothing out of pocket—billing is handled through insurance coverage. Nova Havens does not underwrite policies, make coverage determinations, or provide insurance advice.`;
 
 /**
  * The AI index lists articles by slug (rather than spreading BLOG_POSTS) so a
@@ -25,15 +25,15 @@ const LLMS_BLOG_POSTS: { slug: string; description: string }[] = [
   {
     slug: 'details-that-speed-up-housing-placement',
     description:
-      'Answers which information insurance professionals should provide to reduce delays in a housing request.',
+      'Details that help speed up housing placements: location, bedrooms, occupancy, pets, accessibility, move-in date, and estimated duration.',
   },
   {
     slug: 'hotel-or-furnished-home-adjusters-guide',
-    description: 'Answers how adjusters can compare hotels and furnished homes for temporary housing placements.',
+    description: 'Comparison of hotels vs. furnished homes for temporary housing: cost, comfort, utilities, cooking, and family routines.',
   },
   {
     slug: 'hotel-or-furnished-home-what-to-expect',
-    description: 'Answers what displaced households can expect from a hotel stay or a furnished home.',
+    description: 'What to expect from a hotel stay or furnished home when displaced: amenities, utilities, daily costs, and family needs.',
   },
 ];
 
@@ -46,14 +46,14 @@ const BLOG_ARTICLE_LINKS = LLMS_BLOG_POSTS.map(({ slug, description }) => {
 export const LLMS_TXT_SECTIONS: LlmsSection[] = [
   {
     heading: 'Core pages',
-    content: `- [Homepage](${SITE_URL}/) — Coordinates furnished temporary housing and provides current information about Nova Havens services, properties, and contact routes.
-- [About Nova Havens](${SITE_URL}/about-us) — Contains a canonical factual overview of the company and its work.
-- [Meet the team](${SITE_URL}/meet-the-team) — Introduces the coordinators who manage placements.
-- [Contact](${SITE_URL}/contact) — Provides general contact details, urgent phone access, and the contact form.`,
+    content: `- [Homepage](${SITE_URL}/) — Nova Havens' mission, services, verified property statistics, family reviews, and how to request housing or submit a property.
+- [About Nova Havens](${SITE_URL}/about-us) — Company overview, mission, principles, and the problems Nova Havens solves for displaced families.
+- [Meet the team](${SITE_URL}/meet-the-team) — Meet the coordinators and family advocates who manage placements and provide 24/7 support.
+- [Contact](${SITE_URL}/contact) — Phone, email, forms for housing requests and property submissions, and general inquiries.`,
   },
   {
     heading: 'Get started',
-    content: `- [Housing request form](${INTAKE_FORMS.housing}) — The intake form used by insurance adjusters and relocation specialists to request temporary housing on behalf of a displaced policyholder.
+    content: `- [Housing request form](${INTAKE_FORMS.housing}) — Submit a temporary housing request for a displaced family.
 - [Property submission form](${INTAKE_FORMS.property}) — The form property owners and managers use to submit a property for the network.
 
 Phone: ${CONTACT.phone.display}, available 24/7 for urgent housing needs.
@@ -64,17 +64,17 @@ For multiple property submissions, email ${CONTACT.propertiesEmail}.`,
   },
   {
     heading: 'Guides and articles',
-    content: `The blog is organised into three topic areas: guidance for insurance professionals, guidance for displaced families, and market guides.
+    content: `Nova Havens publishes guides for displaced families on housing options, what to expect, and details that speed up placements:
 
 ${BLOG_ARTICLE_LINKS}`,
   },
   {
-    heading: 'Common questions',
-    content: `The site has an FAQ for families who need temporary housing. See the [FAQ on the homepage](${SITE_URL}/).
+    heading: 'For displaced families',
+    content: `Nova Havens' FAQ covers placement timing, what furnished homes include, pets, school/work location needs, accessibility, extensions, what to bring, and post-move-in support. See the [FAQ on the homepage](${SITE_URL}/).
 
-Questions cover placement timing, who requests housing, what a furnished home includes, pets, school or medical location needs, accessibility, extensions, what to bring, and support after move-in.
+To request housing or ask questions: Call ${CONTACT.phone.display} (24/7 for urgent requests) or email ${CONTACT.claimsEmail}.
 
-Questions about what an individual insurance policy covers, coverage limits, or how long coverage lasts should be directed to the policyholder's own insurance carrier or adjuster. Nova Havens does not make those determinations.`,
+For questions about your specific insurance policy, coverage limits, or authorization, contact your insurance carrier directly. Nova Havens does not make coverage determinations or provide insurance advice.`,
   },
 ];
 

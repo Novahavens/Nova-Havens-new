@@ -19,9 +19,9 @@ export const COMPANY = {
   tagline: 'Nationwide Furnished Housing Coordination',
   /** Canonical one-sentence definition. Used verbatim in JSON-LD and llms.txt. */
   definition:
-    'Nova Havens Temporary Housing is an insurance relocation housing company headquartered in Nashville, Tennessee, that coordinates furnished temporary housing for policyholders displaced by insured property damage, working directly with insurance carriers, adjusters, and relocation specialists under Additional Living Expense (ALE) coverage.',
+    'Nova Havens Temporary Housing is an insurance relocation housing company headquartered in Nashville, Tennessee, that coordinates furnished temporary housing for policyholders displaced by insured property damage under Additional Living Expense (ALE) coverage.',
   description:
-    'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — billed directly to carriers so families pay nothing out of pocket.',
+    'Nova Havens places insurance-displaced families into verified furnished homes nationwide within 24–48 hours — so families pay nothing out of pocket and can focus on recovery.',
   founded: undefined as string | undefined, // e.g. '2021' — add when confirmed
   category: 'Additional Living Expense (ALE) housing',
   serviceType: 'Insurance Housing Coordination',
@@ -85,11 +85,8 @@ export const PUBLIC_STATS = {
   googleRating: { value: 4.8, outOf: 5 },
 } as const;
 
-/**
- * Conservative default property count shown only if data/property-stats.json
- * is missing or malformed. Must never exceed the last known-good figure.
- */
-export const FALLBACK_TOTAL_PROPERTIES = 60_000;
+/** The network property figure published site-wide (rendered as "60,000+"). */
+export const PUBLISHED_PROPERTY_COUNT = 60_000;
 
 export const BRAND = {
   /** The only gold in the system. Mirrors --primary in src/styles/tokens.css. */
@@ -99,12 +96,13 @@ export const BRAND = {
   cardHex: '#111318',
   mutedHex: '#9BA3AF',
   fontFamily: 'Plus Jakarta Sans',
-  /** Brand asset placeholders — see public/brand/README.md and docs/BRAND.md. */
+  /** Brand assets — see public/brand/README.md and docs/BRAND.md. */
   assets: {
-    logoHorizontalDark: '/brand/logo-horizontal-dark.svg',
-    logoHorizontalLight: '/brand/logo-horizontal-light.svg',
-    logoMark: '/brand/logo-mark.svg',
-    favicon: '/favicon.svg',
+    /** Heart-house mark + "Nova Havens Home Rentals" wordmark, transparent background. */
+    logoHorizontal: '/brand/logo-horizontal.png',
+    /** Square heart-house mark, transparent background. */
+    logoMark: '/brand/logo-mark.png',
+    favicon: '/favicon.ico',
     ogImage: '/og-image.png',
   },
 } as const;
@@ -113,7 +111,7 @@ export const COMPANY_FACTS: { term: string; definition: string }[] = [
   {
     term: 'Who Nova Havens serves',
     definition:
-      'Insurance carriers, adjusters and relocation specialists, displaced policyholders, and property owners.',
+      'Displaced families and property owners seeking temporary housing solutions.',
   },
   { term: 'Coverage area', definition: `Properties across all ${SERVICE_AREA.usName}.` },
   {
