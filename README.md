@@ -17,6 +17,7 @@ interactivity.
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deploying to Vercel (and Replit/Docker), environment variables, domains, the daily data sync                                           |
 | [docs/SEO.md](docs/SEO.md)               | Google Search Console setup, the sitemap, submitting URLs for indexing, and launching the new site **without losing existing traffic** |
 | [docs/CMS.md](docs/CMS.md)               | How content is modelled today and how to plug in a CMS later                                                                           |
+| [docs/BLOGGING.md](docs/BLOGGING.md)     | The weekly blog automation: William's Friday checklist, editing a post in the PR, operating n8n and the Google Sheet, troubleshooting   |
 | [docs/BRAND.md](docs/BRAND.md)           | Brand asset inventory, specs, and the placeholders to replace                                                                          |
 | [docs/COMPANY.md](docs/COMPANY.md)       | Every company fact published on the site, and where it is defined in code                                                              |
 
@@ -342,6 +343,16 @@ How to extend it when writing new content:
 
 The fuller playbook, including Search Console and launch steps, is in
 [docs/SEO.md](docs/SEO.md).
+
+## Blogging
+
+Four posts a week are drafted by an n8n automation from public signals
+(Google Trends, NWS, FEMA, news search, Furnished Finder), approved by email
+on Friday, and delivered as a draft pull request of markdown files in
+`apps/web/content/posts/`. Merging publishes; `validate:posts` enforces the
+house content rules in CI. Hand-written posts use the same folder and checks.
+The runbook is [docs/BLOGGING.md](docs/BLOGGING.md); the design is
+[docs/blog-automation/PLAN.md](docs/blog-automation/PLAN.md).
 
 ## Scripts
 

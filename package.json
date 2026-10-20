@@ -14,6 +14,7 @@
     "lint": "pnpm --filter @nova-havens/web lint",
     "typecheck": "pnpm --filter @nova-havens/web typecheck",
     "test:smoke": "pnpm --filter @nova-havens/web test:smoke",
+    "validate:posts": "pnpm --filter @nova-havens/web validate:posts",
     "sync:property-stats": "pnpm --filter @nova-havens/web sync:property-stats",
     "sync:team": "pnpm --filter @nova-havens/web sync:team",
     "format": "prettier --write .",

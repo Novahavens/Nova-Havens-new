@@ -6,7 +6,11 @@
  * CMS can replace this file later without touching the UI (see docs/CMS.md).
  */
 
-export type BlogPostMotif = 'ai' | 'checklist' | 'house' | 'paw' | 'key' | 'magnifier' | 'map' | 'gears';
+import { BLOG_CATEGORIES, BLOG_CTAS, BLOG_MOTIFS } from './categories';
+
+export { BLOG_CATEGORIES };
+
+export type BlogPostMotif = (typeof BLOG_MOTIFS)[number];
 
 /**
  * Per-post closing CTA. Buttons must use these exact labels and point at the
@@ -15,7 +19,7 @@ export type BlogPostMotif = 'ai' | 'checklist' | 'house' | 'paw' | 'key' | 'magn
  * - "property" → "Submit your property"
  * - "none"     → no CTA card (e.g. posts where a phone call is the action)
  */
-export type BlogPostCta = 'housing' | 'property' | 'none';
+export type BlogPostCta = (typeof BLOG_CTAS)[number];
 
 export interface BlogPost {
   id: number;
@@ -257,7 +261,5 @@ Say so. Tell the team what doesn't fit — the area, the layout, the stairs — 
 In many homes, yes. A large share of the properties Nova Havens works with accept pets. What matters is sharing the details at the start — how many, what type, breed and weight — so the search only includes homes that will welcome them.`,
   },
 ];
-
-export const BLOG_CATEGORIES = ['For Insurance Professionals', 'For Displaced Families', 'Market Guides'] as const;
 
 export const BLOG_FILTERS = ['All', ...BLOG_CATEGORIES] as const;

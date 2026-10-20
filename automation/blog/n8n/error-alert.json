@@ -1,0 +1,89 @@
+{
+  "name": "Blog · Error alert",
+  "id": "IXnMBhGgS4nkS4gy",
+  "description": "",
+  "nodes": [
+    {
+      "id": "6e043c40-611e-4c52-900a-5a0e8340a5f4",
+      "name": "On workflow error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "659715ab-0ecd-4662-adf3-1efa8f09e811",
+      "name": "Email ops",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "authentication": "oAuth2",
+        "sendTo": "fazal@novahavens.com",
+        "subject": "=n8n error · {{ $json.workflow.name }}",
+        "emailType": "text",
+        "message": "=The workflow \"{{ $json.workflow.name }}\" failed.\n\nExecution: {{ $json.execution.url }}\nLast node: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error && $json.execution.error.message }}\n\nSee docs/BLOGGING.md section 6 (Troubleshooting) in the site repo.",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "58b14af6-2505-4f9a-8807-1c917dbce226",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vCeKR6SCQiW2qry3",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "861f598e-fe05-41b5-84cc-9a00ff25991e",
+      "name": "Sticky Note b79ad4fe",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -96
+      ],
+      "parameters": {
+        "content": "## Blog · Error alert\nShared error handler. Both blog workflows (Daily Signal Collector, Friday Synthesizer) name this workflow in Settings → Error workflow, so any failed production run emails fazal@novahavens.com with the execution link.",
+        "width": 384,
+        "height": 224
+      }
+    }
+  ],
+  "connections": {
+    "On workflow error": {
+      "main": [
+        [
+          {
+            "node": "Email ops",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "nodeGroups": [],
+  "tags": [
+    "blog-automation"
+  ],
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "instanceUrl": "https://novahavensai.app.n8n.cloud",
+    "exportedAt": "2026-10-20T16:20:03.078Z"
+  }
+}

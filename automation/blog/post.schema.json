@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://novahavens.com/automation/blog/post.schema.json",
+  "title": "Nova Havens blog post (writer output)",
+  "description": "Structured output of the post-writer model. Mirrors the BlogPost shape in apps/web/src/content/blog.ts and the validation gate in docs/blog-automation/PLAN.md section 8. Kept strict and flat for the n8n structured-output parser.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "title", "category", "excerpt", "keywords", "motif", "cta", "content", "sources"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "description": "URL slug: kebab-case, unique across apps/web/src/content/blog.ts and apps/web/content/posts/, contains the primary keyword, no dates.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 80
+    },
+    "title": {
+      "type": "string",
+      "description": "Post title. Target 60 characters or fewer; 70 is the hard limit. Primary keyword in the first half.",
+      "minLength": 10,
+      "maxLength": 70
+    },
+    "category": {
+      "type": "string",
+      "description": "Site blog category. Automation uses only 'For Displaced Families' and 'Market Guides'; 'For Insurance Professionals' exists on the site but is not written to by the automation.",
+      "enum": ["For Displaced Families", "Market Guides", "For Insurance Professionals"]
+    },
+    "excerpt": {
+      "type": "string",
+      "description": "Meta description and social card text. 80-160 characters. States the answer, contains the primary keyword.",
+      "minLength": 80,
+      "maxLength": 160
+    },
+    "keywords": {
+      "type": "array",
+      "description": "3-8 search phrases, primary keyword first.",
+      "minItems": 3,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 60
+      }
+    },
+    "motif": {
+      "type": "string",
+      "description": "Open Graph image motif (BlogPostMotif in blog.ts). checklist=guides, map=disaster/regional, house=housing comparisons, key=property-owner topics, magnifier=trends/research, gears=process, paw=pets, ai=automation topics only.",
+      "enum": ["ai", "checklist", "house", "paw", "key", "magnifier", "map", "gears"]
+    },
+    "cta": {
+      "type": "string",
+      "description": "Closing call-to-action card (BlogPostCta in blog.ts). housing=family-facing, property=owner-facing, none=industry roundups or phone-only actions.",
+      "enum": ["housing", "property", "none"]
+    },
+    "content": {
+      "type": "string",
+      "description": "Post body in the house markdown subset rendered by apps/web/src/components/blog/post-body.tsx. Must start with a '> ' quick-summary block, contain at least 3 '## ' question headings, and end with '## Frequently Asked Questions' followed by 3-5 '**Question?**' blocks. 900-1,500 words (800-1,700 accepted by the validator). No links, HTML, tables or images.",
+      "minLength": 4000,
+      "maxLength": 14000
+    },
+    "sources": {
+      "type": "array",
+      "description": "Primary sources cited by name in the body. Allow-listed domains only. May be empty for evergreen guides.",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url", "accessed"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Source as named in the body, e.g. 'National Weather Service, Hurricane Local Statement' or 'FEMA Disaster Declaration DR-4899-LA'.",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "url": {
+            "type": "string",
+            "description": "HTTPS URL on an allow-listed domain (subdomains permitted): novahavens.com, weather.gov, fema.gov, census.gov, hud.gov, ready.gov, redcross.org.",
+            "pattern": "^https://([a-z0-9-]+\\.)*(novahavens\\.com|weather\\.gov|fema\\.gov|census\\.gov|hud\\.gov|ready\\.gov|redcross\\.org)(/[^\\s]*)?$",
+            "maxLength": 500
+          },
+          "accessed": {
+            "type": "string",
+            "description": "Date the source was read, YYYY-MM-DD.",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
+          }
+        }
+      }
+    }
+  }
+}
