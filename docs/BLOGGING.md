@@ -240,33 +240,35 @@ new `Signals` rows before leaving it to the schedule.
 | Gmail (send + send-and-wait) | exists in n8n (`Gmail account`, fazal@)                         | none                                                                                                               |
 | LLM                          | `n8n free OpenAI API credits` (managed) + Anthropic via gateway | none; switch the model node if credits run out                                                                     |
 | Brave Search                 | gateway credits                                                 | none                                                                                                               |
-| GitHub                       | **missing**                                                     | Create the fine-grained PAT below and add it as `GitHub · blog bot`. Until then the PR step is skipped and posts wait in the `Posts` tab. |
+| GitHub                       | exists in n8n (`GitHub account`, classic PAT, user Novahavens)  | **Expires 2026-11-20.** Renew before then (below). If it lapses the PR step is skipped and the posts arrive by email instead.          |
 | Google Search Console        | optional                                                        | Google OAuth2 credential with scope `webmasters.readonly`; the GSC branch of the collector activates on its own. |
 
-**Create the GitHub token** (William or Fazal, signed in to a GitHub account
-with write access to the repository):
+**The GitHub token** is a classic personal access token created on
+2026-10-21 by the `Novahavens` GitHub account and stored in n8n as the
+credential `GitHub account`. The four *GitHub:* nodes in *Friday Synthesizer*
+reference that credential by ID, so the name does not matter. It was issued
+with a 30-day expiry and **expires 2026-11-20**; after that the PR step fails
+and William receives the posts by email instead.
 
-1. GitHub → profile picture → **Settings** → **Developer settings** →
-   **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
-2. Token name: `n8n blog bot`. Expiration: **1 year** (custom date). Put the
-   date in the calendar; the token must be rotated before it expires.
-3. **Resource owner:** `Novahavens`.
-4. **Repository access:** *Only select repositories* → `Nova-Havens-new`.
-5. **Repository permissions:** **Contents: Read and write**,
-   **Pull requests: Read and write**. Leave everything else at *No access*.
-6. **Generate token**, copy it once. It is not shown again.
+**Renewing (or replacing) the token** — about two minutes, signed in to
+GitHub as `Novahavens`:
 
-**Add it in n8n:**
+1. Open <https://github.com/settings/tokens/new?description=n8n%20blog%20bot&scopes=repo>
+   (classic token, `repo` scope pre-selected). Set **Expiration** to a custom
+   date one year out and put that date in the calendar. **Generate token**,
+   copy it once.
+   Stricter alternative: a fine-grained token at
+   <https://github.com/settings/personal-access-tokens/new> → Resource owner
+   `Novahavens` → *Only select repositories* → `Nova-Havens-new` →
+   **Contents: Read and write**, **Pull requests: Read and write**.
+2. n8n → <https://novahavensai.app.n8n.cloud/home/credentials> → open
+   **GitHub account** → replace **Access Token** with the new value → Save.
+   Nothing in the workflow changes.
+3. Optional check: GitHub → Settings → Developer settings → Personal access
+   tokens → delete the old token.
 
-1. n8n → **Credentials** → **Add credential** → search **GitHub API**.
-2. Server: `https://api.github.com`. User: the GitHub username the token
-   belongs to. Access token: paste.
-3. Name it exactly `GitHub · blog bot` and save. The *Friday Synthesizer*
-   HTTP Request nodes reference it by that name.
-4. The next Friday run opens the draft PR itself. Posts from a week when the
-   credential was missing arrive in the *posts written, GitHub step failed*
-   email as complete `.md` files; create them in the repo by hand (section 4)
-   if they are still wanted.
+The token currently carries every classic scope; only `repo` is needed. When
+renewing, tick `repo` alone.
 
 **Optional: Google Search Console** (adds the site's own top queries to the
 daily signals):
@@ -289,9 +291,8 @@ both scheduled workflows are published.
 
 1. Merge the `blog-automation` branch. No visible site change.
 2. Eyeball `Signals` after two or three daily runs.
-3. Add the GitHub credential (5.4) before Friday. Without it the first
-   Friday still works end to end, but the posts arrive by email instead of
-   as a PR.
+3. GitHub credential added and tested on 2026-10-21 (5.4); renew it before
+   2026-11-20.
 4. Treat the first Friday as a dry run: William approves, the draft PR
    opens, review all four posts closely before merging.
 5. From week two the loop runs on its own.
@@ -302,7 +303,7 @@ both scheduled workflows are published.
 | ----------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | No Friday email                                       | Workflow inactive, the run failed before the email, or no signals   | n8n → *Friday Synthesizer* → **Executions**: is there a run at 09:00 UTC? None → activate the workflow. Failed → the error email has the link; open the failed node. Check the `Runs` tab and that `Signals` has rows from this week. Check spam for the email. |
 | Email arrived but Approve did nothing                 | More than 48 hours passed; the wait timed out                       | The briefs are `expired` in the Sheet. Either wait for next Friday, or in n8n open the expired execution's data and run *Friday Synthesizer* manually (**Test workflow**); a fresh approval email is sent.                                                     |
-| Approved, but no PR                                   | GitHub credential missing or expired                                | William and Fazal receive *posts written, GitHub step failed* with each post as a complete `.md` file; the `Posts` tab logs them as `generated`. Create the files by hand (section 4), and add or renew the `GitHub · blog bot` credential (5.4) for next week. |
+| Approved, but no PR                                   | GitHub credential missing or expired                                | William and Fazal receive *posts written, GitHub step failed* with each post as a complete `.md` file; the `Posts` tab logs them as `generated`. Create the files by hand (section 4), and renew the token in the `GitHub account` credential (5.4) for next week. |
 | PR opened, but CI check **verify** is red             | A post fails `validate:posts`                                       | Open the failed check → **Details** → the *Validate posts* step. The report lists each file and the rule it broke (`excerpt too long (171 > 160)`, `forbidden pattern: coverage claim`, `missing FAQ section`…). Edit the file in the PR (section 3) until green. |
 | A source returned 0 items                             | Feed moved, rate-limited, or blocked (Furnished Finder returns 403 direct) | `Runs` tab → the day's row → `notes` names the source. One empty source does not stop the run. If it stays empty for three days, open the branch in the collector and test the node; update the URL or query in `Config`.                                    |
 | LLM node fails with a credit or quota error           | n8n free OpenAI credits exhausted                                   | On the *Brief writer* and *Post writer* nodes switch the model/credential to Anthropic via the n8n gateway, or add an OpenAI/Anthropic API key credential. Cost is roughly $1–2 a month. Re-run the failed execution.                                           |

@@ -145,7 +145,7 @@ Posts: `generated` → `pr_opened` → `published` (set by hand or a later sync)
    validation errors appended to the prompt; a second failure is logged and
    the post is skipped (the PR still opens with the others).
 8. **Append → Posts** (`status: generated`).
-9. **GitHub** (HTTP Request, credential `GitHub · blog bot`):
+9. **GitHub** (HTTP Request, credential `GitHub account`, classic PAT of the `Novahavens` user):
    `GET /git/ref/heads/main` → `POST /git/refs` (`blog/{{year}}-w{{week}}`) →
    `PUT /contents/apps/web/content/posts/{{slug}}.md` ×4 →
    `POST /pulls` (draft) with the briefs and validation summary as the body.
@@ -242,7 +242,7 @@ Existing posts stay in `blog.ts`; nothing about them changes.
 | Gmail (send + send-and-wait) | exists in n8n (`Gmail account`, fazal@)                     | none                                                                                                       |
 | LLM                         | `n8n free OpenAI API credits` (managed) + Anthropic via gateway | none; switch the model node if credits run out                                                          |
 | Brave Search                | gateway credits                                              | none                                                                                                       |
-| GitHub                      | **missing**                                                  | William or Fazal creates a fine-grained PAT on `Novahavens/Nova-Havens-new` with *Contents: read/write* and *Pull requests: read/write*; add to n8n as `GitHub · blog bot` (type GitHub API). Until then the PR step is skipped and the posts wait in the `Posts` tab. |
+| GitHub                      | exists (`GitHub account`, added 2026-10-21)                  | Classic PAT of the `Novahavens` user, expires 2026-11-20; renewal steps in docs/BLOGGING.md §5.4. If it lapses the PR step is skipped and the posts are emailed as `.md` files. |
 | Google Search Console       | optional                                                     | Google OAuth2 credential with scope `webmasters.readonly`; the GSC branch activates automatically.        |
 
 ## 11. Rollout

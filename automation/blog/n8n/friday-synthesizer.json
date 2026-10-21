@@ -925,7 +925,13 @@
         }
       },
       "executeOnce": true,
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "githubApi": {
+          "id": "lvjXlEVMP7ayF51A",
+          "name": "GitHub account"
+        }
+      }
     },
     {
       "id": "c5f41f7f-ddb8-4ed7-b270-b3387c62b096",
@@ -960,7 +966,13 @@
         }
       },
       "executeOnce": true,
-      "onError": "continueRegularOutput"
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "githubApi": {
+          "id": "lvjXlEVMP7ayF51A",
+          "name": "GitHub account"
+        }
+      }
     },
     {
       "id": "1da44e56-09e7-45b0-b459-d9f53b6af649",
@@ -1014,6 +1026,12 @@
             }
           }
         }
+      },
+      "credentials": {
+        "githubApi": {
+          "id": "lvjXlEVMP7ayF51A",
+          "name": "GitHub account"
+        }
       }
     },
     {
@@ -1064,7 +1082,13 @@
           "timeout": 30000
         }
       },
-      "executeOnce": true
+      "executeOnce": true,
+      "credentials": {
+        "githubApi": {
+          "id": "lvjXlEVMP7ayF51A",
+          "name": "GitHub account"
+        }
+      }
     },
     {
       "id": "11befd6b-9c52-48ab-bbfa-f3ffa8fdb783",
@@ -1278,7 +1302,7 @@
         0
       ],
       "parameters": {
-        "content": "## Blog · Friday Synthesizer\nFridays 09:00 UTC. Reads the last 7 days of Signals, has the LLM propose one brief per category, emails William for approval (48 h), then writes the four posts in the website blog schema, validates them against PLAN.md §8 (one rewrite on failure), logs them to the Posts tab and opens a draft pull request on GitHub with the markdown files. Merging the PR publishes.\n\nPrompts: automation/blog/prompts/*.md in the repo (embedded in the two \"Build … prompts\" Code nodes). Requires the \"GitHub · blog bot\" credential for the PR step; without it the posts are emailed as a sheet link instead.",
+        "content": "## Blog · Friday Synthesizer\nFridays 09:00 UTC. Reads the last 7 days of Signals, has the LLM propose one brief per category, emails William for approval (48 h), then writes the four posts in the website blog schema, validates them against PLAN.md §8 (one rewrite on failure), logs them to the Posts tab and opens a draft pull request on GitHub with the markdown files. Merging the PR publishes.\n\nPrompts: automation/blog/prompts/*.md in the repo (embedded in the two \"Build … prompts\" Code nodes). The four GitHub nodes use the \"GitHub account\" credential (classic PAT of the Novahavens user, expires 2026-11-20 — renewal steps in docs/BLOGGING.md §5.4); if it lapses the posts are emailed as .md files instead.",
         "width": 880,
         "height": 352
       }
@@ -1826,6 +1850,6 @@
   "pinData": {},
   "meta": {
     "instanceUrl": "https://novahavensai.app.n8n.cloud",
-    "exportedAt": "2026-10-20T16:21:10.595Z"
+    "exportedAt": "2026-10-21T22:07:02.786Z"
   }
 }
