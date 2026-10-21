@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: writes-market-guide-midterm
+expected_outcome: |
+  A new markdown post in apps/web/content/posts/, category Market Guides, written in the third person for property owners, cta property, motif house or key. It defines each of the three terms on first use, compares them (length of stay, who the occupant is, who arranges and pays, furnishing standard, lease form) and tells an owner what each means for them, without stating what any insurance policy covers or pays and without any property count, platform name or invented price/statistic. House format throughout (> quick summary first, 3+ ## question headings, next-step section with Nova Havens and (629) 401-0054 or novahavens.com/contact, closing FAQ with 3+ blocks). pnpm --filter @nova-havens/web validate:posts was run and passes.
