@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: fixes-failing-draft
+expected_outcome: |
+  The file apps/web/content/posts/water-damage-where-to-stay.md is edited in place (same slug), passes pnpm --filter @nova-havens/web validate:posts, and the validator output is shown. The coverage claim ('your policy covers', 'reimbursed') is rewritten as a question for the insurer; the property count is removed; the first-person 'we' becomes 'Nova Havens'; the off-list link is removed and the organisation is cited in prose; the excerpt is 80-160 characters; headings become questions with at least three ## ...? headings; a ## Frequently Asked Questions section with at least three **Question?** blocks closes the post; the fixed disclaimer paragraph is present; the quick summary stays as the first block; the topic and useful content are preserved rather than rewritten from scratch.
+context:
+  scaffold_script: place-files.sh

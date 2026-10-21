@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: writes-pet-guide-post
+expected_outcome: |
+  A new markdown post exists at apps/web/content/posts/<slug>.md, category For Displaced Families, second person, in the house format (front matter with slug/title/category/date/excerpt/keywords/motif/cta; opening > quick summary; at least three ## question headings whose first sentence answers them; a next-step section naming Nova Havens with (629) 401-0054 or novahavens.com/contact; closing ## Frequently Asked Questions with 3+ **Question?** blocks). motif is paw. It passes pnpm --filter @nova-havens/web validate:posts. It contains no coverage claim, no property count, no adjuster framing, no URL outside the allow-list, no invented statistics, and the disclaimer paragraph is present because the topic touches fire/flood displacement. The report includes a PR description with title, category, primary keyword and sources.
