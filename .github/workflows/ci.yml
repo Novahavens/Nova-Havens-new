@@ -18,6 +18,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
+      - name: Validate Markdown posts
+        run: pnpm --filter @nova-havens/web test:validator && pnpm --filter @nova-havens/web validate:posts
       - run: pnpm build
       - name: Install Playwright browser
         run: pnpm --filter @nova-havens/web exec playwright install --with-deps chromium

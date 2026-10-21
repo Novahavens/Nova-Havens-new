@@ -8,6 +8,7 @@ edited through pull requests:
 | Content                                                   | File                                                                                  | Rendered by                                           |
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | Blog posts                                                | `apps/web/src/content/blog.ts`                                                        | `/blog`, `/blog/[slug]`, OG images, sitemap, llms.txt |
+| Blog posts (markdown)                                     | `apps/web/content/posts/*.md` ← n8n weekly automation, or written by hand (docs/BLOGGING.md) | same pages, via `src/content/posts-md.ts`            |
 | FAQ                                                       | `apps/web/src/content/faqs.ts`                                                        | Home + About FAQ sections, FAQ schema                 |
 | How-it-works steps                                        | `apps/web/src/content/how-it-works.ts`                                                | Home tabs, HowTo schema                               |
 | Team (fallback roster)                                    | `apps/web/src/content/team.ts`                                                        | `/meet-the-team`, Person schema                       |
@@ -36,8 +37,15 @@ Jotform / Monday.com / Google Forms already hold the operational data.
 ## 2. When to add a CMS
 
 Add one when a non-developer needs to publish or edit content **without a
-pull request**, or when posts start arriving weekly. Until then, the file
-workflow is faster and safer.
+pull request**. Until then, the file workflow is faster and safer.
+
+Weekly posts no longer need a CMS: the blog automation (docs/BLOGGING.md,
+docs/blog-automation/PLAN.md) drafts four markdown posts a week into
+`apps/web/content/posts/` and opens a pull request; a human approves the
+topics, reviews the PR and merges. Edits happen in GitHub's web editor, and
+the same `validate:posts` check runs in CI. A CMS remains optional and, if
+one is added later, the three `source.ts` functions are still the only
+integration point.
 
 ## 3. Choosing a CMS for this stack
 

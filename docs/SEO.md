@@ -12,7 +12,7 @@ These are built in and need no configuration:
 | Signal                                                                                                                                           | Where it comes from                                                        |
 | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
 | Unique `<title>` and meta description on every page                                                                                              | `pageMetadata()` in `apps/web/src/lib/seo.ts`, called from each `page.tsx` |
-| Canonical URL on every page (`https://novahavens.com/...`, no trailing slash, no `www`)                                                          | same; base comes from `NEXT_PUBLIC_SITE_URL`                               |
+| Canonical URL on every page (`https://www.novahavens.com/...`, no trailing slash; the apex `novahavens.com` 308-redirects to `www`)               | same; base comes from `NEXT_PUBLIC_SITE_URL`                               |
 | Open Graph + Twitter cards, per-post generated social images                                                                                     | `pageMetadata()`, `app/blog/[slug]/opengraph-image.tsx`                    |
 | Structured data (JSON-LD): `LocalBusiness`, `WebSite`, `FAQPage`, `HowTo`, `BlogPosting`, `BreadcrumbList`, `Person`, `AboutPage`, `ContactPage` | `src/lib/seo.ts`                                                           |
 | `/sitemap.xml` with `lastmod` for every URL                                                                                                      | `app/sitemap.ts`                                                           |
@@ -20,7 +20,7 @@ These are built in and need no configuration:
 | `/llms.txt` machine-readable company index for AI assistants                                                                                     | `app/llms.txt/route.ts`                                                    |
 | Fully server-rendered HTML (no JavaScript needed to read any content)                                                                            | React Server Components                                                    |
 | Fast Core Web Vitals: self-hosted font, optimised images, minimal client JS                                                                      | `next/font`, `next/image`, server components                               |
-| 301 redirects for the old build's `/index.html` URLs; `www` → apex redirect                                                                      | `next.config.ts`; Vercel domain settings                                   |
+| 301 redirects for the old build's `/index.html` URLs; apex → `www` redirect                                                                      | `next.config.ts`; Vercel domain settings                                   |
 | `noindex` on preview deployments                                                                                                                 | Added automatically by Vercel                                              |
 
 ## 2. Google Search Console (GSC)
@@ -237,7 +237,7 @@ Google carry signals across.
 | Cadence                         | Task                                                                                                                                                                         |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Weekly (5 min)                  | Glance at GSC Performance and Pages. Look at the daily data-sync workflow run (figures stale?).                                                                              |
-| When publishing a post          | Add to `content/blog.ts` (and `content/llms.ts`), merge, then _Request indexing_ for the new URL. Share it on LinkedIn/Instagram/Facebook — social links drive first crawls. |
+| When publishing a post          | Automated posts arrive every Friday as a PR of `apps/web/content/posts/*.md` files (docs/BLOGGING.md); hand-written posts go in the same folder. `validate:posts` runs in CI on the PR. Review, merge, then _Request indexing_ for each new URL. Share it on LinkedIn/Instagram/Facebook — social links drive first crawls. |
 | Monthly                         | Run Lighthouse on `/` and one post; check GSC → Enhancements (FAQ, breadcrumbs) for new errors; review the top queries and refresh the matching page copy if it is thin.     |
 | Quarterly                       | Review `PUBLIC_STATS` in `site.ts` (families assisted, days to place) and the `lastmod` dates; update the year-end figures.                                                  |
 | Before any content/brand change | Keep URLs; keep H1 meaning; keep the FAQ Q&A structure (the FAQ schema is generated from it).                                                                                |

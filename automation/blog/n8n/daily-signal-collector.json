@@ -1,0 +1,1074 @@
+{
+  "name": "Blog · Daily Signal Collector",
+  "id": "NGZCzdK4xZ8ISYhu",
+  "description": "Daily 07:00 UTC: collects Google Trends, NWS alerts, FEMA declarations, Brave searches (furnished housing, guides, Furnished Finder blog) and optional Search Console queries; classifies, scores and upserts into the Signals tab of the Blog Automation sheet",
+  "nodes": [
+    {
+      "id": "5dcfd55f-2e9d-48e2-8fa5-3e4620512bcd",
+      "name": "Every day 07:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        576
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 7,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e7f099dc-556f-4a95-b66c-31dcfdc7f9dc",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        704
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "spreadsheetId",
+              "value": "1vpVWf9-Nv_ZElTa_v1T5HGx4NH5POhg8lClYB6SDCw4",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "workflowName",
+              "value": "Blog · Daily Signal Collector",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8dee99a1-3771-42a5-8f2a-5974bddef00a",
+      "name": "Read Config tab",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        704
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Config').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Config"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "74939ae4-a276-47a3-9fc9-209e2f4fd7b7",
+      "name": "Build config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        704
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const split = (v) => String(v || '').split('|').map(s => s.trim()).filter(Boolean);\nconst cfg = {};\nfor (const item of $input.all()) { if (item.json.key) cfg[String(item.json.key).trim()] = String(item.json.value ?? '').trim(); }\nconst queries = {\n  furnished_housing_trends: split(cfg['queries.furnished_housing_trends']),\n  furnished_housing_guides: split(cfg['queries.furnished_housing_guides']),\n  furnished_finder_weekly: split(cfg['queries.furnished_finder_weekly']),\n};\nconst keywords = {\n  disaster_alerts: split(cfg['keywords.disaster_alerts']).map(s => s.toLowerCase()),\n  furnished_housing_trends: split(cfg['keywords.furnished_housing_trends']).map(s => s.toLowerCase()),\n  furnished_housing_guides: split(cfg['keywords.furnished_housing_guides']).map(s => s.toLowerCase()),\n};\nreturn [{ json: { cfg, queries, keywords, siteUrl: cfg['site.url'] || 'https://www.novahavens.com', gscSite: cfg['gsc.site'] || 'sc-domain:novahavens.com', runAt: new Date().toISOString() } }];"
+      }
+    },
+    {
+      "id": "be6f5735-7882-45fb-97ea-a56e211b685c",
+      "name": "Google Trends RSS (US)",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        128
+      ],
+      "parameters": {
+        "url": "https://trends.google.com/trending/rss?geo=US",
+        "options": {}
+      },
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "8128d0f3-cc7b-402d-a90e-d30eb2da57a8",
+      "name": "Normalise Trends",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        128
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const out = [];\nfor (const { json } of $input.all()) {\n  if (!json || json.error || !json.title) continue;\n  const title = String(json.title).trim();\n  out.push({ json: { source: 'google_trends', category: 'other', title, url: 'https://trends.google.com/trending?geo=US&q=' + encodeURIComponent(title), summary: String(json.contentSnippet || json.content || '').slice(0, 300), region: 'US', published: json.isoDate || json.pubDate || '', weight: 0.8 } });\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "ee6d8629-4f5c-41d4-9880-9ebd610277ed",
+      "name": "All signals",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1328,
+        704
+      ],
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 7
+      }
+    },
+    {
+      "id": "0678bb61-acd0-428c-afac-958dfbce698a",
+      "name": "NWS active alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        320
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.weather.gov/alerts/active?status=actual&severity=Extreme,Severe&message_type=alert,update",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "(novahavens.com blog automation, ops@novahavens.com)"
+            },
+            {
+              "name": "Accept",
+              "value": "application/geo+json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "0bbc2478-618b-46da-8364-4b14dcf4cc9c",
+      "name": "Normalise NWS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const data = $input.first().json;\nconst features = Array.isArray(data && data.features) ? data.features : [];\nconst groups = {};\nfor (const f of features) {\n  const p = f.properties || {};\n  const event = p.event || 'Weather alert';\n  const ugc = (p.geocode && p.geocode.UGC) || [];\n  const states = Array.from(new Set(ugc.map(c => String(c).slice(0, 2))));\n  const g = groups[event] || (groups[event] = { event, count: 0, states: new Set(), headline: p.headline || '', severity: p.severity, url: p['@id'] || 'https://www.weather.gov/alerts', areas: [] });\n  g.count += 1; states.forEach(s => g.states.add(s)); if (g.areas.length < 3 && p.areaDesc) g.areas.push(String(p.areaDesc).split(';')[0]);\n}\nconst rows = Object.values(groups).sort((a, b) => b.count - a.count).slice(0, 12);\nreturn rows.map(g => ({ json: {\n  source: 'nws_alerts', category: 'disaster_alerts',\n  title: g.count + ' active ' + g.event + ' alert' + (g.count === 1 ? '' : 's') + ' (' + (g.severity || 'Severe') + ')',\n  url: g.url, summary: (g.headline || g.event) + '. Areas include ' + g.areas.join('; ') + '.',\n  region: Array.from(g.states).slice(0, 12).join(','), published: new Date().toISOString(), weight: 1.0, count: g.count\n} }));"
+      }
+    },
+    {
+      "id": "d0169003-3ad3-4e21-a56f-347ffb9b128c",
+      "name": "FEMA disaster declarations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        512
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$orderby=declarationDate%20desc&$top=80",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "8c988a1e-37e5-43d2-93d2-9214f5d1f31b",
+      "name": "Normalise FEMA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        512
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const data = $input.first().json;\nconst list = Array.isArray(data && data.DisasterDeclarationsSummaries) ? data.DisasterDeclarationsSummaries : [];\nconst since = Date.now() - 7 * 86400000;\nconst byNumber = {};\nfor (const d of list) {\n  const when = Date.parse(d.declarationDate || '');\n  if (!when || when < since) continue;\n  const g = byNumber[d.disasterNumber] || (byNumber[d.disasterNumber] = { ...d, areas: 0 });\n  g.areas += 1;\n}\nreturn Object.values(byNumber).map(d => ({ json: {\n  source: 'fema_declarations', category: 'disaster_alerts',\n  title: (d.declarationType === 'DR' ? 'Major disaster' : d.declarationType === 'EM' ? 'Emergency' : 'Fire management') + ' declaration: ' + (d.declarationTitle || d.incidentType) + ' (' + d.state + ')',\n  url: 'https://www.fema.gov/disaster/' + d.disasterNumber,\n  summary: (d.incidentType || 'Incident') + ' declared ' + String(d.declarationDate || '').slice(0, 10) + '; ' + d.areas + ' designated area(s); incident began ' + String(d.incidentBeginDate || '').slice(0, 10) + '.',\n  region: d.state || '', published: d.declarationDate || '', weight: 1.0\n} }));"
+      }
+    },
+    {
+      "id": "e973df93-a0d9-4a10-bc72-303ae5e64f18",
+      "name": "Trend queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        704
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return $input.first().json.queries.furnished_housing_trends.map(query => ({ json: { query, category: 'furnished_housing_trends' } }));"
+      }
+    },
+    {
+      "id": "c04452c8-8305-481f-aa71-4c914372dffe",
+      "name": "Brave · trends",
+      "type": "@brave/n8n-nodes-brave-search.braveSearch",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        704
+      ],
+      "parameters": {
+        "operation": "web",
+        "query": "={{ $json.query }}",
+        "count": 10,
+        "additionalParameters": {
+          "country": "US",
+          "search_lang": "en",
+          "freshness": "pw",
+          "result_filter": [
+            "web",
+            "news"
+          ],
+          "text_decorations": false
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "4727497c-ca97-4133-88c3-68a75a9539d2",
+      "name": "Normalise Brave trends",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        704
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const category = 'furnished_housing_trends'; const base = 0.5;\nconst out = []; const seen = new Set();\nconst collect = (arr, source) => { for (const r of (Array.isArray(arr) ? arr : [])) {\n  if (!r || !r.url || !r.title || seen.has(r.url)) continue; seen.add(r.url);\n  out.push({ json: { source, category, title: String(r.title).replace(/<[^>]+>/g, '').trim(), url: r.url, summary: String(r.description || (r.extra_snippets && r.extra_snippets[0]) || '').replace(/<[^>]+>/g, '').slice(0, 300), region: 'US', published: r.page_age || r.age || '', weight: source === 'brave_news' ? base + 0.2 : base } });\n} };\nfor (const { json } of $input.all()) { if (!json || json.error) continue; collect(json.web && json.web.results, 'brave_web'); collect(json.news && json.news.results, 'brave_news'); collect(json.results, 'brave_web'); }\nreturn out;"
+      }
+    },
+    {
+      "id": "c09e1483-429b-4459-9242-10bb8f28fef0",
+      "name": "Guide queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        896
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return $input.first().json.queries.furnished_housing_guides.map(query => ({ json: { query, category: 'furnished_housing_guides' } }));"
+      }
+    },
+    {
+      "id": "44632172-4a23-44d8-a2df-bceecf373013",
+      "name": "Brave · guides",
+      "type": "@brave/n8n-nodes-brave-search.braveSearch",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        896
+      ],
+      "parameters": {
+        "operation": "web",
+        "query": "={{ $json.query }}",
+        "count": 10,
+        "additionalParameters": {
+          "country": "US",
+          "search_lang": "en",
+          "freshness": "pw",
+          "result_filter": [
+            "web",
+            "news"
+          ],
+          "text_decorations": false
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "b00e9bc8-74ed-4dd7-948d-bf990acdc234",
+      "name": "Normalise Brave guides",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        896
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const category = 'furnished_housing_guides'; const base = 0.5;\nconst out = []; const seen = new Set();\nconst collect = (arr, source) => { for (const r of (Array.isArray(arr) ? arr : [])) {\n  if (!r || !r.url || !r.title || seen.has(r.url)) continue; seen.add(r.url);\n  out.push({ json: { source, category, title: String(r.title).replace(/<[^>]+>/g, '').trim(), url: r.url, summary: String(r.description || (r.extra_snippets && r.extra_snippets[0]) || '').replace(/<[^>]+>/g, '').slice(0, 300), region: 'US', published: r.page_age || r.age || '', weight: source === 'brave_news' ? base + 0.2 : base } });\n} };\nfor (const { json } of $input.all()) { if (!json || json.error) continue; collect(json.web && json.web.results, 'brave_web'); collect(json.news && json.news.results, 'brave_news'); collect(json.results, 'brave_web'); }\nreturn out;"
+      }
+    },
+    {
+      "id": "56019487-9551-4601-b02e-df651392a5e0",
+      "name": "Furnished Finder queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        1088
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return $input.first().json.queries.furnished_finder_weekly.map(query => ({ json: { query, category: 'furnished_finder_weekly' } }));"
+      }
+    },
+    {
+      "id": "9cb4150e-a39a-413b-8236-2a538a38c058",
+      "name": "Brave · Furnished Finder blog",
+      "type": "@brave/n8n-nodes-brave-search.braveSearch",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        1088
+      ],
+      "parameters": {
+        "operation": "web",
+        "query": "={{ $json.query }}",
+        "count": 20,
+        "additionalParameters": {
+          "country": "US",
+          "search_lang": "en",
+          "freshness": "pw",
+          "result_filter": [
+            "web",
+            "news"
+          ],
+          "text_decorations": false
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "02d6cb3a-b5d2-42f3-bf40-5ec30d816e6d",
+      "name": "Normalise Furnished Finder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1088
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const category = 'furnished_finder_weekly'; const base = 0.6;\nconst out = []; const seen = new Set();\nconst collect = (arr, source) => { for (const r of (Array.isArray(arr) ? arr : [])) {\n  if (!r || !r.url || !r.title || seen.has(r.url)) continue; seen.add(r.url);\n  out.push({ json: { source, category, title: String(r.title).replace(/<[^>]+>/g, '').trim(), url: r.url, summary: String(r.description || (r.extra_snippets && r.extra_snippets[0]) || '').replace(/<[^>]+>/g, '').slice(0, 300), region: 'US', published: r.page_age || r.age || '', weight: source === 'brave_news' ? base + 0.2 : base } });\n} };\nfor (const { json } of $input.all()) { if (!json || json.error) continue; collect(json.web && json.web.results, 'brave_web'); collect(json.news && json.news.results, 'brave_news'); collect(json.results, 'brave_web'); }\nreturn out;"
+      }
+    },
+    {
+      "id": "76094fba-f02a-4a4c-b8ac-dc59cbcd0fcf",
+      "name": "Search Console · top queries (optional)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        1280
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://searchconsole.googleapis.com/webmasters/v3/sites/{{ encodeURIComponent($json.gscSite) }}/searchAnalytics/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ startDate: $today.minus({ days: 10 }).toISODate(), endDate: $today.minus({ days: 3 }).toISODate(), dimensions: [\"query\"], rowLimit: 50 }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "disabled": true,
+      "executeOnce": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "5f211ae2-d66c-4708-872f-d738b268f1ea",
+      "name": "Normalise Search Console",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        1280
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const data = $input.first().json;\nconst rows = Array.isArray(data && data.rows) ? data.rows : [];\nconst site = $('Build config').first().json.siteUrl;\nreturn rows.slice(0, 50).map(r => ({ json: { source: 'search_console', category: 'other', title: String(r.keys && r.keys[0] || '').trim(), url: site, summary: 'clicks ' + (r.clicks || 0) + ', impressions ' + (r.impressions || 0) + ', avg position ' + Number(r.position || 0).toFixed(1), region: 'US', published: new Date().toISOString(), weight: 0.9, impressions: r.impressions || 0 } })).filter(i => i.json.title);"
+      }
+    },
+    {
+      "id": "0ff24203-99fa-4941-9615-d5d75702ad75",
+      "name": "Classify, score, dedupe",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        784
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const cfg = $('Build config').first().json;\nconst kw = cfg.keywords;\nconst hash = (s) => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; return h.toString(36); };\nconst now = new Date();\nconst seen = new Set();\nconst out = [];\nfor (const { json } of $input.all()) {\n  if (!json || !json.title) continue;\n  const text = (json.title + ' ' + (json.summary || '')).toLowerCase();\n  const hits = (list) => list.filter(k => text.includes(k)).length;\n  let category = json.category;\n  let kwHits = 0;\n  if (category === 'other') {\n    const scores = { disaster_alerts: hits(kw.disaster_alerts), furnished_housing_trends: hits(kw.furnished_housing_trends), furnished_housing_guides: hits(kw.furnished_housing_guides) };\n    const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];\n    if (best && best[1] > 0) { category = best[0]; kwHits = best[1]; }\n  } else {\n    kwHits = hits(kw[category] || []);\n  }\n  const key = (json.url && !json.url.endsWith('novahavens.com') ? json.url : json.title).toLowerCase().replace(/[^a-z0-9]+/g, '');\n  const signal_id = category + ':' + hash(key);\n  if (seen.has(signal_id)) continue; seen.add(signal_id);\n  const ageDays = json.published ? Math.max(0, (now - new Date(json.published)) / 86400000) : 2;\n  const recency = isFinite(ageDays) ? Math.max(0.3, 1 - ageDays / 14) : 0.6;\n  const score = Math.round(100 * Math.min(1, (json.weight || 0.5) * recency * (1 + 0.15 * kwHits) * (json.count ? Math.min(1.5, 1 + json.count / 50) : 1) * (json.impressions ? Math.min(1.5, 1 + json.impressions / 500) : 1)));\n  const raw = { ...json }; delete raw.summary; delete raw.title;\n  out.push({ json: { signal_id, collected_at: now.toISOString(), category, source: json.source, title: json.title.slice(0, 200), url: json.url || '', summary: (json.summary || '').slice(0, 400), region: json.region || '', score, raw_json: JSON.stringify(raw).slice(0, 800) } });\n}\nreturn out.sort((a, b) => b.json.score - a.json.score);"
+      }
+    },
+    {
+      "id": "3c0b7da2-b62d-414c-a40d-59561ad6b12d",
+      "name": "Upsert Signals",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1776,
+        784
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Config').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Signals"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "signal_id"
+          ],
+          "schema": [
+            {
+              "id": "signal_id",
+              "displayName": "signal_id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "collected_at",
+              "displayName": "collected_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "region",
+              "displayName": "region",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "raw_json",
+              "displayName": "raw_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {
+          "handlingExtraData": "ignoreIt",
+          "cellFormat": "RAW"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "97259313-df7b-4709-b799-32f5c2b526bc",
+      "name": "Run summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        784
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const rows = $('Classify, score, dedupe').all();\nconst bySource = {}; const byCat = {};\nfor (const { json } of rows) { bySource[json.source] = (bySource[json.source] || 0) + 1; byCat[json.category] = (byCat[json.category] || 0) + 1; }\nreturn [{ json: { run_at: new Date().toISOString(), workflow: $('Config').first().json.workflowName, status: rows.length ? 'ok' : 'empty', items: rows.length, notes: 'by source ' + JSON.stringify(bySource) + ' · by category ' + JSON.stringify(byCat) } }];"
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "57bab8ae-518f-40bf-9eb2-30b7ec8a2c6d",
+      "name": "Log run",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2224,
+        784
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Config').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Runs"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "3f591735-5853-4afb-810a-6ecfaa8af948",
+      "name": "Sticky Note 31ea560e",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        480
+      ],
+      "parameters": {
+        "content": "## Blog · Daily Signal Collector\nRuns every day at 07:00 UTC. Reads the Config tab, pulls free public feeds (Google Trends, NWS alerts, FEMA declarations, Brave searches for furnished-housing topics and the Furnished Finder blog, optionally Search Console), classifies and scores every item, and upserts it into the **Signals** tab keyed by signal_id. The Friday Synthesizer reads the last 7 days from that tab.\n\nSearch queries and keyword rules live in the Config tab — no workflow edit needed to tune them. Enable the Search Console node once a Google OAuth credential with webmasters.readonly exists.\n\nSee docs/BLOGGING.md and docs/blog-automation/PLAN.md in the site repo.",
+        "width": 880,
+        "height": 352
+      }
+    }
+  ],
+  "connections": {
+    "Every day 07:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Read Config tab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Config tab": {
+      "main": [
+        [
+          {
+            "node": "Build config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build config": {
+      "main": [
+        [
+          {
+            "node": "Google Trends RSS (US)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "NWS active alerts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FEMA disaster declarations",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trend queries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Guide queries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Furnished Finder queries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search Console · top queries (optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Trends RSS (US)": {
+      "main": [
+        [
+          {
+            "node": "Normalise Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise Trends": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All signals": {
+      "main": [
+        [
+          {
+            "node": "Classify, score, dedupe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NWS active alerts": {
+      "main": [
+        [
+          {
+            "node": "Normalise NWS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise NWS": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "FEMA disaster declarations": {
+      "main": [
+        [
+          {
+            "node": "Normalise FEMA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise FEMA": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Trend queries": {
+      "main": [
+        [
+          {
+            "node": "Brave · trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brave · trends": {
+      "main": [
+        [
+          {
+            "node": "Normalise Brave trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise Brave trends": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Guide queries": {
+      "main": [
+        [
+          {
+            "node": "Brave · guides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brave · guides": {
+      "main": [
+        [
+          {
+            "node": "Normalise Brave guides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise Brave guides": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Furnished Finder queries": {
+      "main": [
+        [
+          {
+            "node": "Brave · Furnished Finder blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brave · Furnished Finder blog": {
+      "main": [
+        [
+          {
+            "node": "Normalise Furnished Finder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise Furnished Finder": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Search Console · top queries (optional)": {
+      "main": [
+        [
+          {
+            "node": "Normalise Search Console",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise Search Console": {
+      "main": [
+        [
+          {
+            "node": "All signals",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Classify, score, dedupe": {
+      "main": [
+        [
+          {
+            "node": "Upsert Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Signals": {
+      "main": [
+        [
+          {
+            "node": "Run summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run summary": {
+      "main": [
+        [
+          {
+            "node": "Log run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "UTC",
+    "executionTimeout": 1800,
+    "errorWorkflow": "IXnMBhGgS4nkS4gy"
+  },
+  "nodeGroups": [
+    {
+      "id": "0153f1fb-30cd-47c7-a9e9-40d5097ba930",
+      "name": "1 · Config",
+      "nodeNames": [
+        "Config",
+        "Read Config tab",
+        "Build config"
+      ]
+    },
+    {
+      "id": "c0d5bbda-2832-43cb-bf8a-d62088206c3a",
+      "name": "2 · Google Trends",
+      "nodeNames": [
+        "Google Trends RSS (US)",
+        "Normalise Trends"
+      ]
+    },
+    {
+      "id": "797daf9c-169a-4229-a5cb-9475825c001c",
+      "name": "3 · NWS alerts",
+      "nodeNames": [
+        "NWS active alerts",
+        "Normalise NWS"
+      ]
+    },
+    {
+      "id": "4078c432-0f4c-400f-8b51-19fbb2b7a9ce",
+      "name": "4 · FEMA declarations",
+      "nodeNames": [
+        "FEMA disaster declarations",
+        "Normalise FEMA"
+      ]
+    },
+    {
+      "id": "e40ef0a9-2763-4bb5-905f-0a1030415b79",
+      "name": "5 · Brave · furnished housing trends",
+      "nodeNames": [
+        "Trend queries",
+        "Brave · trends",
+        "Normalise Brave trends"
+      ]
+    },
+    {
+      "id": "c7543464-b9d7-40d0-83e7-5c01e6c4d428",
+      "name": "6 · Brave · furnished housing guides",
+      "nodeNames": [
+        "Guide queries",
+        "Brave · guides",
+        "Normalise Brave guides"
+      ]
+    },
+    {
+      "id": "3da2b03b-4c3c-40bb-980c-1e312c533763",
+      "name": "7 · Brave · Furnished Finder weekly",
+      "nodeNames": [
+        "Furnished Finder queries",
+        "Brave · Furnished Finder blog",
+        "Normalise Furnished Finder"
+      ]
+    },
+    {
+      "id": "4848561c-cd50-426d-8e3c-74f527f1c505",
+      "name": "8 · Search Console (optional)",
+      "nodeNames": [
+        "Search Console · top queries (optional)",
+        "Normalise Search Console"
+      ]
+    },
+    {
+      "id": "40f862a8-0c9d-4705-a08c-d968de8babd1",
+      "name": "9 · Classify and store",
+      "nodeNames": [
+        "All signals",
+        "Classify, score, dedupe",
+        "Upsert Signals",
+        "Run summary",
+        "Log run"
+      ]
+    }
+  ],
+  "tags": [
+    "blog-automation"
+  ],
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "instanceUrl": "https://novahavensai.app.n8n.cloud",
+    "exportedAt": "2026-10-20T16:21:09.850Z"
+  }
+}

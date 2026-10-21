@@ -1,0 +1,884 @@
+{
+  "name": "Blog · Setup (run once)",
+  "id": "C1vJ8PFpjud8Ke43",
+  "description": "Creates (or reuses) the master \"Nova Havens · Blog Automation\" Google Sheet, writes header rows for Signals/Briefs/Posts/Runs and seeds the Config tab.",
+  "nodes": [
+    {
+      "id": "2a1f2fec-509a-43cb-99d5-33bbbc0af906",
+      "name": "Run once",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        384
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "60492e78-d781-4a44-917d-53abc2a84d51",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        384
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "existingSpreadsheetId",
+              "value": "1vpVWf9-Nv_ZElTa_v1T5HGx4NH5POhg8lClYB6SDCw4",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "title",
+              "value": "Nova Havens · Blog Automation",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c046574a-4559-4891-8913-49b1dded9dff",
+      "name": "Reuse existing spreadsheet?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        384
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.existingSpreadsheetId }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "e37f4b58-c388-483b-bac3-da5010aba03c",
+      "name": "Use existing spreadsheet",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        288
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "spreadsheetId",
+              "value": "={{ $json.existingSpreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "spreadsheetUrl",
+              "value": "=https://docs.google.com/spreadsheets/d/{{ $json.existingSpreadsheetId }}/edit",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8308ca44-9370-4d5c-b3e8-50451ee750c3",
+      "name": "Resolve spreadsheet",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        384
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "spreadsheetId",
+              "value": "={{ $json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "r2",
+              "name": "spreadsheetUrl",
+              "value": "={{ $json.spreadsheetUrl }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "08bee510-85ed-4a28-ba4f-54d511c59e72",
+      "name": "Create master spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        480
+      ],
+      "parameters": {
+        "resource": "spreadsheet",
+        "operation": "create",
+        "authentication": "oAuth2",
+        "title": "={{ $json.title }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Config"
+            },
+            {
+              "title": "Signals"
+            },
+            {
+              "title": "Briefs"
+            },
+            {
+              "title": "Posts"
+            },
+            {
+              "title": "Runs"
+            }
+          ]
+        },
+        "options": {
+          "locale": "en_US"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "91f7ad32-3fc3-480b-889c-bc1bc65937e9",
+      "name": "Config rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const rows = [\n  ['recipients.approver', 'william@novahavens.com', 'Receives the Friday approval email and the PR link'],\n  ['recipients.ops', 'fazal@novahavens.com', 'Receives error alerts and decline notices'],\n  ['site.url', 'https://www.novahavens.com', 'Canonical site; used to read the sitemap for existing slugs'],\n  ['github.repo', 'Novahavens/Nova-Havens-new', 'owner/repo the PR is opened on'],\n  ['github.base', 'main', 'Base branch for the weekly PR'],\n  ['posts.path', 'apps/web/content/posts', 'Folder the markdown posts are written to'],\n  ['gsc.site', 'sc-domain:novahavens.com', 'Search Console property (only used when the GSC credential exists)'],\n  ['queries.furnished_housing_trends', 'furnished housing | furnished apartments for rent | furnished rentals near me | temporary housing after house fire | corporate housing furnished', 'Pipe-separated Brave searches, past week'],\n  ['queries.furnished_housing_guides', 'how to find furnished housing | furnished rental checklist | what is included in a furnished apartment | short term furnished rental tips | temporary housing while home is repaired', 'Pipe-separated Brave searches, past week'],\n  ['queries.furnished_finder_weekly', 'site:furnishedfinder.com blog | \"Furnished Finder\" blog mid-term rental | furnished finder landlord tips travel nurse housing | mid-term rental landlord blog this week', 'Pipe-separated Brave searches, past week; titles and snippets only (site:…/blog returns nothing)'],\n  ['keywords.disaster_alerts', 'hurricane | wildfire | flood | flooding | tornado | earthquake | storm | evacuation | fema | blizzard | winter storm | disaster | tropical | typhoon | mudslide | landslide', 'Pipe-separated; routes Google Trends items'],\n  ['keywords.furnished_housing_trends', 'furnished | rental | rentals | rent | apartment | housing | relocation | corporate housing | temporary housing | extended stay | airbnb | vrbo | landlord', 'Pipe-separated; routes Google Trends items'],\n  ['keywords.furnished_housing_guides', 'how to | guide | checklist | tips | what to bring | lease | deposit | inventory | move in | move-in', 'Pipe-separated; routes Google Trends items'],\n  ['limits.signals_per_category', '15', 'Top-N signals per category passed to the brief writer'],\n  ['limits.approval_hours', '48', 'Hours the Friday email waits for a decision'],\n];\nreturn rows.map(([key, value, notes]) => ({ json: { key, value, notes } }));"
+      }
+    },
+    {
+      "id": "2d955468-b7ed-4361-98d5-1888c6e8e81f",
+      "name": "Upsert Config",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Resolve spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Config"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "key",
+              "id": "key",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "value",
+              "id": "value",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": false,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "notes",
+              "id": "notes",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "matchingColumns": [
+            "key"
+          ]
+        },
+        "options": {
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "035f7fc2-1f5f-45a3-8b88-a18af1492268",
+      "name": "Seed Signals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        192
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: Object.fromEntries(['signal_id','collected_at','category','source','title','url','summary','region','score','raw_json'].map(k => [k, ''])) }];"
+      }
+    },
+    {
+      "id": "d2020fe9-1334-4038-ae37-c335b728d32d",
+      "name": "Header Signals",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        192
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Signals"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "a3bb5fb5-0c81-45b8-8082-620b66aadfd9",
+      "name": "Drop seed row Signals",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        192
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "delete",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Signals"
+        },
+        "toDelete": "rows",
+        "startIndex": 2,
+        "numberToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "263db18a-838e-4a9a-b0f2-c146688cad1b",
+      "name": "Seed Briefs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        384
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: Object.fromEntries(['brief_id','week','category','blog_category','proposed_title','angle','target_keywords','outline','evidence_ids','why_now','risk_notes','status','decided_at'].map(k => [k, ''])) }];"
+      }
+    },
+    {
+      "id": "c9f0236a-1a3f-4f76-bef1-79a807f5b411",
+      "name": "Header Briefs",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        384
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Briefs"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "323ac19a-5e48-4361-a648-8996144382d1",
+      "name": "Drop seed row Briefs",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        384
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "delete",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Briefs"
+        },
+        "toDelete": "rows",
+        "startIndex": 2,
+        "numberToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "8f5d95f9-36fd-4abb-8f11-dd2c29c926de",
+      "name": "Seed Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        576
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: Object.fromEntries(['post_id','week','brief_id','slug','title','blog_category','excerpt','keywords','motif','cta','word_count','validation','pr_url','status','created_at'].map(k => [k, ''])) }];"
+      }
+    },
+    {
+      "id": "bed0a33e-b915-4105-998c-f59203b2ee08",
+      "name": "Header Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        576
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Posts"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "fbba851e-ec13-4ae0-b3ba-177f581bfb84",
+      "name": "Drop seed row Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        576
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "delete",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Posts"
+        },
+        "toDelete": "rows",
+        "startIndex": 2,
+        "numberToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "c0b13e92-fa86-4132-92d5-489208b707c4",
+      "name": "Seed Runs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        768
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: Object.fromEntries(['run_at','workflow','status','items','notes'].map(k => [k, ''])) }];"
+      }
+    },
+    {
+      "id": "27d3bad2-31b6-4a4b-8637-553dfb7d6df0",
+      "name": "Header Runs",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        768
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Runs"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "0fddc72b-1560-4456-b8a7-15a05ec7f2da",
+      "name": "Drop seed row Runs",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        768
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "delete",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create master spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Runs"
+        },
+        "toDelete": "rows",
+        "startIndex": 2,
+        "numberToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ugfg7LMQrjVuAdAa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "1917c3ef-8453-4fd4-b47c-4a5084449bc4",
+      "name": "Sticky Note 7e4181e2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        192
+      ],
+      "parameters": {
+        "content": "## Blog · Setup (run once)\nCreates the master Google Sheet \"Nova Havens · Blog Automation\" with the five tabs, writes the header rows and seeds the Config tab.\n\n- Leave **Settings → existingSpreadsheetId** empty to create a new spreadsheet (headers + Config).\n- Put an ID there to refresh the **Config** tab of an existing spreadsheet (upsert by key; data tabs are left untouched).\n\nCopy the spreadsheet ID from **Resolve spreadsheet** into the Config node of the Daily Collector and Friday Synthesizer workflows.",
+        "width": 1056,
+        "height": 416
+      }
+    }
+  ],
+  "connections": {
+    "Run once": {
+      "main": [
+        [
+          {
+            "node": "Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings": {
+      "main": [
+        [
+          {
+            "node": "Reuse existing spreadsheet?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reuse existing spreadsheet?": {
+      "main": [
+        [
+          {
+            "node": "Use existing spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create master spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use existing spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Resolve spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Config rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create master spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Resolve spreadsheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Seed Signals",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Seed Briefs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Seed Posts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Seed Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config rows": {
+      "main": [
+        [
+          {
+            "node": "Upsert Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seed Signals": {
+      "main": [
+        [
+          {
+            "node": "Header Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Header Signals": {
+      "main": [
+        [
+          {
+            "node": "Drop seed row Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seed Briefs": {
+      "main": [
+        [
+          {
+            "node": "Header Briefs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Header Briefs": {
+      "main": [
+        [
+          {
+            "node": "Drop seed row Briefs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seed Posts": {
+      "main": [
+        [
+          {
+            "node": "Header Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Header Posts": {
+      "main": [
+        [
+          {
+            "node": "Drop seed row Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seed Runs": {
+      "main": [
+        [
+          {
+            "node": "Header Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Header Runs": {
+      "main": [
+        [
+          {
+            "node": "Drop seed row Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "nodeGroups": [
+    {
+      "id": "afa9e8ac-767f-4a07-97f4-ce807e302d4d",
+      "name": "1 · Settings",
+      "nodeNames": [
+        "Settings",
+        "Reuse existing spreadsheet?"
+      ],
+      "description": "Reuse the ID in Settings, or create a new spreadsheet"
+    },
+    {
+      "id": "4247241f-75a3-4ff6-a0fa-3282438302e3",
+      "name": "2 · Config (upsert by key)",
+      "nodeNames": [
+        "Resolve spreadsheet",
+        "Config rows",
+        "Upsert Config"
+      ]
+    },
+    {
+      "id": "b86c7e1e-c7a8-43a1-a6d2-27e502c2badf",
+      "name": "3 · Signals headers (new sheet only)",
+      "nodeNames": [
+        "Seed Signals",
+        "Header Signals",
+        "Drop seed row Signals"
+      ]
+    },
+    {
+      "id": "e4509725-ac59-40e0-a54f-60ced9f9fd36",
+      "name": "4 · Briefs headers (new sheet only)",
+      "nodeNames": [
+        "Seed Briefs",
+        "Header Briefs",
+        "Drop seed row Briefs"
+      ]
+    },
+    {
+      "id": "c2f720b2-2a18-4edf-9fa2-85b2fd23d0d3",
+      "name": "5 · Posts headers (new sheet only)",
+      "nodeNames": [
+        "Seed Posts",
+        "Header Posts",
+        "Drop seed row Posts"
+      ]
+    },
+    {
+      "id": "b0059e2c-33e5-4b54-9187-70069a21e59b",
+      "name": "6 · Runs headers (new sheet only)",
+      "nodeNames": [
+        "Seed Runs",
+        "Header Runs",
+        "Drop seed row Runs"
+      ]
+    }
+  ],
+  "tags": [
+    "blog-automation"
+  ],
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "instanceUrl": "https://novahavensai.app.n8n.cloud",
+    "exportedAt": "2026-10-20T16:18:30.346Z"
+  }
+}
